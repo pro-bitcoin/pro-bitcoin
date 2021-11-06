@@ -35,7 +35,7 @@ global_task_template: &GLOBAL_TASK_TEMPLATE
   container:
     # https://cirrus-ci.org/faq/#are-there-any-limits
     # Each project has 16 CPU in total, assign 2 to each container, so that 8 tasks run in parallel
-    cpu: 2
+    cpu: 4
     memory: 8G  # Set to 8GB to avoid OOM. https://cirrus-ci.org/guide/linux/#linux-containers
   ccache_cache:
     folder: "/tmp/ccache_dir"
@@ -85,6 +85,7 @@ task:
 
 task:
   name: 'ARM [unit tests, no functional tests] [buster]'
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: debian:buster
@@ -94,6 +95,7 @@ task:
 
 task:
   name: 'Win64 [unit tests, no gui tests, no boost::process, no functional tests] [focal]'
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:focal
@@ -103,6 +105,7 @@ task:
 
 task:
   name: '32-bit + dash [gui] [CentOS 8]'
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: centos:8
@@ -113,6 +116,7 @@ task:
 
 task:
   name: '[previous releases, uses qt5 dev package and some depends packages, DEBUG] [unsigned char] [bionic]'
+  only_if: false
   previous_releases_cache:
     folder: "releases"
   << : *GLOBAL_TASK_TEMPLATE
@@ -123,6 +127,7 @@ task:
 
 task:
   name: '[depends, sanitizers: thread (TSan), no gui] [hirsute]'
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:hirsute
@@ -135,6 +140,7 @@ task:
 
 task:
   name: '[depends, sanitizers: memory (MSan)] [focal]'
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:focal
@@ -144,6 +150,7 @@ task:
 
 task:
   name: '[no depends, sanitizers: address/leak (ASan + LSan) + undefined (UBSan) + integer] [hirsute]'
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:hirsute
@@ -153,7 +160,7 @@ task:
 
 task:
   name: '[no depends, sanitizers: fuzzer,address,undefined,integer] [focal]'
-  only_if: $CIRRUS_BRANCH == $CIRRUS_DEFAULT_BRANCH || $CIRRUS_BASE_BRANCH == $CIRRUS_DEFAULT_BRANCH
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:focal
@@ -166,6 +173,7 @@ task:
 
 task:
   name: '[multiprocess, DEBUG] [focal]'
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:focal
@@ -187,6 +195,7 @@ task:
 
 task:
   name: 'macOS 10.14 [gui, no tests] [focal]'
+  only_if: false
   << : *DEPENDS_SDK_CACHE_TEMPLATE
   << : *GLOBAL_TASK_TEMPLATE
   container:
@@ -197,6 +206,7 @@ task:
 
 task:
   name: 'macOS 11 native [gui] [no depends]'
+  only_if: false
   brew_install_script:
     - brew install boost libevent berkeley-db4 qt@5 miniupnpc libnatpmp ccache zeromq qrencode sqlite libtool automake pkg-config gnu-getopt
   << : *GLOBAL_TASK_TEMPLATE
@@ -211,6 +221,7 @@ task:
 
 task:
   name: 'ARM64 Android APK [focal]'
+  only_if: false
   << : *DEPENDS_SDK_CACHE_TEMPLATE
   depends_sources_cache:
     folder: "depends/sources"

@@ -126,6 +126,12 @@ AC_ARG_WITH([sqlite],
   [use_sqlite=$withval],
   [use_sqlite=auto])
 
+AC_ARG_WITH([prometheus],
+  [AS_HELP_STRING([--with-prometheus=yes|no|auto],
+  [enable prometheus])],
+  [use_prometheus=$withval],
+  [use_prometheus=yes])
+
 AC_ARG_WITH([bdb],
   [AS_HELP_STRING([--without-bdb],
   [disable bdb wallet support (default is enabled if wallet is enabled)])],
@@ -1309,6 +1315,9 @@ else
   CPPFLAGS="$CPPFLAGS -DPROVIDE_FUZZ_MAIN_FUNCTION"
 fi
 
+
+PKG_CHECK_MODULES([PROMETHEUS], [prometheus-cpp-core >= 0.12.0, prometheus-cpp-pull >= 0.12.0], [use_prometheus=yes], [AC_MSG_ERROR([libprometheus-cpp-core version 0.12.0 or greater not found.])])
+
 if test x$enable_wallet != xno; then
     dnl Check for libdb_cxx only if wallet enabled
     if test "x$use_bdb" != "xno"; then
@@ -1836,6 +1845,7 @@ AC_SUBST(USE_UPNP)
 AC_SUBST(USE_QRCODE)
 AC_SUBST(BOOST_LIBS)
 AC_SUBST(SQLITE_LIBS)
+AC_SUBST(PROMETHEUS_LIBS)
 AC_SUBST(TESTDEFS)
 AC_SUBST(MINIUPNPC_CPPFLAGS)
 AC_SUBST(MINIUPNPC_LIBS)

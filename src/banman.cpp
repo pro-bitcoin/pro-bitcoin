@@ -10,7 +10,9 @@
 #include <util/system.h>
 #include <util/time.h>
 #include <util/translation.h>
+#include <metrics/container.h>
 
+static const auto& metricsContainer = metrics::Instance();
 
 BanMan::BanMan(fs::path ban_file, CClientUIInterface* client_interface, int64_t default_ban_time)
     : m_client_interface(client_interface), m_ban_db(std::move(ban_file)), m_default_ban_time(default_ban_time)
@@ -127,6 +129,7 @@ void BanMan::Ban(const CSubNet& sub_net, int64_t ban_time_offset, bool since_uni
 
     {
         LOCK(m_cs_banned);
+        metricsContainer->Peer().Banned(m_banned.size());
         if (m_banned[sub_net].nBanUntil < ban_entry.nBanUntil) {
             m_banned[sub_net] = ban_entry;
             m_is_dirty = true;

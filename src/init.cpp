@@ -1309,7 +1309,7 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
 
     RegisterValidationInterface(new metrics::MetricsNotificationsInterface(metrics::Instance()->Block(), metrics::Instance()->MemPool()));
 #if ENABLE_ZMQ
-    mg_zmq_notification_interface = CZMQNotificationInterface::Create();
+    g_zmq_notification_interface = CZMQNotificationInterface::Create();
 
     if (g_zmq_notification_interface) {
         RegisterValidationInterface(g_zmq_notification_interface);

@@ -48,18 +48,11 @@ PeerMetricsImpl::PeerMetricsImpl(const std::string& chain, prometheus::Registry&
     _send_msg_timer = nullptr;
     //_send_msg_timer = &FamilySummary("peer_send_time").Add({}, quantiles, window);
     auto& _permission_family = FamilyGauge("peer_permission");
-    _permission_gauge = {
-        {NetPermissionFlags::None, &_permission_family.Add({{"type", "none"}})},
-        {NetPermissionFlags::BloomFilter, &_permission_family.Add({{"type", "bloomfilter"}})},
-        {NetPermissionFlags::Relay, &_permission_family.Add({{"type", "relay"}})},
-        {NetPermissionFlags::ForceRelay, &_permission_family.Add({{"type", "force-relay"}})},
-        {NetPermissionFlags::Download, &_permission_family.Add({{"type", "download"}})},
-        {NetPermissionFlags::NoBan, &_permission_family.Add({{"type", "noban"}})},
-        {NetPermissionFlags::Mempool, &_permission_family.Add({{"type", "mempool"}})},
-        {NetPermissionFlags::Addr, &_permission_family.Add({{"type", "addr"}})},
-        {NetPermissionFlags::Implicit, &_permission_family.Add({{"type", "implicit"}})},
-        {NetPermissionFlags::All, &_permission_family.Add({{"type", "all"}})},
-    };
+
+    // net_permission.h
+    for (const std::string& ty : std::vector<std::string>{"all", "none", "bloomfilter", "relay", "forcerelay", "download", "noban", "mempool", "addr", "implicit"}) {
+        _permission_gauge.insert({ty, &_permission_family.Add({{"type", ty}})});
+    }
     initConnections();
 }
 
@@ -116,7 +109,7 @@ void PeerMetricsImpl::ConnectionType(int type, uint amt)
     auto found = _connections_gauge.at(type);
     found->Set(amt);
 }
-void PeerMetricsImpl::Permission(NetPermissionFlags permission, uint amt)
+void PeerMetricsImpl::Permission(const std::string& permission, uint amt)
 {
     auto found = this->_permission_gauge.find(permission);
     if (found == this->_permission_gauge.end()) {

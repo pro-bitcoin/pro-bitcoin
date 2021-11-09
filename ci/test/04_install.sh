@@ -41,8 +41,8 @@ if [ -z "$DANGER_RUN_CI_ON_HOST" ]; then
 
   DOCKER_ID=$(docker run $DOCKER_ADMIN --rm --interactive --detach --tty \
                   --mount type=bind,src=$BASE_ROOT_DIR,dst=/ro_base,readonly \
-                  --mount type=bind,src=$CCACHE_DIR,dst=$CCACHE_DIR \
                   --mount type=bind,src=$DEPENDS_DIR,dst=$DEPENDS_DIR \
+                  --mount type=bind,src=$BASE_SCRATCH_DIR,dst=$BASE_SCRATCH_DIR \
                   --mount type=bind,src=$PREVIOUS_RELEASES_DIR,dst=$PREVIOUS_RELEASES_DIR \
                   -w $BASE_ROOT_DIR \
                   --env-file /tmp/env \
@@ -85,10 +85,7 @@ DOCKER_EXEC echo "Free disk space:"
 DOCKER_EXEC df -h
 
 if [ "$RUN_FUZZ_TESTS" = "true" ] || [ "$RUN_UNIT_TESTS" = "true" ] || [ "$RUN_UNIT_TESTS_SEQUENTIAL" = "true" ]; then
-  if [ ! -d ${DIR_QA_ASSETS} ]; then
-    DOCKER_EXEC git clone --depth=1 https://github.com/bitcoin-core/qa-assets ${DIR_QA_ASSETS}
-  fi
-
+  [ -d "${DIR_QA_ASSETS}" ] || git clone --depth=1 https://github.com/bitcoin-core/qa-assets "${DIR_QA_ASSETS}"
   export DIR_FUZZ_IN=${DIR_QA_ASSETS}/fuzz_seed_corpus/
   export DIR_UNIT_TEST_DATA=${DIR_QA_ASSETS}/unit_test_data/
 fi
@@ -99,14 +96,14 @@ if [[ ${USE_MEMORY_SANITIZER} == "true" ]]; then
   DOCKER_EXEC "update-alternatives --install /usr/bin/clang++ clang++ \$(which clang++-9) 100"
   DOCKER_EXEC "update-alternatives --install /usr/bin/clang clang \$(which clang-9) 100"
   DOCKER_EXEC "mkdir -p ${BASE_SCRATCH_DIR}/msan/build/"
-  DOCKER_EXEC "git clone --depth=1 https://github.com/llvm/llvm-project -b llvmorg-12.0.0 ${BASE_SCRATCH_DIR}/msan/llvm-project"
+  DOCKER_EXEC "test -d ${BASE_SCRATCH_DIR}/msan/llvm-project || git clone --depth=1 https://github.com/llvm/llvm-project -b llvmorg-12.0.0 ${BASE_SCRATCH_DIR}/msan/llvm-project"
   DOCKER_EXEC "cd ${BASE_SCRATCH_DIR}/msan/build/ && cmake -DLLVM_ENABLE_PROJECTS='libcxx;libcxxabi' -DCMAKE_BUILD_TYPE=Release -DLLVM_USE_SANITIZER=Memory -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -DLLVM_TARGETS_TO_BUILD=X86 ../llvm-project/llvm/"
   DOCKER_EXEC "cd ${BASE_SCRATCH_DIR}/msan/build/ && make $MAKEJOBS cxx"
 fi
 
 if [ -z "$DANGER_RUN_CI_ON_HOST" ]; then
   echo "Create $BASE_ROOT_DIR"
-  DOCKER_EXEC rsync -a /ro_base/ $BASE_ROOT_DIR
+  DOCKER_EXEC rsync -a --info=progress2 --exclude '*.o' --exclude .git --exclude depends/ --exclude  ci/scratch /ro_base/ $BASE_ROOT_DIR
 fi
 
 if [ "$USE_BUSY_BOX" = "true" ]; then

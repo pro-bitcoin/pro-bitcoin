@@ -7,8 +7,6 @@
 #include <prometheus/registry.h>
 #include <prometheus/summary.h>
 
-#include <util/system.h>
-
 namespace metrics {
 
 enum NetDirection {
@@ -34,6 +32,44 @@ enum MemPoolType {
     POOl_USAGE,
     POOL_FEE,
     POOL_UPDATE,
+};
+
+// see protocol.h
+static std::vector<std::string> netMsgTypes{
+    "version",
+    "verack",
+    "addr",
+    "addrv2",
+    "sendaddrv2",
+    "inv",
+    "getdata",
+    "merkleblock",
+    "getblocks",
+    "getheaders",
+    "tx",
+    "headers",
+    "block",
+    "getaddr",
+    "mempool",
+    "ping",
+    "pong",
+    "notfound",
+    "filterload",
+    "filteradd",
+    "filterclear",
+    "sendheaders",
+    "feefilter",
+    "sendcmpct",
+    "cmpctblock",
+    "getblocktxn",
+    "blocktxn",
+    "getcfilters",
+    "cfilter",
+    "getcfheaders",
+    "cfheaders",
+    "getcfcheckpt",
+    "cfcheckpt",
+    "wtxidrelay",
 };
 
 class Metrics
@@ -90,46 +126,26 @@ class ConfigMetrics : Metrics
 private:
     prometheus::Family<prometheus::Gauge>* _config;
     prometheus::Gauge* _ibd;
-    static std::string CategoryToString(const OptionsCategory category)
-    {
-        switch (category) {
-        case OptionsCategory::OPTIONS:
-            return "options";
-            break;
-        case OptionsCategory::CONNECTION:
-            return "connection";
-            break;
-        case OptionsCategory::DEBUG_TEST:
-            return "debug";
-            break;
-        case OptionsCategory::NODE_RELAY:
-            return "node-relay";
-            break;
-        case OptionsCategory::BLOCK_CREATION:
-            return "block";
-            break;
-        case OptionsCategory::RPC:
-            return "rpc";
-            break;
-        case OptionsCategory::CHAINPARAMS:
-            return "chain";
-            break;
-        case OptionsCategory::COMMANDS:
-            return "commands";
-            break;
-        case OptionsCategory::REGISTER_COMMANDS:
-            return "register";
-            break;
-        default:
-            return "unknown";
-            break;
-        }
-    }
+    std::vector<std::string> _categories{
+        "options",
+        "connection",
+        "wallet",
+        "wallet-debug-test",
+        "zmq",
+        "debug_test",
+        "chainparams",
+        "node-relay",
+        "block_creation",
+        "rpc",
+        "gui",
+        "commands",
+        "register-commands",
+    };
 
 public:
     explicit ConfigMetrics(const std::string& chain, prometheus::Registry& registry);
-    void Set(const std::string& cfg, const OptionsCategory category, const std::string type, int64_t value);
-    void SetFlag(const std::string& cfg, const OptionsCategory category, bool value);
+    void Set(const std::string& cfg, size_t category, const std::string type, int64_t value);
+    void SetFlag(const std::string& cfg, size_t category, bool value);
     void SetIBD(const bool value);
 };
 

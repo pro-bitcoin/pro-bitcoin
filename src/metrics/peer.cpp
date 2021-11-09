@@ -1,5 +1,4 @@
 #include <metrics/metrics.h>
-#include <protocol.h>
 
 namespace metrics {
 std::unique_ptr<PeerMetrics> PeerMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)
@@ -37,7 +36,7 @@ PeerMetricsImpl::PeerMetricsImpl(const std::string& chain, prometheus::Registry&
         20000,
         40000,
     };
-    for (const std::string& msg : getAllNetMessageTypes()) {
+    for (const std::string& msg : netMsgTypes) {
         _process_msg_timer.insert({msg, &netMsgTypeFamily.Add({{"type", msg}}, buckets)});
         _push_msg_counter.insert({msg, &pushMsgTypeFamily.Add({{"type", msg}})});
     }

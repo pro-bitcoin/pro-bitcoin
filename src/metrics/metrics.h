@@ -77,7 +77,7 @@ struct BlockTimerOp {
     prometheus::Histogram::BucketBoundaries _buckets;
 };
 
-static BlockTimerOp BLOCK_LOAD = BlockTimerOp("load", prometheus::Histogram::BucketBoundaries{500,5000,50000,100000});
+static BlockTimerOp BLOCK_LOAD = BlockTimerOp("load", prometheus::Histogram::BucketBoundaries{500, 5000, 50000, 100000});
 static BlockTimerOp BLOCK_CONNECT = BlockTimerOp("connect", prometheus::Histogram::BucketBoundaries{500000, 1000000, 2000000, 4000000, 8000000});
 static BlockTimerOp BLOCK_FLUSH_VIEW = BlockTimerOp("flush-view", prometheus::Histogram::BucketBoundaries{100, 200, 500, 1000});
 static BlockTimerOp BLOCK_FLUSH_DISK = BlockTimerOp("flush-disk", prometheus::Histogram::BucketBoundaries{10, 25, 75, 100});
@@ -125,6 +125,7 @@ private:
             break;
         }
     }
+
 public:
     explicit ConfigMetrics(const std::string& chain, prometheus::Registry& registry);
     void Set(const std::string& cfg, const OptionsCategory category, const std::string type, int64_t value);
@@ -148,11 +149,11 @@ protected:
         "fees",
         "reward",
         "difficulty",
-        "valueout"
-    };
+        "valueout"};
     std::map<const std::string, prometheus::Gauge*> _block_tip_gauge;
     std::vector<prometheus::Histogram*> _block_bucket_timers;
     std::vector<prometheus::Gauge*> _block_avg;
+
 public:
     static std::unique_ptr<BlockMetrics> make(const std::string& chain, prometheus::Registry& registry, bool noop);
     virtual ~BlockMetrics(){};
@@ -164,10 +165,10 @@ public:
     virtual void Transactions(size_t amt){};
     virtual void SigOps(int64_t amt) {}
     virtual void HeaderTime(int64_t amt) {}
-    virtual void Reward(int64_t amt) {};
-    virtual void Fees(int64_t amt) {};
-    virtual void Difficulty(double amt) {};
-    virtual void ValueOut(double amt) {};
+    virtual void Reward(int64_t amt){};
+    virtual void Fees(int64_t amt){};
+    virtual void Difficulty(double amt){};
+    virtual void ValueOut(double amt){};
 
     virtual void TipLoadBlockDisk(int64_t current, double avg){};
     virtual void TipConnectBlock(int64_t current, double avg){};

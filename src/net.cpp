@@ -652,7 +652,7 @@ bool CNode::ReceiveMsgBytes(Span<const uint8_t> msg_bytes, bool& complete)
                 // Message deserialization failed.  Drop the message but don't disconnect the peer.
                 // store the size of the corrupt message
                 mapRecvBytesPerMsgCmd.find(NET_MESSAGE_COMMAND_OTHER)->second += out_err_raw_size;
-                netMetrics.BandwidthGauge(metrics::NetDirection::RX, "unknown",  out_err_raw_size);
+                netMetrics.BandwidthGauge(metrics::NetDirection::RX, "unknown", out_err_raw_size);
                 continue;
             }
 
@@ -1309,9 +1309,9 @@ void CConnman::NotifyNumConnectionsChanged()
     {
         LOCK(cs_vNodes);
         vNodesSize = vNodes.size();
-        if(vNodesSize != nPrevNodeCount) {
+        if (vNodesSize != nPrevNodeCount) {
             nPrevNodeCount = vNodesSize;
-            if(clientInterface)
+            if (clientInterface)
                 clientInterface->NotifyNumConnectionsChanged(vNodesSize);
             // count various node attributes
             uint fullNodes{0};
@@ -1340,23 +1340,22 @@ void CConnman::NotifyNumConnectionsChanged()
             uint pAddr{0};
             uint pImplicit{0};
             uint pAll{0};
-            for (CNode* pnode : vNodes)
-            {
-                if(pnode->fClient)
+            for (CNode* pnode : vNodes) {
+                if (pnode->fClient)
                     spvNodes++;
                 else
                     fullNodes++;
-                if(pnode->IsInboundConn())
+                if (pnode->IsInboundConn())
                     inboundNodes++;
                 else
                     outboundNodes++;
-                if(pnode->addr.IsIPv4())
+                if (pnode->addr.IsIPv4())
                     ipv4Nodes++;
-                if(pnode->addr.IsIPv6())
+                if (pnode->addr.IsIPv6())
                     ipv6Nodes++;
-                if(pnode->addr.IsTor())
+                if (pnode->addr.IsTor())
                     torNodes++;
-                if(pnode->addr.IsI2P())
+                if (pnode->addr.IsI2P())
                     i2pNodes++;
 
                 if (pnode->HasPermission(NetPermissionFlags::All)) {
@@ -1381,24 +1380,24 @@ void CConnman::NotifyNumConnectionsChanged()
                 }
 
                 switch (pnode->m_conn_type) {
-                    case ConnectionType::BLOCK_RELAY:
-                        nblockRelay++;
-                        break;
-                    case ConnectionType::MANUAL:
-                        nManual++;
-                        break;
-                    case ConnectionType::FEELER:
-                        nFeeler++;
-                        break;
-                    case ConnectionType::OUTBOUND_FULL_RELAY:
-                        nRelay++;
-                        break;
-                    case ConnectionType::ADDR_FETCH:
-                        nAddr++;
-                        break;
-                    case ConnectionType::INBOUND:
-                        nIn++;
-                        break;
+                case ConnectionType::BLOCK_RELAY:
+                    nblockRelay++;
+                    break;
+                case ConnectionType::MANUAL:
+                    nManual++;
+                    break;
+                case ConnectionType::FEELER:
+                    nFeeler++;
+                    break;
+                case ConnectionType::OUTBOUND_FULL_RELAY:
+                    nRelay++;
+                    break;
+                case ConnectionType::ADDR_FETCH:
+                    nAddr++;
+                    break;
+                case ConnectionType::INBOUND:
+                    nIn++;
+                    break;
                 }
             }
             netMetrics.ConnectionGauge(metrics::NetConnectionType::TOTAL, nPrevNodeCount);
@@ -3017,8 +3016,7 @@ void CConnman::RecordBytesSent(uint64_t bytes)
     netMetrics.BandwidthGauge(metrics::NetDirection::TX, "total", bytes);
     if (nMaxOutboundLimit) {
         const auto now = GetTime<std::chrono::seconds>();
-        if (nMaxOutboundCycleStartTime + MAX_UPLOAD_TIMEFRAME < now)
-        {
+        if (nMaxOutboundCycleStartTime + MAX_UPLOAD_TIMEFRAME < now) {
             // timeframe expired, reset cycle
             nMaxOutboundCycleStartTime = now;
             netMetrics.MaxOutboundStartTime(now.count());

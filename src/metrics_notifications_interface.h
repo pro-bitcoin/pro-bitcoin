@@ -2,8 +2,8 @@
 #define BITCOIN_METRICS_NOTIFICATIONS_INTERFACE_H
 
 #include <chain.h>
-#include <validationinterface.h>
 #include <metrics/metrics.h>
+#include <validationinterface.h>
 
 namespace metrics {
 class MetricsNotificationsInterface final : public CValidationInterface
@@ -24,6 +24,6 @@ private:
     metrics::BlockMetrics& _blockMetrics;
     metrics::MemPoolMetrics& _memPoolMetrics;
 };
-} // metrics
+} // namespace metrics
 
 #endif

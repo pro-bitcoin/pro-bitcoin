@@ -39,6 +39,6 @@ public:
 void Init(const std::string& bind, const std::string& chain, bool noop = false);
 
 Container* Instance();
-}
+} // namespace metrics
 
 #endif

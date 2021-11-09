@@ -68,13 +68,13 @@
 #include <walletinitinterface.h>
 
 #include <functional>
+#include <metrics/metrics.h>
+#include <metrics_notifications_interface.h>
 #include <set>
 #include <stdint.h>
 #include <stdio.h>
 #include <thread>
 #include <vector>
-#include <metrics/metrics.h>
-#include <metrics_notifications_interface.h>
 
 #ifndef WIN32
 #include <attributes.h>
@@ -1090,14 +1090,14 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     }
 
     // Metrics
-    auto metrics_endpoint = args.GetArg("-metricsbind", chainparams.IsTestChain() ? "localhost:18335": "localhost:8335");
+    auto metrics_endpoint = args.GetArg("-metricsbind", chainparams.IsTestChain() ? "localhost:18335" : "localhost:8335");
     auto use_metrics = args.GetBoolArg("-metrics", false);
     if (!use_metrics) {
         LogPrintf("Using noop Metrics\n");
     }
     try {
-        metrics::Init(metrics_endpoint, chainparams.IsTestChain() ? "test": "main", !use_metrics);
-    } catch(std::exception &e) {
+        metrics::Init(metrics_endpoint, chainparams.IsTestChain() ? "test" : "main", !use_metrics);
+    } catch (std::exception& e) {
         return InitError(strprintf(_("Metrics init error %s %s\n"), metrics_endpoint, e.what()));
     }
     LogPrintf("Bound metrics endpoint to %s/metrics\n", metrics_endpoint);
@@ -1357,7 +1357,7 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     configMetrics.SetFlag("alertnotify", OptionsCategory::OPTIONS, args.GetArg("-alertnotify", "") != "");
     configMetrics.SetFlag("acceptnonstdtxn", OptionsCategory::NODE_RELAY, args.GetBoolArg("-acceptnonstdtxn", !chainparams.RequireStandard()));
     std::string blockfilterindex_value = args.GetArg("-blockfilterindex", DEFAULT_BLOCKFILTERINDEX);
-    configMetrics.SetFlag("blockfilterindex", OptionsCategory::OPTIONS,  blockfilterindex_value != DEFAULT_BLOCKFILTERINDEX);
+    configMetrics.SetFlag("blockfilterindex", OptionsCategory::OPTIONS, blockfilterindex_value != DEFAULT_BLOCKFILTERINDEX);
     configMetrics.SetFlag("blocksonly", OptionsCategory::NODE_RELAY, ignores_incoming_txs);
     configMetrics.SetFlag("blocknotify", OptionsCategory::OPTIONS, args.GetArg("-blocknotify", "") != "");
     configMetrics.SetFlag("checkpoints", OptionsCategory::DEBUG_TEST, fCheckpointsEnabled);
@@ -1367,17 +1367,17 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     configMetrics.SetFlag("daemonnowait", OptionsCategory::OPTIONS, args.GetBoolArg("-daemon", DEFAULT_DAEMONWAIT));
     configMetrics.SetFlag("datacarrier", OptionsCategory::NODE_RELAY, fAcceptDatacarrier);
     configMetrics.SetFlag("discover", OptionsCategory::CONNECTION, args.GetBoolArg("-discover", true));
-    configMetrics.SetFlag("dns",  OptionsCategory::CONNECTION, fNameLookup);
+    configMetrics.SetFlag("dns", OptionsCategory::CONNECTION, fNameLookup);
     configMetrics.SetFlag("dnsseed", OptionsCategory::CONNECTION, gArgs.GetBoolArg("-dnsseed", DEFAULT_DNSSEED));
     configMetrics.SetFlag("forcednsseed", OptionsCategory::CONNECTION, gArgs.GetBoolArg("-forcednsseed", DEFAULT_FORCEDNSSEED));
     configMetrics.SetFlag("fixedseeds", OptionsCategory::CONNECTION, gArgs.GetBoolArg("-fixedseeds", DEFAULT_FIXEDSEEDS));
-    configMetrics.SetFlag("i2pacceptincoming",OptionsCategory::CONNECTION, args.GetBoolArg("-i2pacceptincoming", true));
+    configMetrics.SetFlag("i2pacceptincoming", OptionsCategory::CONNECTION, args.GetBoolArg("-i2pacceptincoming", true));
     configMetrics.SetFlag("listen", OptionsCategory::CONNECTION, fListen);
     configMetrics.SetFlag("listenonion", OptionsCategory::CONNECTION, args.GetBoolArg("-listenonion", DEFAULT_LISTEN_ONION));
-    configMetrics.SetFlag("peerbloomfilters",  OptionsCategory::CONNECTION, nLocalServices & NODE_BLOOM);
+    configMetrics.SetFlag("peerbloomfilters", OptionsCategory::CONNECTION, nLocalServices & NODE_BLOOM);
     configMetrics.SetFlag("peerblockfilters", OptionsCategory::CONNECTION, args.GetBoolArg("-peerblockfilters", DEFAULT_PEERBLOCKFILTERS));
-    configMetrics.SetFlag("permitbaremultisig",  OptionsCategory::CONNECTION, fIsBareMultisigStd);
-    configMetrics.SetFlag("persistmempool", OptionsCategory::OPTIONS,  args.GetBoolArg("-persistmempool", DEFAULT_PERSIST_MEMPOOL));
+    configMetrics.SetFlag("permitbaremultisig", OptionsCategory::CONNECTION, fIsBareMultisigStd);
+    configMetrics.SetFlag("persistmempool", OptionsCategory::OPTIONS, args.GetBoolArg("-persistmempool", DEFAULT_PERSIST_MEMPOOL));
     configMetrics.SetFlag("proxyrandomize", OptionsCategory::CONNECTION, proxyRandomize);
     configMetrics.SetFlag("reindex", OptionsCategory::OPTIONS, fReindex);
     configMetrics.SetFlag("reindex-chainstate", OptionsCategory::OPTIONS, fReindexChainState);
@@ -1386,29 +1386,29 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     //configMetrics.SetFlag("rpcport", OptionsCategory::RPC, args.GetArg("-rpcport", DEFAULT_RPC));
     configMetrics.SetFlag("server", OptionsCategory::RPC, args.GetBoolArg("-server", false));
     configMetrics.SetFlag("startupnotify", OptionsCategory::OPTIONS, args.GetArg("-startupnotify", "") != "");
-    configMetrics.SetFlag("sysperms",OptionsCategory::OPTIONS,  args.GetBoolArg("-sysperms", false));
+    configMetrics.SetFlag("sysperms", OptionsCategory::OPTIONS, args.GetBoolArg("-sysperms", false));
     configMetrics.SetFlag("txindex", OptionsCategory::OPTIONS, args.GetBoolArg("-txindex", DEFAULT_TXINDEX));
     configMetrics.SetFlag("upnp", OptionsCategory::CONNECTION, args.GetBoolArg("-upnp", DEFAULT_UPNP));
     configMetrics.SetFlag("natpmp", OptionsCategory::CONNECTION, gArgs.GetBoolArg("-natpmp", DEFAULT_NATPMP));
-    configMetrics.SetFlag("whitelistforcerelay",OptionsCategory::NODE_RELAY, args.GetBoolArg("-whitelistforcerelay", DEFAULT_WHITELISTFORCERELAY));
-    configMetrics.SetFlag("whitelistrelay",OptionsCategory::NODE_RELAY, args.GetBoolArg("-whitelistrelay", DEFAULT_WHITELISTRELAY));
+    configMetrics.SetFlag("whitelistforcerelay", OptionsCategory::NODE_RELAY, args.GetBoolArg("-whitelistforcerelay", DEFAULT_WHITELISTFORCERELAY));
+    configMetrics.SetFlag("whitelistrelay", OptionsCategory::NODE_RELAY, args.GetBoolArg("-whitelistrelay", DEFAULT_WHITELISTRELAY));
 
     configMetrics.SetIBD(true); // reset by CChainState::IsInitialBlockDownload()
 
     configMetrics.Set("bantime", OptionsCategory::CONNECTION, "seconds", args.GetArg("-bantime", DEFAULT_MISBEHAVING_BANTIME));
     configMetrics.Set("blockmaxweight", OptionsCategory::BLOCK_CREATION, "int", args.GetArg("-blockmaxweight", DEFAULT_BLOCK_MAX_WEIGHT));
     configMetrics.Set("blockmintxfee", OptionsCategory::BLOCK_CREATION, "int", args.GetArg("-blockmintxfee", DEFAULT_BLOCK_MIN_TX_FEE));
-    configMetrics.Set("bytespersigop", OptionsCategory::NODE_RELAY,"bytes", nBytesPerSigOp);
+    configMetrics.Set("bytespersigop", OptionsCategory::NODE_RELAY, "bytes", nBytesPerSigOp);
     configMetrics.Set("checkblocks", OptionsCategory::DEBUG_TEST, "int", args.GetArg("-checkblocks", DEFAULT_CHECKBLOCKS));
     configMetrics.Set("checklevel", OptionsCategory::DEBUG_TEST, "int", args.GetArg("-checklevel", DEFAULT_CHECKLEVEL));
     configMetrics.Set("checkmempool", OptionsCategory::DEBUG_TEST, "int", check_ratio);
     configMetrics.Set("datacarriersize", OptionsCategory::NODE_RELAY, "bytes", nMaxDatacarrierBytes);
-    configMetrics.Set("dbcache",OptionsCategory::OPTIONS, "bytes", nTotalCache);
+    configMetrics.Set("dbcache", OptionsCategory::OPTIONS, "bytes", nTotalCache);
     configMetrics.Set("maxmempool", OptionsCategory::OPTIONS, "bytes", nMempoolSizeMax);
     int64_t nExpiryTimeout = gArgs.GetArg("-mempoolexpiry", DEFAULT_MEMPOOL_EXPIRY) * 60 * 60;
     configMetrics.Set("mempoolexpiry", OptionsCategory::OPTIONS, "seconds", nExpiryTimeout);
-    configMetrics.Set("maxorphantx",OptionsCategory::OPTIONS, "int", args.GetArg("-maxorphantx", DEFAULT_MAX_ORPHAN_TRANSACTIONS));
-    configMetrics.Set("maxsigcachesize",OptionsCategory::DEBUG_TEST ,"bytes", args.GetArg("-maxsigcachesizze", DEFAULT_MAX_SIG_CACHE_SIZE)*1024*1024);
+    configMetrics.Set("maxorphantx", OptionsCategory::OPTIONS, "int", args.GetArg("-maxorphantx", DEFAULT_MAX_ORPHAN_TRANSACTIONS));
+    configMetrics.Set("maxsigcachesize", OptionsCategory::DEBUG_TEST, "bytes", args.GetArg("-maxsigcachesizze", DEFAULT_MAX_SIG_CACHE_SIZE) * 1024 * 1024);
     configMetrics.Set("maxtipage", OptionsCategory::DEBUG_TEST, "seconds", nMaxTipAge);
     configMetrics.Set("maxconnections", OptionsCategory::CONNECTION, "int", nMaxConnections);
     int64_t max_adjustment = std::max<int64_t>(0, gArgs.GetArg("-maxtimeadjustment", DEFAULT_MAX_TIME_ADJUSTMENT));
@@ -1420,7 +1420,7 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     configMetrics.Set("rpcserialversion", OptionsCategory::RPC, "int", args.GetArg("-rpcserialversion", DEFAULT_RPC_SERIALIZE_VERSION));
     configMetrics.Set("rpcthreads", OptionsCategory::RPC, "int", args.GetArg("-rpcthreads", DEFAULT_HTTP_THREADS));
     configMetrics.Set("rpcallowip", OptionsCategory::RPC, "int", args.GetArgs("-rpcallowip").size());
-    configMetrics.Set("timeout", OptionsCategory::CONNECTION, "seconds",  nConnectTimeout);
+    configMetrics.Set("timeout", OptionsCategory::CONNECTION, "seconds", nConnectTimeout);
     //configMetrics.Set("rpcwhitelist", OptionsCategory::RPC, args.GetArgs("-rpcwhitelist").size());
     //configMetrics.Set("chainstate-db", nCoinDBCache);
     //configMetrics.Set("txindex-cache", nTxIndexCache);
@@ -1867,12 +1867,12 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     }
 
     connOptions.m_i2p_accept_incoming = args.GetBoolArg("-i2pacceptincoming", true);
-    configMetrics.Set("maxuploadtarget", OptionsCategory::CONNECTION, "bytes",connOptions.nMaxOutboundLimit);
+    configMetrics.Set("maxuploadtarget", OptionsCategory::CONNECTION, "bytes", connOptions.nMaxOutboundLimit);
     configMetrics.Set("maxsendbuffer", OptionsCategory::CONNECTION, "bytes", connOptions.nSendBufferMaxSize);
-    configMetrics.Set("maxreceivebuffer",OptionsCategory::CONNECTION, "bytes", connOptions.nReceiveFloodSize);
+    configMetrics.Set("maxreceivebuffer", OptionsCategory::CONNECTION, "bytes", connOptions.nReceiveFloodSize);
     configMetrics.Set("seednode", OptionsCategory::CONNECTION, "int", connOptions.vSeedNodes.size());
-    configMetrics.Set("whitelist", OptionsCategory::CONNECTION,  "int", connOptions.vWhitelistedRange.size());
-    configMetrics.Set("whitelistbind", OptionsCategory::CONNECTION, "int" , connOptions.vWhiteBinds.size());
+    configMetrics.Set("whitelist", OptionsCategory::CONNECTION, "int", connOptions.vWhitelistedRange.size());
+    configMetrics.Set("whitelistbind", OptionsCategory::CONNECTION, "int", connOptions.vWhiteBinds.size());
 
     if (!node.connman->Start(*node.scheduler, connOptions)) {
         return false;

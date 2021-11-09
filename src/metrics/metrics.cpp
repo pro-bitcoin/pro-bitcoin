@@ -65,7 +65,7 @@ void ConfigMetrics::Set(const std::string& cfg, const OptionsCategory category, 
 {
     _config->Add({{"type", type}, {"name", cfg}, {"category", CategoryToString(category)}}).Set((double)value);
 }
-void ConfigMetrics::SetFlag(const std::string& cfg, const OptionsCategory category,  bool value)
+void ConfigMetrics::SetFlag(const std::string& cfg, const OptionsCategory category, bool value)
 {
     double flag = value ? 1.0 : 0.0;
     _config->Add({{"type", "bool"}, {"name", cfg}, {"category", CategoryToString(category)}}).Set(flag);

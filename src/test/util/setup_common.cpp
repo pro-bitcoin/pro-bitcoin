@@ -11,6 +11,7 @@
 #include <consensus/params.h>
 #include <consensus/validation.h>
 #include <crypto/sha256.h>
+#include <functional>
 #include <init.h>
 #include <interfaces/chain.h>
 #include <metrics/container.h>
@@ -38,7 +39,6 @@
 #include <validation.h>
 #include <validationinterface.h>
 #include <walletinitinterface.h>
-#include <functional>
 
 const std::function<std::string(const char*)> G_TRANSLATION_FUN = nullptr;
 UrlDecodeFn* const URL_DECODE = nullptr;

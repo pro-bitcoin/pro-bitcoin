@@ -1,10 +1,7 @@
 #include <metrics/metrics.h>
 
 #include <future>
-#include <logging.h>
 #include <memory>
-#include <protocol.h>
-#include <utility>
 
 namespace metrics {
 using namespace prometheus;
@@ -61,14 +58,19 @@ ConfigMetrics::ConfigMetrics(const std::string& chain, prometheus::Registry& reg
     _ibd = &FamilyGauge("initial_block_download").Add({});
 }
 
-void ConfigMetrics::Set(const std::string& cfg, const OptionsCategory category, const std::string type, int64_t value)
+void ConfigMetrics::Set(const std::string& cfg, size_t category, const std::string type, int64_t value)
 {
-    _config->Add({{"type", type}, {"name", cfg}, {"category", CategoryToString(category)}}).Set((double)value);
+    if (category <= _categories.size() - 1) {
+        _config->Add({{"type", type}, {"name", cfg}, {"category", _categories[category]}}).Set((double)value);
+    }
 }
-void ConfigMetrics::SetFlag(const std::string& cfg, const OptionsCategory category, bool value)
+
+void ConfigMetrics::SetFlag(const std::string& cfg, size_t category, bool value)
 {
     double flag = value ? 1.0 : 0.0;
-    _config->Add({{"type", "bool"}, {"name", cfg}, {"category", CategoryToString(category)}}).Set(flag);
+    if (category <= _categories.size() - 1) {
+        _config->Add({{"type", "bool"}, {"name", cfg}, {"category", _categories[category]}}).Set(flag);
+    }
 }
 void ConfigMetrics::SetIBD(const bool value)
 {

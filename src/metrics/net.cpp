@@ -1,5 +1,4 @@
 #include <metrics/metrics.h>
-#include <protocol.h>
 
 namespace metrics {
 std::unique_ptr<NetMetrics> NetMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)
@@ -49,7 +48,7 @@ NetMetricsImpl::NetMetricsImpl(const std::string& chain, prometheus::Registry& r
 void NetMetricsImpl::initBandwidth()
 {
     auto& family = FamilyGauge("net_bandwidth");
-    for (const std::string& msg : getAllNetMessageTypes()) {
+    for (const std::string& msg : netMsgTypes) {
         _bandwidth_gauge_rx.insert({msg, &family.Add({{"type", msg}, {"direction", "rx"}})});
         _bandwidth_gauge_tx.insert({msg, &family.Add({{"type", msg}, {"direction", "tx"}})});
     }

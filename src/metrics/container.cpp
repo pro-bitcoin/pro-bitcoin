@@ -1,4 +1,6 @@
+#include <cassert>
 #include <metrics/container.h>
+
 
 namespace metrics {
 Container::Container() = default;

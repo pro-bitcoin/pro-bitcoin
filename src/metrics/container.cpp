@@ -36,7 +36,7 @@ ConfigMetrics& Container::Config()
 
 void Container::Init(const std::string& chain, bool noop)
 {
-    // check if already init 
+    // check if already init
     if (_init.exchange(true)) {
         return;
     }
@@ -65,4 +65,4 @@ Container* Instance()
     return &c;
 }
 
-}
+} // namespace metrics

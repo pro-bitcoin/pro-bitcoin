@@ -25,8 +25,7 @@ MemPoolMetricsImpl::MemPoolMetricsImpl(const std::string& chain, prometheus::Reg
         &mempool_family.Add({{"type", "bytes"}}),
         &mempool_family.Add({{"type", "usage"}}),
         &mempool_family.Add({{"type", "fee"}}),
-        &mempool_family.Add({{"type", "updated"}})
-    };
+        &mempool_family.Add({{"type", "updated"}})};
     _vin_incoming_counter = &incoming_family.Add({{"type", "vin"}});
     _vout_incoming_counter = &incoming_family.Add({{"type", "vout"}});
     _incoming_size_counter = &incoming_family.Add({{"type", "bytes"}});
@@ -67,7 +66,7 @@ void MemPoolMetricsImpl::Removed(size_t reason)
         _removed_unknown_counter->Increment();
         return;
     }
-    _removed_counter[reason-1]->Increment();
+    _removed_counter[reason - 1]->Increment();
 }
 
 void MemPoolMetricsImpl::Orphans(size_t map, size_t outpoint)

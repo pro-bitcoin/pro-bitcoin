@@ -1,7 +1,7 @@
 #include <metrics/metrics.h>
 
 namespace metrics {
-    /*
+/*
     UtxoMetrics::UtxoMetrics(const std::string &chain, prometheus::Registry& registry): Metrics(chain, registry) {
         auto& family = FamilyGauge("utxo");
         _total_btc_amt_gauge = &family.Add({{"type", "btc-amount"}});

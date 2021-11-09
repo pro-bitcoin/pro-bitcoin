@@ -1,4 +1,4 @@
-#include<metrics_notifications_interface.h>
+#include <metrics_notifications_interface.h>
 
 namespace metrics {
 MetricsNotificationsInterface::MetricsNotificationsInterface(BlockMetrics& blockMetrics, MemPoolMetrics& mempoolMetrics) : _blockMetrics(blockMetrics), _memPoolMetrics(mempoolMetrics) {}
@@ -29,4 +29,4 @@ void MetricsNotificationsInterface::TransactionRemovedFromMempool(const CTransac
     _memPoolMetrics.Removed(static_cast<size_t>(reason));
 }
 
-}
+} // namespace metrics

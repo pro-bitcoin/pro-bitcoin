@@ -835,10 +835,10 @@ bool MemPoolAccept::PreChecks(ATMPArgs& args, Workspace& ws)
             if (newFeeRate <= oldFeeRate)
             {
                 return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "insufficient-fee",
-                        strprintf("rejecting replacement %s; new feerate %s <= old feerate %s",
-                            hash.ToString(),
-                            newFeeRate.ToString(),
-                            oldFeeRate.ToString()));
+                                     strprintf("rejecting replacement %s; new feerate %s <= old feerate %s",
+                                               hash.ToString(),
+                                               newFeeRate.ToString(),
+                                               oldFeeRate.ToString()));
             }
 
             for (const CTxIn &txin : mi->GetTx().vin)
@@ -863,10 +863,10 @@ bool MemPoolAccept::PreChecks(ATMPArgs& args, Workspace& ws)
             }
         } else {
             return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "too-many-potential-replacements",
-                    strprintf("rejecting replacement %s; too many potential replacements (%d > %d)\n",
-                        hash.ToString(),
-                        nConflictingCount,
-                        maxDescendantsToVisit));
+                                 strprintf("rejecting replacement %s; too many potential replacements (%d > %d)\n",
+                                           hash.ToString(),
+                                           nConflictingCount,
+                                           maxDescendantsToVisit));
         }
 
         for (unsigned int j = 0; j < tx.vin.size(); j++)
@@ -899,8 +899,8 @@ bool MemPoolAccept::PreChecks(ATMPArgs& args, Workspace& ws)
         if (nModifiedFees < nConflictingFees)
         {
             return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "insufficient-fee",
-                    strprintf("rejecting replacement %s, less fees than conflicting txs; %s < %s",
-                        hash.ToString(), FormatMoney(nModifiedFees), FormatMoney(nConflictingFees)));
+                                 strprintf("rejecting replacement %s, less fees than conflicting txs; %s < %s",
+                                           hash.ToString(), FormatMoney(nModifiedFees), FormatMoney(nConflictingFees)));
         }
 
         // Finally in addition to paying more fees than the conflicts the
@@ -909,10 +909,10 @@ bool MemPoolAccept::PreChecks(ATMPArgs& args, Workspace& ws)
         if (nDeltaFees < ::incrementalRelayFee.GetFee(nSize))
         {
             return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "insufficient-fee",
-                    strprintf("rejecting replacement %s, not enough additional fees to relay; %s < %s",
-                        hash.ToString(),
-                        FormatMoney(nDeltaFees),
-                        FormatMoney(::incrementalRelayFee.GetFee(nSize))));
+                                 strprintf("rejecting replacement %s, not enough additional fees to relay; %s < %s",
+                                           hash.ToString(),
+                                           FormatMoney(nDeltaFees),
+                                           FormatMoney(::incrementalRelayFee.GetFee(nSize))));
         }
     }
     return true;
@@ -1137,7 +1137,7 @@ static MempoolAcceptResult AcceptToMemoryPoolWithTime(const CChainParams& chainp
     active_chainstate.FlushStateToDisk(state_dummy, FlushStateMode::PERIODIC);
     auto end = std::chrono::high_resolution_clock::now();
     auto diff = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    if (result.m_result_type ==  MempoolAcceptResult::ResultType::VALID)  {
+    if (result.m_result_type == MempoolAcceptResult::ResultType::VALID) {
         metricsContainer->MemPool().AcceptTime(diff.count());
     }
     return result;
@@ -1892,7 +1892,7 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
 
     int64_t nTime2 = GetTimeMicros(); nTimeForks += nTime2 - nTime1;
     int64_t nCurrentTime = nTime2 - nTime1;
-    double nAvgTime = (double)nTimeForks/double(nBlocksTotal);
+    double nAvgTime = (double)nTimeForks / double(nBlocksTotal);
     blockMetrics.ForkCheck(nCurrentTime, nAvgTime);
     LogPrint(BCLog::BENCH, "    - Fork checks: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * nCurrentTime, nTimeForks * MICRO, nAvgTime);
 
@@ -1980,9 +1980,9 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     }
     int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
     nCurrentTime = nTime3 - nTime2;
-    nAvgTime = double(nTimeConnect)/double(nBlocksTotal);
+    nAvgTime = double(nTimeConnect) / double(nBlocksTotal);
     txMetrics.TransactionCheck(nCurrentTime, nAvgTime);
-    LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs (%.2fms/blk)]\n", (unsigned)block.vtx.size(), MILLI * nCurrentTime, MILLI * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : MILLI * (nTime3 - nTime2) / (nInputs-1), nTimeConnect * MICRO, nAvgTime * MILLI);
+    LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs (%.2fms/blk)]\n", (unsigned)block.vtx.size(), MILLI * nCurrentTime, MILLI * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : MILLI * (nTime3 - nTime2) / (nInputs - 1), nTimeConnect * MICRO, nAvgTime * MILLI);
 
     CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, m_params.GetConsensus());
     if (block.vtx[0]->GetValueOut() > blockReward) {
@@ -2028,8 +2028,7 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
         blockMetrics.Fees(nFees);
         blockMetrics.Reward(blockReward);
         CAmount nValueOut{0};
-        for (auto &tx: block.vtx)
-        {
+        for (auto& tx : block.vtx) {
             if (!tx->IsCoinBase()) {
                 nValueOut += tx->GetValueOut();
             }
@@ -2438,7 +2437,7 @@ bool CChainState::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew
     nCurrentTime = nTime4 - nTime3;
     nAvgTime = (double)nTimeFlush / (double)nBlocksTotal;
     blockMetrics.TipFlushView(nCurrentTime, nAvgTime);
-    LogPrint(BCLog::BENCH, "  - Flush: %.2fms [%.2fs (%.2fms/blk)]\n",nCurrentTime * MILLI, nTimeFlush * MICRO, nAvgTime * MILLI);
+    LogPrint(BCLog::BENCH, "  - Flush: %.2fms [%.2fs (%.2fms/blk)]\n", nCurrentTime * MILLI, nTimeFlush * MICRO, nAvgTime * MILLI);
     // Write the chain state to disk, if necessary.
     if (!FlushStateToDisk(state, FlushStateMode::IF_NEEDED)) {
         return false;

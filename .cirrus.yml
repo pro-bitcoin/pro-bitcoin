@@ -140,7 +140,7 @@ task:
 
 task:
   name: '[depends, sanitizers: memory (MSan)] [focal]'
-  only_if: false
+  only_if: true
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:focal

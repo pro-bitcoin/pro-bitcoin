@@ -1411,16 +1411,16 @@ void CConnman::NotifyNumConnectionsChanged()
             netMetrics.ConnectionGauge(metrics::NetConnectionType::TOR, torNodes);
             netMetrics.ConnectionGauge(metrics::NetConnectionType::I2P, i2pNodes);
 
-            peerMetrics.Permission(NetPermissionFlags::All, pAll);
-            peerMetrics.Permission(NetPermissionFlags::Implicit, pImplicit);
-            peerMetrics.Permission(NetPermissionFlags::Addr, pAddr);
-            peerMetrics.Permission(NetPermissionFlags::Mempool, pMempool);
-            peerMetrics.Permission(NetPermissionFlags::NoBan, pNoBan);
-            peerMetrics.Permission(NetPermissionFlags::Download, pDownload);
-            peerMetrics.Permission(NetPermissionFlags::ForceRelay, pForce);
-            peerMetrics.Permission(NetPermissionFlags::Relay, pRelay);
-            peerMetrics.Permission(NetPermissionFlags::BloomFilter, pBloom);
-            peerMetrics.Permission(NetPermissionFlags::None, pNone);
+            peerMetrics.Permission("all", pAll);
+            peerMetrics.Permission("implicit", pImplicit);
+            peerMetrics.Permission("addr", pAddr);
+            peerMetrics.Permission("mempool", pMempool);
+            peerMetrics.Permission("noban", pNoBan);
+            peerMetrics.Permission("download", pDownload);
+            peerMetrics.Permission("forcerelay", pForce);
+            peerMetrics.Permission("relay", pRelay);
+            peerMetrics.Permission("bloomfilter", pBloom);
+            peerMetrics.Permission("none", pNone);
 
             peerMetrics.ConnectionType(static_cast<int>(ConnectionType::ADDR_FETCH), nAddr);
             peerMetrics.ConnectionType(static_cast<int>(ConnectionType::BLOCK_RELAY), nblockRelay);

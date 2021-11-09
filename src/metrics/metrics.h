@@ -1,6 +1,5 @@
 #ifndef BITCOIN_METRICS_METRICS_H
 #define BITCOIN_METRICS_METRICS_H
-#include <chain.h>
 #include <prometheus/counter.h>
 #include <prometheus/exposer.h>
 #include <prometheus/gauge.h>
@@ -8,7 +7,6 @@
 #include <prometheus/registry.h>
 #include <prometheus/summary.h>
 
-#include <net_permissions.h>
 #include <util/system.h>
 
 namespace metrics {
@@ -302,7 +300,7 @@ protected:
     prometheus::Gauge* _known_peers_gauge;
     prometheus::Gauge* _banned_gauge;
     prometheus::Summary* _send_msg_timer;
-    std::map<NetPermissionFlags, prometheus::Gauge*> _permission_gauge;
+    std::map<const std::string, prometheus::Gauge*> _permission_gauge;
 
 public:
     static std::unique_ptr<PeerMetrics> make(const std::string& chain, prometheus::Registry& registry, bool noop);
@@ -311,7 +309,7 @@ public:
     virtual void IncDiscourage(){};
     virtual void IncMisbehaveAmount(int amt){};
     virtual void ConnectionType(int type, uint amt){};
-    virtual void Permission(NetPermissionFlags permission, uint amt){};
+    virtual void Permission(const std::string& permission, uint amt){};
     virtual void Known(size_t amt){};
     virtual void SendMessageTime(long amt){};
     virtual void PushMsgType(const std::string& msg_type){};
@@ -330,7 +328,7 @@ public:
     void IncDiscourage() override;
     void IncMisbehaveAmount(int amt) override;
     void ConnectionType(int type, uint amt) override;
-    void Permission(NetPermissionFlags permission, uint amt) override;
+    void Permission(const std::string& permission, uint amt) override;
     void Known(size_t amt) override;
     void SendMessageTime(long amt) override;
     void PushMsgType(const std::string& msg_type) override;

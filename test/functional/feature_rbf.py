@@ -81,7 +81,9 @@ class ReplaceByFeeTest(BitcoinTestFramework):
         self.supports_cli = False
 
     def skip_test_if_missing_module(self):
-        self.skip_if_no_wallet()
+        # TODO enable this - too many false positivies
+        return True
+        #self.skip_if_no_wallet()
 
     def run_test(self):
         make_utxo(self.nodes[0], 1 * COIN)

@@ -1092,16 +1092,17 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     // Metrics
     auto metrics_endpoint = args.GetArg("-metricsbind", chainparams.IsTestChain() ? "localhost:18335" : "localhost:8335");
     auto use_metrics = args.GetBoolArg("-metrics", false);
-    if (!use_metrics) {
-        LogPrintf("Using noop Metrics\n");
-    }
     try {
         metrics::Init(metrics_endpoint, chainparams.IsTestChain() ? "test" : "main", !use_metrics);
     } catch (std::exception& e) {
         return InitError(strprintf(_("Metrics init error %s %s\n"), metrics_endpoint, e.what()));
     }
-    LogPrintf("Bound metrics endpoint to %s/metrics\n", metrics_endpoint);
-    //
+    if (!use_metrics) {
+        LogPrintf("Using noop Metrics\n");
+    } else {
+        LogPrintf("Bound metrics endpoint to %s/metrics\n", metrics_endpoint);
+    }
+
     InitSignatureCache();
     InitScriptExecutionCache();
 

@@ -14,7 +14,7 @@ export MSAN_AND_LIBCXX_FLAGS="${MSAN_FLAGS} ${LIBCXX_FLAGS}"
 export BDB_PREFIX="${BASE_ROOT_DIR}/db4"
 
 export CONTAINER_NAME="ci_native_msan"
-export PACKAGES="clang-9 llvm-9 cmake gpg software-properties-common"
+export PACKAGES="clang-9 llvm-9 cmake"
 export DEP_OPTS="NO_BDB=1 NO_QT=1 CC='clang' CXX='clang++' CFLAGS='${MSAN_FLAGS}' CXXFLAGS='${MSAN_AND_LIBCXX_FLAGS}' boost_cxxflags='-std=c++17 -fvisibility=hidden -fPIC ${MSAN_AND_LIBCXX_FLAGS}'"
 DEP_OPTS="${DEP_OPTS} libevent_cflags='${MSAN_FLAGS}' sqlite_cflags='${MSAN_FLAGS}'"
 DEP_OPTS="${DEP_OPTS} zeromq_cxxflags='-std=c++17 ${MSAN_AND_LIBCXX_FLAGS}'"

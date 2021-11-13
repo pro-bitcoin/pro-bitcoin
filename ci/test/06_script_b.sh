@@ -41,5 +41,5 @@ if [ "$RUN_SECURITY_TESTS" = "true" ]; then
 fi
 
 if [ "$RUN_FUZZ_TESTS" = "true" ]; then
-  DOCKER_EXEC LD_LIBRARY_PATH=$DEPENDS_DIR/$HOST/lib test/fuzz/test_runner.py ${FUZZ_TESTS_CONFIG} $MAKEJOBS -l DEBUG ${DIR_FUZZ_IN}
+  DOCKER_EXEC LD_LIBRARY_PATH=$DEPENDS_DIR/$HOST/lib test/fuzz/test_runner.py ${FUZZ_TESTS_CONFIG} $MAKEJOBS -l DEBUG ${DIR_QA_ASSETS:?}/fuzz_seed_corpus/
 fi

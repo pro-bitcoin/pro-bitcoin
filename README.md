@@ -1,6 +1,6 @@
 # Pro Bitcoin
 
-A [promentheus](https://prometheus.io/docs/introduction/overview/) enabled bitcoin-core node running version [22.0](https://github.com/bitcoin/bitcoin/tree/v22.0), inspired by [https://statoshi.info](https://statoshi.info/?orgId=1)
+A [prometheus](https://prometheus.io/docs/introduction/overview/) enabled bitcoin-core node running version [22.0](https://github.com/bitcoin/bitcoin/tree/v22.0), inspired by [https://statoshi.info](https://statoshi.info/?orgId=1)
 
 ## Usage
 

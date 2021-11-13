@@ -39,10 +39,17 @@ if [ -z "$DANGER_RUN_CI_ON_HOST" ]; then
     systemctl restart docker
   fi
 
+if [ "$RUN_FUZZ_TESTS" = "true" ] || [ "$RUN_UNIT_TESTS" = "true" ] || [ "$RUN_UNIT_TESTS_SEQUENTIAL" = "true" ]; then
+  [ -d "${DIR_QA_ASSETS}" ] || git clone --depth=1 https://github.com/bitcoin-core/qa-assets "${DIR_QA_ASSETS}"
+  export DIR_FUZZ_IN=${DIR_QA_ASSETS}/fuzz_seed_corpus/
+  export DIR_UNIT_TEST_DATA=${DIR_QA_ASSETS}/unit_test_data/
+fi
+
   DOCKER_ID=$(docker run $DOCKER_ADMIN --rm --interactive --detach --tty \
                   --mount type=bind,src=$BASE_ROOT_DIR,dst=/ro_base,readonly \
                   --mount type=bind,src=$DEPENDS_DIR,dst=$DEPENDS_DIR \
-                  --mount type=bind,src=$BASE_SCRATCH_DIR,dst=$BASE_SCRATCH_DIR \
+                  --mount type=bind,src=$CCACHE_DIR,dst=$CCACHE_DIR \
+                  --mount type=bind,src=$DIR_QA_ASSETS,dst=$DIR_QA_ASSETS \
                   --mount type=bind,src=$PREVIOUS_RELEASES_DIR,dst=$PREVIOUS_RELEASES_DIR \
                   -w $BASE_ROOT_DIR \
                   --env-file /tmp/env \
@@ -84,12 +91,6 @@ fi
 DOCKER_EXEC echo "Free disk space:"
 DOCKER_EXEC df -h
 
-if [ "$RUN_FUZZ_TESTS" = "true" ] || [ "$RUN_UNIT_TESTS" = "true" ] || [ "$RUN_UNIT_TESTS_SEQUENTIAL" = "true" ]; then
-  [ -d "${DIR_QA_ASSETS}" ] || git clone --depth=1 https://github.com/bitcoin-core/qa-assets "${DIR_QA_ASSETS}"
-  export DIR_FUZZ_IN=${DIR_QA_ASSETS}/fuzz_seed_corpus/
-  export DIR_UNIT_TEST_DATA=${DIR_QA_ASSETS}/unit_test_data/
-fi
-
 DOCKER_EXEC mkdir -p "${BASE_SCRATCH_DIR}/sanitizer-output/"
 
 if [[ ${USE_MEMORY_SANITIZER} == "true" ]]; then
@@ -122,3 +123,8 @@ fi
 DOCKER_EXEC "curl -s --fail -L https://apt.kitware.com/keys/kitware-archive-latest.asc  | gpg --dearmor - > /etc/apt/trusted.gpg.d/kitware.gpg"
 DOCKER_EXEC "apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'"
 DOCKER_EXEC "apt-get update && apt-get install -y cmake"
+
+# install prometheus if NO_DEPENDS
+if [ -n "$NO_DEPENDS" ]; then
+    DOCKER_EXEC ./contrib/install_prometheus.sh
+fi

@@ -108,6 +108,13 @@ if [ -z "$DANGER_RUN_CI_ON_HOST" ]; then
 fi
 
 if [ "$USE_BUSY_BOX" = "true" ]; then
+  DOCKER_EXEC echo "deb http://deb.debian.org/debian buster-backports main >> /etc/apt/sources.list"
+  DOCKER_EXEC "apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 04EE7237B7D453EC || true"
+  DOCKER_EXEC "apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 648ACFD622F3D138 || true"
+  DOCKER_EXEC "apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 7638D0442B90D010 || true"
+  DOCKER_EXEC "apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 8B48AD6246925553 || true"
+  DOCKER_EXEC apt-get update
+  DOCKER_EXEC apt-get install --no-install-recommends --no-upgrade -y cmake/buster-backports
   echo "Setup to use BusyBox utils"
   DOCKER_EXEC mkdir -p $BASE_SCRATCH_DIR/bins/
   # tar excluded for now because it requires passing in the exact archive type in ./depends (fixed in later BusyBox version)
@@ -117,12 +124,12 @@ if [ "$USE_BUSY_BOX" = "true" ]; then
   DOCKER_EXEC for util in \$\(busybox --list \| grep -v "^ar$" \| grep -v "^tar$" \| grep -v "^find$"\)\; do ln -s \$\(command -v busybox\) $BASE_SCRATCH_DIR/bins/\$util\; done
   # Print BusyBox version
   DOCKER_EXEC patch --help
-fi
-
+ else
 # update cmake
-DOCKER_EXEC "curl -s --fail -L https://apt.kitware.com/keys/kitware-archive-latest.asc  | gpg --dearmor - > /etc/apt/trusted.gpg.d/kitware.gpg"
-DOCKER_EXEC "apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'"
-DOCKER_EXEC "apt-get update && apt-get install -y cmake"
+  DOCKER_EXEC "curl -s --fail -L https://apt.kitware.com/keys/kitware-archive-latest.asc  | gpg --dearmor - > /etc/apt/trusted.gpg.d/kitware.gpg"
+  DOCKER_EXEC "apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'"
+  DOCKER_EXEC "apt-get update && apt-get install -y cmake"
+fi
 
 # install prometheus if NO_DEPENDS
 if [ -n "$NO_DEPENDS" ]; then

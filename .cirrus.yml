@@ -85,7 +85,7 @@ task:
 
 task:
   name: 'ARM [unit tests, no functional tests] [buster]'
-  only_if: false
+  only_if: true
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: debian:buster
@@ -150,7 +150,7 @@ task:
 
 task:
   name: '[no depends, sanitizers: address/leak (ASan + LSan) + undefined (UBSan) + integer] [hirsute]'
-  only_if: true
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:hirsute

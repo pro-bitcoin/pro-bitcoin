@@ -834,7 +834,7 @@ bool MemPoolAccept::PreChecks(ATMPArgs& args, Workspace& ws)
             CFeeRate oldFeeRate(mi->GetModifiedFee(), mi->GetTxSize());
             if (newFeeRate <= oldFeeRate)
             {
-                return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "insufficient-fee",
+                return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "insufficient fee",
                                      strprintf("rejecting replacement %s; new feerate %s <= old feerate %s",
                                                hash.ToString(),
                                                newFeeRate.ToString(),
@@ -862,7 +862,7 @@ bool MemPoolAccept::PreChecks(ATMPArgs& args, Workspace& ws)
                 nConflictingSize += it->GetTxSize();
             }
         } else {
-            return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "too-many-potential-replacements",
+            return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "too many potential replacements",
                                  strprintf("rejecting replacement %s; too many potential replacements (%d > %d)\n",
                                            hash.ToString(),
                                            nConflictingCount,
@@ -898,7 +898,7 @@ bool MemPoolAccept::PreChecks(ATMPArgs& args, Workspace& ws)
         // transactions would not be paid for.
         if (nModifiedFees < nConflictingFees)
         {
-            return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "insufficient-fee",
+            return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "insufficient fee",
                                  strprintf("rejecting replacement %s, less fees than conflicting txs; %s < %s",
                                            hash.ToString(), FormatMoney(nModifiedFees), FormatMoney(nConflictingFees)));
         }
@@ -908,7 +908,7 @@ bool MemPoolAccept::PreChecks(ATMPArgs& args, Workspace& ws)
         CAmount nDeltaFees = nModifiedFees - nConflictingFees;
         if (nDeltaFees < ::incrementalRelayFee.GetFee(nSize))
         {
-            return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "insufficient-fee",
+            return state.Invalid(TxValidationResult::TX_MEMPOOL_POLICY, "insufficient fee",
                                  strprintf("rejecting replacement %s, not enough additional fees to relay; %s < %s",
                                            hash.ToString(),
                                            FormatMoney(nDeltaFees),

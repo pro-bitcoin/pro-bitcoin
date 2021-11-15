@@ -127,7 +127,7 @@ task:
 
 task:
   name: '[depends, sanitizers: thread (TSan), no gui] [hirsute]'
-  only_if: false
+  only_if: true
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:hirsute
@@ -150,7 +150,7 @@ task:
 
 task:
   name: '[no depends, sanitizers: address/leak (ASan + LSan) + undefined (UBSan) + integer] [hirsute]'
-  only_if: false
+  only_if: true
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:hirsute

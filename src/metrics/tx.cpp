@@ -1,4 +1,5 @@
 #include <metrics/metrics.h>
+#include <algorithm>
 
 namespace metrics {
 std::unique_ptr<TxMetrics> TxMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)
@@ -35,10 +36,12 @@ TxMetricsImpl::TxMetricsImpl(const std::string& chain, prometheus::Registry& reg
         "coinbase", "not-standard", "tx-size-small", "non-final", "txn-already-in-mempool", "txn-same-nonwitness-data-in-mempool",
         "bip125-replacement-disallowed", "txn-mempool-conflict", "txn-already-known", "bad-txns-inputs-missingorspent",
         "non-BIP68-final", "bad-txns-nonstandard-inputs", "bad-witness-nonstandard", "bad-txns-too-many-sigops",
-        "too-long-mempool-chain", "bad-txns-spends-conflicting-tx", "insufficient-fee", "too-many-potential-replacements",
+        "too-long-mempool-chain", "bad-txns-spends-conflicting-tx", "insufficient fee", "too many potential replacements",
         "replacement-adds-unconfirmed", "unknown"};
     for (const auto& item : reasons) {
-        _single_transaction_counter.insert({item, &single_transaction_family.Add({{"result", "rejected"}, {"reason", item}})});
+         std::string lbl = item;
+         std::replace(lbl.begin(), lbl.end(), ' ', '-');
+        _single_transaction_counter.insert({item, &single_transaction_family.Add({{"result", "rejected"}, {"reason", lbl}})});
     }
     _cache_gauge = &FamilyGauge("tx_cache").Add({});
     /*

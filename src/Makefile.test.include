@@ -2,6 +2,9 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+# used by boost-test-suite to produce xml test reports
+JUNIT ?=
+
 if ENABLE_FUZZ_BINARY
 noinst_PROGRAMS += test/fuzz/fuzz
 endif
@@ -334,7 +337,7 @@ bitcoin_test_check: $(TEST_BINARY) FORCE
 bitcoin_test_clean : FORCE
 	rm -f $(CLEAN_BITCOIN_TEST) $(test_test_bitcoin_OBJECTS) $(TEST_BINARY)
 
-check-local: $(BITCOIN_TESTS:.cpp=.cpp.test)
+check-local: $(BITCOIN_TESTS:.cpp=.cpp.test) boost-test-suite
 if BUILD_BITCOIN_TX
 	@echo "Running test/util/bitcoin-util-test.py..."
 	$(PYTHON) $(top_builddir)/test/util/bitcoin-util-test.py
@@ -353,9 +356,14 @@ if EMBEDDED_UNIVALUE
 	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) -C univalue check
 endif
 
+boost-test-suite:
+	[ -n "$(JUNIT)" ] && ($(TEST_BINARY) --catch_system_errors=no --log_level=warning --log_format=JUNIT > $(TEST_BINARY).xml || (cat $(TEST_BINARY).xml && false))
+
 %.cpp.test: %.cpp
-	@echo Running tests: `cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1` from $<
-	$(AM_V_at)$(TEST_BINARY) --catch_system_errors=no -l test_suite -t "`cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1`" -- DEBUG_LOG_OUT > $<.log 2>&1 || (cat $<.log && false)
+	$(AM_V_at)if [ -z "$(JUNIT)" ] ; then \
+		echo Running tests: `cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1` from $< \
+		$(TEST_BINARY) --catch_system_errors=no -l test_suite -t "`cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1`" -- DEBUG_LOG_OUT > $<.log 2>&1 || (cat $<.log && false)  \
+		fi
 
 %.json.h: %.json
 	@$(MKDIR_P) $(@D)

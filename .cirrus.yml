@@ -44,7 +44,7 @@ global_task_template: &GLOBAL_TASK_TEMPLATE
   ci_script:
     - ./ci/test_run_all.sh
   always:
-    junit_result_artifacts:
+    boost_test_artifacts:
       path: "**ci/scratch/build/**/test_bitcoin.xml"
       format: junit
       type: text/xml

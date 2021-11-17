@@ -1,10 +1,12 @@
 # Pro Bitcoin
 
+[![Build Status](https://api.cirrus-ci.com/github/pro-bitcoin/pro-bitcoin.svg)](https://cirrus-ci.com/github/pro-bitcoin/pro-bitcoin)
+
 A [prometheus](https://prometheus.io/docs/introduction/overview/) enabled bitcoin-core node running version [22.0](https://github.com/bitcoin/bitcoin/tree/v22.0), inspired by [https://statoshi.info](https://statoshi.info/?orgId=1)
 
 ## Usage
 
-By default metrics are enabled with a scrape url at `http://localhost:8335/metrics` (18335 for testnet)
+Default metrics scrape url at `http://localhost:8335/metrics` (18335 for testnet)
 
 ## Config
 

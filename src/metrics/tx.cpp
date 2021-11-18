@@ -1,17 +1,14 @@
-#include <metrics/metrics.h>
 #include <algorithm>
+#include <logging.h>
+#include <metrics/metrics.h>
 
 namespace metrics {
 std::unique_ptr<TxMetrics> TxMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)
 {
-    auto m = std::make_unique<TxMetrics>();
-    if (noop)
-        return m;
-
-    auto real = new TxMetricsImpl(chain, registry);
-    m.reset(reinterpret_cast<TxMetrics*>(real));
-    return m;
+    LogPrint(BCLog::METRICS, "creaing TxMetrics on %s\n", chain);
+    return noop ? std::make_unique<TxMetrics>() : std::make_unique<TxMetricsImpl>(chain, registry);
 }
+
 TxMetricsImpl::TxMetricsImpl(const std::string& chain, prometheus::Registry& registry) : Metrics(chain, registry)
 {
     auto& single_transaction_family = FamilyCounter("transaction");
@@ -44,15 +41,6 @@ TxMetricsImpl::TxMetricsImpl(const std::string& chain, prometheus::Registry& reg
         _single_transaction_counter.insert({item, &single_transaction_family.Add({{"result", "rejected"}, {"reason", lbl}})});
     }
     _cache_gauge = &FamilyGauge("tx_cache").Add({});
-    /*
-        _transactions_counter = {
-                {"size", &transactions_family.Add({{"type", "size"}})},
-                {"inputs", &transactions_family.Add({{"type", "inputs"}})},
-                {"outputs", &transactions_family.Add({{"type", "outputs"}})},
-                {"sigops-cost", &transactions_family.Add({{"type", "sigops-cost"}})},
-                {"unknown", &transactions_family.Add({{"type", "unknown"}})},
-        };
-         */
 }
 
 void TxMetricsImpl::IncInvalid(const std::string& reason)
@@ -81,20 +69,8 @@ void TxMetricsImpl::IncOrphanRemove()
 {
     _orphan_remove_counter->Increment();
 }
-void TxMetricsImpl::IncAccepted(unsigned long amt)
-{
-    _accepted_counter->Increment((double)amt);
-}
 void TxMetricsImpl::IncTransactions(const std::string& type, long amt)
 {
-    /*
-        auto found = this->_transactions_counter.find(type);
-        if (found == this->_transactions_counter.end()) {
-            this->_transactions_counter.find("unknown")->second->Increment((double)amt);
-            return;
-        }
-        found->second->Increment((double)amt);
-         */
 }
 void TxMetricsImpl::TransactionCheck(int64_t current, double amt)
 {

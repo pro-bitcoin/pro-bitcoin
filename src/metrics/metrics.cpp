@@ -1,3 +1,4 @@
+#include <logging.h>
 #include <metrics/metrics.h>
 
 #include <future>
@@ -56,6 +57,7 @@ ConfigMetrics::ConfigMetrics(const std::string& chain, prometheus::Registry& reg
     FamilyGauge("bitcoin_boot_time").Add({}).Set((double)now);
     _config = &FamilyGauge("bitcoin_conf");
     _ibd = &FamilyGauge("initial_block_download").Add({});
+    LogPrint(BCLog::METRICS, "Creating ConfigMetrics on %s\n", chain);
 }
 
 void ConfigMetrics::Set(const std::string& cfg, size_t category, const std::string type, int64_t value)

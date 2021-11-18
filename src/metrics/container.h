@@ -1,10 +1,11 @@
 #ifndef BITCOIN_METRICS_CONTAINER_H
 #define BITCOIN_METRICS_CONTAINER_H
 
+#include <cassert>
 #include <metrics/metrics.h>
 
 namespace metrics {
-static auto prom_registry = std::make_shared<prometheus::Registry>(); // NOLINT(cert-err58-cpp)
+static auto prom_registry = std::make_shared<prometheus::Registry>();
 static std::shared_ptr<prometheus::Exposer> exposer;
 
 class Container
@@ -21,10 +22,7 @@ protected:
 
 public:
     Container();
-    ~Container()
-    {
-        //delete this;
-    }
+    ~Container() {}
     void Init(const std::string& chain, bool noop);
     PeerMetrics& Peer();
     NetMetrics& Net();
@@ -35,10 +33,9 @@ public:
     ConfigMetrics& Config();
 };
 
-
 void Init(const std::string& bind, const std::string& chain, bool noop = false);
-
 Container* Instance();
+prometheus::Registry& Registry();
 } // namespace metrics
 
 #endif

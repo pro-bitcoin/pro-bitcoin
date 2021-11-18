@@ -99,6 +99,7 @@ class TestNode():
             "-datadir=" + self.datadir,
             "-logtimemicros",
             "-debug",
+            "-metrics=0",
             "-debugexclude=libevent",
             "-debugexclude=leveldb",
             "-uacomment=testnode%d" % i,

@@ -1,4 +1,4 @@
-#include <cassert>
+#include <logging.h>
 #include <metrics/metrics.h>
 #include <prometheus/histogram.h>
 
@@ -13,13 +13,8 @@
 namespace metrics {
 std::unique_ptr<BlockMetrics> BlockMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)
 {
-    auto m = std::make_unique<BlockMetrics>();
-    if (noop)
-        return m;
-
-    auto real = new BlockMetricsImpl(chain, registry);
-    m.reset(reinterpret_cast<BlockMetrics*>(real));
-    return m;
+    LogPrint(BCLog::METRICS, "creaing TxMetrics on %s\n", chain);
+    return noop ? std::make_unique<BlockMetrics>() : std::make_unique<BlockMetricsImpl>(chain, registry);
 }
 
 BlockMetricsImpl::BlockMetricsImpl(const std::string& chain, prometheus::Registry& registry) : Metrics(chain, registry)

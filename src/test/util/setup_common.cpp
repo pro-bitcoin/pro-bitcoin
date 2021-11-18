@@ -76,7 +76,7 @@ BasicTestingSetup::BasicTestingSetup(const std::string& chainName, const std::ve
     : m_path_root{fs::temp_directory_path() / "test_common_" PACKAGE_NAME / g_insecure_rand_ctx_temp_path.rand256().ToString()},
       m_args{}
 {
-    metrics::Init("", "test", true);
+    metrics::Init("", "test", false); // don't bind metrics exporter
     m_node.args = &gArgs;
     const std::vector<const char*> arguments = Cat(
         {

@@ -1308,7 +1308,9 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
         LogPrintf("Using /16 prefix for IP bucketing\n");
     }
 
-    RegisterValidationInterface(new metrics::MetricsNotificationsInterface(metrics::Instance()->Block(), metrics::Instance()->MemPool()));
+    auto metricsInterface = std::make_shared<metrics::MetricsNotificationsInterface>(metrics::Instance()->Block(), metrics::Instance()->MemPool());
+    RegisterSharedValidationInterface(metricsInterface);
+
 #if ENABLE_ZMQ
     g_zmq_notification_interface = CZMQNotificationInterface::Create();
 
@@ -1417,7 +1419,7 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     configMetrics.Set("minrelaytxfee", static_cast<size_t>(OptionsCategory::NODE_RELAY), "int", args.GetArg("-minrelaytxfee", DEFAULT_MIN_RELAY_TX_FEE));
     configMetrics.Set("par", static_cast<size_t>(OptionsCategory::OPTIONS), "int", script_threads);
     configMetrics.Set("peertimeout", static_cast<size_t>(OptionsCategory::CONNECTION), "seconds", peer_connect_timeout);
-    configMetrics.Set("prune", static_cast<size_t>(OptionsCategory::OPTIONS), "int", nPruneTarget);
+    configMetrics.SetU("prune", static_cast<size_t>(OptionsCategory::OPTIONS), "int", nPruneTarget);
     configMetrics.Set("rpcserialversion", static_cast<size_t>(OptionsCategory::RPC), "int", args.GetArg("-rpcserialversion", DEFAULT_RPC_SERIALIZE_VERSION));
     configMetrics.Set("rpcthreads", static_cast<size_t>(OptionsCategory::RPC), "int", args.GetArg("-rpcthreads", DEFAULT_HTTP_THREADS));
     configMetrics.Set("rpcallowip", static_cast<size_t>(OptionsCategory::RPC), "int", args.GetArgs("-rpcallowip").size());

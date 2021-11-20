@@ -67,6 +67,13 @@ void ConfigMetrics::Set(const std::string& cfg, size_t category, const std::stri
     }
 }
 
+void ConfigMetrics::SetU(const std::string& cfg, size_t category, const std::string type, uint64_t value)
+{
+    if (category <= _categories.size() - 1) {
+        _config->Add({{"type", type}, {"name", cfg}, {"category", _categories[category]}}).Set(static_cast<double>(value));
+    }
+}
+
 void ConfigMetrics::SetFlag(const std::string& cfg, size_t category, bool value)
 {
     double flag = value ? 1.0 : 0.0;

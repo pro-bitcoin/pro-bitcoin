@@ -88,23 +88,6 @@ public:
     Metrics(const std::string& chain, prometheus::Registry& registry);
 };
 
-/*
-    class UtxoMetrics: Metrics {
-    protected:
-        prometheus::Gauge* _total_gauge;
-        prometheus::Gauge* _total_out_gauge;
-        prometheus::Gauge* _total_btc_amt_gauge;
-        prometheus::Gauge* _db_size_gauge;
-        prometheus::Gauge* _block_height_gauge;
-    public:
-        explicit UtxoMetrics(const std::string& chain, prometheus::Registry& registry);
-        void Total(double amt);
-        void Outputs(double amt);
-        void BtcAmount(double amt);
-        void DbSize(double amt);
-        void BlockHeight(double amt);
-    };
-*/
 struct BlockTimerOp {
     BlockTimerOp(std::string name, prometheus::Histogram::BucketBoundaries buckets);
     std::string name() const;
@@ -145,6 +128,7 @@ private:
 public:
     explicit ConfigMetrics(const std::string& chain, prometheus::Registry& registry);
     void Set(const std::string& cfg, size_t category, const std::string type, int64_t value);
+    void SetU(const std::string& cfg, size_t category, const std::string type, uint64_t value);
     void SetFlag(const std::string& cfg, size_t category, bool value);
     void SetIBD(const bool value);
 };

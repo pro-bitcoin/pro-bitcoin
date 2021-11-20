@@ -48,6 +48,8 @@ global_task_template: &GLOBAL_TASK_TEMPLATE
       path: "**ci/scratch/build/**/test_bitcoin.xml"
       format: junit
       type: text/xml
+    function_test_artifacts:
+      path: "**ci/scratch/test_runner/**/*.log"
 
 
 depends_sdk_cache_template: &DEPENDS_SDK_CACHE_TEMPLATE

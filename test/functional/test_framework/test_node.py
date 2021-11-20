@@ -34,6 +34,7 @@ from .util import (
     rpc_url,
     wait_until_helper,
     p2p_port,
+    metrics_port,
     EncodeDecimal,
 )
 
@@ -94,12 +95,14 @@ class TestNode():
         # Configuration for logging is set as command-line args rather than in the bitcoin.conf file.
         # This means that starting a bitcoind using the temp dir to debug a failed test won't
         # spam debug.log.
+        # metrics_bind = metrics_port(i)
         self.args = [
             self.binary,
             "-datadir=" + self.datadir,
             "-logtimemicros",
             "-debug",
-            "-metrics=0",
+            "-metrics=1",
+            "-metricsbind=localhost:0",
             "-debugexclude=libevent",
             "-debugexclude=leveldb",
             "-uacomment=testnode%d" % i,

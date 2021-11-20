@@ -34,7 +34,7 @@ TxMetricsImpl::TxMetricsImpl(const std::string& chain, prometheus::Registry& reg
         "bip125-replacement-disallowed", "txn-mempool-conflict", "txn-already-known", "bad-txns-inputs-missingorspent",
         "non-BIP68-final", "bad-txns-nonstandard-inputs", "bad-witness-nonstandard", "bad-txns-too-many-sigops",
         "too-long-mempool-chain", "bad-txns-spends-conflicting-tx", "insufficient fee", "too many potential replacements",
-        "replacement-adds-unconfirmed", "unknown"};
+        "replacement-adds-unconfirmed", "mempool full", "unknown"};
     for (const auto& item : reasons) {
          std::string lbl = item;
          std::replace(lbl.begin(), lbl.end(), ' ', '-');

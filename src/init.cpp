@@ -1092,15 +1092,15 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     // Metrics
     auto metrics_endpoint = args.GetArg("-metricsbind", chainparams.IsTestChain() ? "localhost:18335" : "localhost:8335");
     auto use_metrics = args.GetBoolArg("-metrics", false);
-    try {
-        metrics::Init(metrics_endpoint, chainparams.IsTestChain() ? "test" : "main", !use_metrics);
-    } catch (std::exception& e) {
-        return InitError(strprintf(_("Metrics init error %s %s\n"), metrics_endpoint, e.what()));
-    }
     if (!use_metrics) {
         LogPrintf("Using noop Metrics\n");
     } else {
         LogPrintf("Bound metrics endpoint to %s/metrics\n", metrics_endpoint);
+    }
+    try {
+        metrics::Init(metrics_endpoint, chainparams.IsTestChain() ? "test" : "main", !use_metrics);
+    } catch (std::exception& e) {
+        return InitError(strprintf(_("Metrics init error %s %s\n"), metrics_endpoint, e.what()));
     }
 
     InitSignatureCache();
@@ -1425,7 +1425,10 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     //configMetrics.Set("rpcwhitelist", static_cast<size_t>(OptionsCategory::RPC, args.GetArgs("-rpcwhitelist").size());
     //configMetrics.Set("chainstate-db", nCoinDBCache);
     //configMetrics.Set("txindex-cache", nTxIndexCache);
-
+    LogPrintf("Registered %d metrics\n", metrics::Registry().Collect().size());
+    for (auto& m : metrics::Registry().Collect()) {
+        LogPrint(BCLog::METRICS, "Registered metric %s:%d\n", m.name, static_cast<int32_t>(m.type));
+    }
     bool fLoaded = false;
     while (!fLoaded && !ShutdownRequested()) {
         const bool fReset = fReindex;

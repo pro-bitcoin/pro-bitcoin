@@ -1,4 +1,5 @@
 #include <cassert>
+#include <logging.h>
 #include <metrics/container.h>
 
 
@@ -38,6 +39,7 @@ ConfigMetrics& Container::Config()
 
 void Container::Init(const std::string& chain, bool noop)
 {
+    LogPrint(BCLog::METRICS, "Init metrics on %s\n", chain);
     // check if already init
     if (_init.exchange(true)) {
         return;
@@ -54,7 +56,7 @@ void Container::Init(const std::string& chain, bool noop)
 
 void Init(const std::string& bind, const std::string& chain, bool noop)
 {
-    if (!noop) {
+    if (!bind.empty() && !noop) {
         exposer = std::make_shared<prometheus::Exposer>(bind);
         exposer->RegisterCollectable(prom_registry);
     }
@@ -67,4 +69,8 @@ Container* Instance()
     return &c;
 }
 
+prometheus::Registry& Registry()
+{
+    return *prom_registry;
+}
 } // namespace metrics

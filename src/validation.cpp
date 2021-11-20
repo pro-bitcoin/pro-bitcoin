@@ -85,7 +85,7 @@ const std::vector<std::string> CHECKLEVEL_DOC {
     "each level includes the checks of the previous levels",
 };
 
-static const auto metricsContainer = metrics::Instance();
+static const auto& metricsContainer = metrics::Instance();
 
 bool CBlockIndexWorkComparator::operator()(const CBlockIndex *pa, const CBlockIndex *pb) const {
     // First sort by most total work, ...
@@ -1104,7 +1104,6 @@ PackageMempoolAcceptResult MemPoolAccept::AcceptMultipleTransactions(const std::
                             MempoolAcceptResult::Success(std::move(ws.m_replaced_transactions), ws.m_base_fees));
         }
     }
-    metricsContainer->Tx().IncAccepted(results.size());
     return PackageMempoolAcceptResult(package_state, std::move(results));
 }
 

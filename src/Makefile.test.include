@@ -3,7 +3,7 @@
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 # used by boost-test-suite to produce xml test reports
-JUNIT ?=
+TEST_REPORTS ?=
 
 if ENABLE_FUZZ_BINARY
 noinst_PROGRAMS += test/fuzz/fuzz
@@ -106,6 +106,7 @@ BITCOIN_TESTS =\
   test/mempool_tests.cpp \
   test/merkle_tests.cpp \
   test/merkleblock_tests.cpp \
+  test/metrics_tests.cpp \
   test/miner_tests.cpp \
   test/multisig_tests.cpp \
   test/net_peer_eviction_tests.cpp \
@@ -357,10 +358,12 @@ if EMBEDDED_UNIVALUE
 endif
 
 boost-test-suite:
-	[ -n "$(JUNIT)" ] && ($(TEST_BINARY) --catch_system_errors=no --log_level=warning --log_format=JUNIT > $(TEST_BINARY).xml || (cat $(TEST_BINARY).xml && false))
+	if [ -n "$(TEST_REPORTS)" ]; then \
+		$(TEST_BINARY) --catch_system_errors=no --log_format=JUNIT --log_sink=$(TEST_BINARY).xml; \
+	fi
 
 %.cpp.test: %.cpp
-	$(AM_V_at)if [ -z "$(JUNIT)" ] ; then \
+	$(AM_V_at)if [ -z "$(TEST_REPORTS)" ] ; then \
 		echo Running tests: `cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1` from $< \
 		$(TEST_BINARY) --catch_system_errors=no -l test_suite -t "`cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1`" -- DEBUG_LOG_OUT > $<.log 2>&1 || (cat $<.log && false)  \
 		fi

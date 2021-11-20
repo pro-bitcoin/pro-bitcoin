@@ -1,15 +1,10 @@
+#include <logging.h>
 #include <metrics/metrics.h>
-
 namespace metrics {
 std::unique_ptr<PeerMetrics> PeerMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)
 {
-    auto m = std::make_unique<PeerMetrics>();
-    if (noop)
-        return m;
-
-    auto real = new PeerMetricsImpl(chain, registry);
-    m.reset(reinterpret_cast<PeerMetrics*>(real));
-    return m;
+    LogPrint(BCLog::METRICS, "creaing PeerMetrics on %s\n", chain);
+    return noop ? std::make_unique<PeerMetrics>() : std::make_unique<PeerMetricsImpl>(chain, registry);
 }
 PeerMetricsImpl::PeerMetricsImpl(const std::string& chain, prometheus::Registry& registry) : Metrics(chain, registry)
 {

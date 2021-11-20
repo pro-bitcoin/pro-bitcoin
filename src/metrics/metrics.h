@@ -6,7 +6,6 @@
 #include <prometheus/histogram.h>
 #include <prometheus/registry.h>
 #include <prometheus/summary.h>
-
 namespace metrics {
 
 enum NetDirection {
@@ -151,25 +150,6 @@ public:
 
 class BlockMetrics
 {
-protected:
-    std::vector<std::string> _block_types{
-        "size",
-        "size-witness",
-        "weight",
-        "height",
-        "version",
-        "transactions",
-        "sigops",
-        "time",
-        "header-time",
-        "fees",
-        "reward",
-        "difficulty",
-        "valueout"};
-    std::map<const std::string, prometheus::Gauge*> _block_tip_gauge;
-    std::vector<prometheus::Histogram*> _block_bucket_timers;
-    std::vector<prometheus::Gauge*> _block_avg;
-
 public:
     static std::unique_ptr<BlockMetrics> make(const std::string& chain, prometheus::Registry& registry, bool noop);
     virtual ~BlockMetrics(){};
@@ -196,10 +176,27 @@ public:
     virtual void UpdateIndex(int64_t current, double avg){};
 };
 
-class BlockMetricsImpl : BlockMetrics, Metrics
+class BlockMetricsImpl : virtual public BlockMetrics, Metrics
 {
 protected:
     void set(const std::string& type, double amt);
+    std::vector<std::string> _block_types{
+        "size",
+        "size-witness",
+        "weight",
+        "height",
+        "version",
+        "transactions",
+        "sigops",
+        "time",
+        "header-time",
+        "fees",
+        "reward",
+        "difficulty",
+        "valueout"};
+    std::map<const std::string, prometheus::Gauge*> _block_tip_gauge;
+    std::vector<prometheus::Histogram*> _block_bucket_timers;
+    std::vector<prometheus::Gauge*> _block_avg;
 
 public:
     ~BlockMetricsImpl(){};
@@ -229,6 +226,20 @@ public:
 
 class TxMetrics
 {
+public:
+    virtual ~TxMetrics() {}
+    static std::unique_ptr<TxMetrics> make(const std::string& chain, prometheus::Registry& registry, bool noop);
+    virtual void IncInvalid(const std::string& reason){};
+    virtual void InputTime(double t){};
+    virtual void IncOrphanAdd(){};
+    virtual void IncOrphanRemove(){};
+    virtual void CacheSize(double amt){};
+    virtual void IncTransactions(const std::string& type, long amt){};
+    virtual void TransactionCheck(int64_t current, double amt){};
+};
+
+class TxMetricsImpl : virtual public TxMetrics, Metrics
+{
 protected:
     std::map<const std::string, prometheus::Counter*> _single_transaction_counter;
     prometheus::Summary* _inputs_timer;
@@ -240,27 +251,12 @@ protected:
     prometheus::Gauge* _check_avg;
 
 public:
-    static std::unique_ptr<TxMetrics> make(const std::string& chain, prometheus::Registry& registry, bool noop);
-    virtual void IncInvalid(const std::string& reason){};
-    virtual void InputTime(double t){};
-    virtual void IncOrphanAdd(){};
-    virtual void IncOrphanRemove(){};
-    virtual void IncAccepted(unsigned long amt){};
-    virtual void CacheSize(double amt){};
-    virtual void IncTransactions(const std::string& type, long amt){};
-    virtual void TransactionCheck(int64_t current, double amt){};
-};
-
-class TxMetricsImpl : TxMetrics, Metrics
-{
-public:
-    ~TxMetricsImpl(){};
+    ~TxMetricsImpl() {}
     explicit TxMetricsImpl(const std::string& chain, prometheus::Registry& registry);
     void IncInvalid(const std::string& reason) override;
     void InputTime(double t) override;
     void IncOrphanAdd() override;
     void IncOrphanRemove() override;
-    void IncAccepted(unsigned long amt) override;
     void CacheSize(double amt) override;
     void IncTransactions(const std::string& type, long amt) override;
     void TransactionCheck(int64_t current, double amt) override;
@@ -268,17 +264,8 @@ public:
 
 class NetMetrics
 {
-protected:
-    std::map<NetConnectionType, prometheus::Gauge*> _connections_gauge;
-    std::map<const std::string, prometheus::Gauge*> _bandwidth_gauge_tx;
-    std::map<const std::string, prometheus::Gauge*> _bandwidth_gauge_rx;
-    prometheus::Summary* _ping_timer;
-    prometheus::Counter* _ping_problem_counter;
-    std::map<const std::string, prometheus::Counter*> _connection_counter;
-    prometheus::Gauge* _max_outbound_gauge;
-    prometheus::Gauge* _max_outbound_start_gauge;
-
 public:
+    virtual ~NetMetrics() {}
     static std::unique_ptr<NetMetrics> make(const std::string& chain, prometheus::Registry& registry, bool noop);
     virtual void IncConnection(const std::string& type){};
     virtual void ConnectionGauge(NetConnectionType netConnection, uint amt){};
@@ -288,10 +275,18 @@ public:
     virtual void MaxOutbound(int64_t amt){};
     virtual void MaxOutboundStartTime(int64_t amt){};
 };
-class NetMetricsImpl : NetMetrics, Metrics
+class NetMetricsImpl : virtual public NetMetrics, Metrics
 {
 protected:
     void initBandwidth();
+    std::map<NetConnectionType, prometheus::Gauge*> _connections_gauge;
+    std::map<const std::string, prometheus::Gauge*> _bandwidth_gauge_tx;
+    std::map<const std::string, prometheus::Gauge*> _bandwidth_gauge_rx;
+    prometheus::Summary* _ping_timer;
+    prometheus::Counter* _ping_problem_counter;
+    std::map<const std::string, prometheus::Counter*> _connection_counter;
+    prometheus::Gauge* _max_outbound_gauge;
+    prometheus::Gauge* _max_outbound_start_gauge;
 
 public:
     ~NetMetricsImpl(){};
@@ -307,19 +302,8 @@ public:
 
 class PeerMetrics
 {
-protected:
-    std::vector<prometheus::Gauge*> _connections_gauge;
-    std::map<const std::string, prometheus::Histogram*> _process_msg_timer;
-    std::map<const std::string, prometheus::Counter*> _push_msg_counter;
-    std::vector<prometheus::Counter*> _tx_validations;
-    prometheus::Counter* _bad_peer_counter;
-    prometheus::Counter* _misbehave_counter;
-    prometheus::Gauge* _known_peers_gauge;
-    prometheus::Gauge* _banned_gauge;
-    prometheus::Summary* _send_msg_timer;
-    std::map<const std::string, prometheus::Gauge*> _permission_gauge;
-
 public:
+    virtual ~PeerMetrics() {}
     static std::unique_ptr<PeerMetrics> make(const std::string& chain, prometheus::Registry& registry, bool noop);
     virtual void ProcessMsgType(const std::string& msg_type, long amt){};
     virtual void IncTxValidationResult(int state){};
@@ -332,10 +316,20 @@ public:
     virtual void PushMsgType(const std::string& msg_type){};
     virtual void Banned(unsigned long amt){};
 };
-class PeerMetricsImpl : PeerMetrics, Metrics
+class PeerMetricsImpl : virtual public PeerMetrics, Metrics
 {
 protected:
     void initConnections();
+    std::vector<prometheus::Gauge*> _connections_gauge;
+    std::map<const std::string, prometheus::Histogram*> _process_msg_timer;
+    std::map<const std::string, prometheus::Counter*> _push_msg_counter;
+    std::vector<prometheus::Counter*> _tx_validations;
+    prometheus::Counter* _bad_peer_counter;
+    prometheus::Counter* _misbehave_counter;
+    prometheus::Gauge* _known_peers_gauge;
+    prometheus::Gauge* _banned_gauge;
+    prometheus::Summary* _send_msg_timer;
+    std::map<const std::string, prometheus::Gauge*> _permission_gauge;
 
 public:
     ~PeerMetricsImpl(){};
@@ -354,6 +348,17 @@ public:
 
 class MemPoolMetrics
 {
+public:
+    virtual ~MemPoolMetrics() {}
+    static std::unique_ptr<MemPoolMetrics> make(const std::string& chain, prometheus::Registry& registry, bool noop);
+    virtual void AcceptTime(long amt){};
+    virtual void Transactions(MemPoolType type, long amt){};
+    virtual void Incoming(size_t in, size_t out, unsigned int byte_size, int64_t amt){};
+    virtual void Removed(size_t reason){};
+    virtual void Orphans(size_t map, size_t outpoint){};
+};
+class MemPoolMetricsImpl : virtual public MemPoolMetrics, Metrics
+{
 protected:
     prometheus::Histogram* _accept_pool_timer;
     std::vector<prometheus::Gauge*> _mempool_gauge;
@@ -367,16 +372,6 @@ protected:
     prometheus::Gauge* _orphan_size_gauge;
     prometheus::Gauge* _orphan_outpoint_gauge;
 
-public:
-    static std::unique_ptr<MemPoolMetrics> make(const std::string& chain, prometheus::Registry& registry, bool noop);
-    virtual void AcceptTime(long amt){};
-    virtual void Transactions(MemPoolType type, long amt){};
-    virtual void Incoming(size_t in, size_t out, unsigned int byte_size, int64_t amt){};
-    virtual void Removed(size_t reason){};
-    virtual void Orphans(size_t map, size_t outpoint){};
-};
-class MemPoolMetricsImpl : MemPoolMetrics, Metrics
-{
 public:
     explicit MemPoolMetricsImpl(const std::string& chain, prometheus::Registry& registry);
     ~MemPoolMetricsImpl(){};

@@ -1,16 +1,12 @@
+#include <logging.h>
 #include <metrics/metrics.h>
 
 
 namespace metrics {
 std::unique_ptr<MemPoolMetrics> MemPoolMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)
 {
-    auto m = std::make_unique<MemPoolMetrics>();
-    if (noop)
-        return m;
-
-    auto real = new MemPoolMetricsImpl(chain, registry);
-    m.reset(reinterpret_cast<MemPoolMetrics*>(real));
-    return m;
+    LogPrint(BCLog::METRICS, "creaing MempoolMetrics on %s\n", chain);
+    return noop ? std::make_unique<MemPoolMetrics>() : std::make_unique<MemPoolMetricsImpl>(chain, registry);
 }
 MemPoolMetricsImpl::MemPoolMetricsImpl(const std::string& chain, prometheus::Registry& registry) : Metrics(chain, registry)
 {

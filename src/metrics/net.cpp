@@ -1,14 +1,11 @@
+#include <logging.h>
 #include <metrics/metrics.h>
 
 namespace metrics {
 std::unique_ptr<NetMetrics> NetMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)
 {
-    auto m = std::make_unique<NetMetrics>();
-    if (noop)
-        return m;
-    auto real = new NetMetricsImpl(chain, registry);
-    m.reset(reinterpret_cast<NetMetrics*>(real));
-    return m;
+    LogPrint(BCLog::METRICS, "creaing NetMetrics on %s\n", chain);
+    return noop ? std::make_unique<NetMetrics>() : std::make_unique<NetMetricsImpl>(chain, registry);
 }
 
 NetMetricsImpl::NetMetricsImpl(const std::string& chain, prometheus::Registry& registry) : Metrics(chain, registry)

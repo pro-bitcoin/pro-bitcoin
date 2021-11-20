@@ -77,6 +77,7 @@ compute_credits_template: &CREDITS_TEMPLATE
 
 task:
   name: 'lint [bionic]'
+  only_if: false
   << : *BASE_TEMPLATE
   container:
     image: ubuntu:bionic  # For python 3.6, oldest supported version according to doc/dependencies.md
@@ -91,7 +92,7 @@ task:
 
 task:
   name: 'ARM [unit tests, no functional tests] [buster]'
-  only_if: true
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: debian:buster
@@ -133,7 +134,7 @@ task:
 
 task:
   name: '[depends, sanitizers: thread (TSan), no gui] [hirsute]'
-  only_if: true
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:hirsute
@@ -146,7 +147,7 @@ task:
 
 task:
   name: '[depends, sanitizers: memory (MSan)] [focal]'
-  only_if: true
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:focal
@@ -166,7 +167,7 @@ task:
 
 task:
   name: '[no depends, sanitizers: fuzzer,address,undefined,integer] [focal]'
-  only_if: true
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:focal

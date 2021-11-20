@@ -1,0 +1,878 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite tests="431" skipped="0" errors="0" failures="1" id="0" name="Bitcoin_Core_Test_Suite" time="44.8318">
+<testcase assertions="1060" classname="arith_uint256_tests" name="basics" time="0.001772">
+</testcase>
+<testcase assertions="3328" classname="arith_uint256_tests" name="shifts" time="0.007178">
+</testcase>
+<testcase assertions="260" classname="arith_uint256_tests" name="unaryOperators" time="0.000653">
+</testcase>
+<testcase assertions="34" classname="arith_uint256_tests" name="bitwiseOperators" time="0.000264">
+</testcase>
+<testcase assertions="2560" classname="arith_uint256_tests" name="comparison" time="0.004388">
+</testcase>
+<testcase assertions="2818" classname="arith_uint256_tests" name="plusMinus" time="0.005599">
+</testcase>
+<testcase assertions="15" classname="arith_uint256_tests" name="multiply" time="0.00017">
+</testcase>
+<testcase assertions="12" classname="arith_uint256_tests" name="divide" time="0.000275">
+</testcase>
+<testcase assertions="527" classname="arith_uint256_tests" name="methods" time="0.001234">
+</testcase>
+<testcase assertions="79" classname="arith_uint256_tests" name="bignum_SetCompact" time="0.000312">
+</testcase>
+<testcase assertions="20" classname="arith_uint256_tests" name="getmaxcoverage" time="0.00018">
+</testcase>
+<testcase assertions="19" classname="addrman_tests" name="addrman_simple" time="0.002005">
+</testcase>
+<testcase assertions="11" classname="addrman_tests" name="addrman_ports" time="0.002143">
+</testcase>
+<testcase assertions="29" classname="addrman_tests" name="addrman_select" time="0.011776">
+</testcase>
+<testcase assertions="59" classname="addrman_tests" name="addrman_new_collisions" time="0.002334">
+</testcase>
+<testcase assertions="245" classname="addrman_tests" name="addrman_tried_collisions" time="0.126832">
+</testcase>
+<testcase assertions="15" classname="addrman_tests" name="addrman_find" time="0.001945">
+</testcase>
+<testcase assertions="5" classname="addrman_tests" name="addrman_create" time="0.001863">
+</testcase>
+<testcase assertions="6" classname="addrman_tests" name="addrman_delete" time="0.001817">
+</testcase>
+<testcase assertions="4115" classname="addrman_tests" name="addrman_getaddr" time="0.374675">
+</testcase>
+<testcase assertions="1029" classname="addrman_tests" name="caddrinfo_get_tried_bucket_legacy" time="0.009307">
+</testcase>
+<testcase assertions="3071" classname="addrman_tests" name="caddrinfo_get_new_bucket_legacy" time="0.033558">
+</testcase>
+<testcase assertions="1029" classname="addrman_tests" name="caddrinfo_get_tried_bucket" time="0.108625">
+</testcase>
+<testcase assertions="3582" classname="addrman_tests" name="caddrinfo_get_new_bucket" time="0.029634">
+</testcase>
+<testcase assertions="18" classname="addrman_tests" name="addrman_serialization" time="0.003895">
+</testcase>
+<testcase assertions="10" classname="addrman_tests" name="remove_invalid" time="0.004021">
+</testcase>
+<testcase assertions="157" classname="addrman_tests" name="addrman_selecttriedcollision" time="0.02776">
+</testcase>
+<testcase assertions="138" classname="addrman_tests" name="addrman_noevict" time="0.041484">
+</testcase>
+<testcase assertions="102" classname="addrman_tests" name="addrman_evictionworks" time="0.028123">
+</testcase>
+<testcase assertions="5" classname="amount_tests" name="MoneyRangeTest" time="0.000178">
+</testcase>
+<testcase assertions="36" classname="amount_tests" name="GetFeeTest" time="0.000114">
+</testcase>
+<testcase assertions="8" classname="amount_tests" name="BinaryOperatorTest" time="8.2e-05">
+</testcase>
+<testcase assertions="3" classname="amount_tests" name="ToStringTest" time="8.8e-05">
+</testcase>
+<testcase assertions="24" classname="allocator_tests" name="arena_tests" time="0.004175">
+</testcase>
+<testcase assertions="19" classname="allocator_tests" name="lockedpool_tests_mock" time="0.000291">
+</testcase>
+<testcase assertions="4" classname="allocator_tests" name="lockedpool_tests_live" time="0.000172">
+</testcase>
+<testcase assertions="25" classname="base32_tests" name="base32_testvectors" time="0.000269">
+</testcase>
+<testcase assertions="14" classname="base58_tests" name="base58_EncodeBase58" time="0.002077">
+</testcase>
+<testcase assertions="42" classname="base58_tests" name="base58_DecodeBase58" time="0.001825">
+</testcase>
+<testcase assertions="3000" classname="base58_tests" name="base58_random_encode_decode" time="0.082916">
+</testcase>
+<testcase assertions="18" classname="base64_tests" name="base64_testvectors" time="0.000251">
+</testcase>
+<testcase assertions="21" classname="bech32_tests" name="bech32_testvectors_valid" time="0.000172">
+</testcase>
+<testcase assertions="21" classname="bech32_tests" name="bech32m_testvectors_valid" time="0.000132">
+</testcase>
+<testcase assertions="14" classname="bech32_tests" name="bech32_testvectors_invalid" time="0.000196">
+</testcase>
+<testcase assertions="14" classname="bech32_tests" name="bech32m_testvectors_invalid" time="9.5e-05">
+</testcase>
+<testcase assertions="38" classname="bip32_tests" name="bip32_test1" time="0.006306">
+</testcase>
+<testcase assertions="38" classname="bip32_tests" name="bip32_test2" time="0.005186">
+</testcase>
+<testcase assertions="12" classname="bip32_tests" name="bip32_test3" time="0.004322">
+</testcase>
+<testcase assertions="17" classname="bip32_tests" name="bip32_test4" time="0.020999">
+</testcase>
+<testcase assertions="1" classname="blockchain_tests" name="get_difficulty_for_very_low_target" time="0.001538">
+</testcase>
+<testcase assertions="1" classname="blockchain_tests" name="get_difficulty_for_low_target" time="0.001568">
+</testcase>
+<testcase assertions="1" classname="blockchain_tests" name="get_difficulty_for_mid_target" time="0.001497">
+</testcase>
+<testcase assertions="1" classname="blockchain_tests" name="get_difficulty_for_high_target" time="0.001764">
+</testcase>
+<testcase assertions="1" classname="blockchain_tests" name="get_difficulty_for_very_high_target" time="0.001555">
+</testcase>
+<testcase assertions="13" classname="blockencodings_tests" name="SimpleRoundTripTest" time="0.00383">
+</testcase>
+<testcase assertions="16" classname="blockencodings_tests" name="NonCoinbasePreforwardRTTest" time="0.003711">
+</testcase>
+<testcase assertions="12" classname="blockencodings_tests" name="SufficientPreforwardRTTest" time="0.003491">
+</testcase>
+<testcase assertions="6" classname="blockencodings_tests" name="EmptyBlockRoundTripTest" time="0.004852">
+</testcase>
+<testcase assertions="6" classname="blockencodings_tests" name="TransactionsRequestSerializationTest" time="0.004175">
+</testcase>
+<testcase assertions="2" classname="blockencodings_tests" name="TransactionsRequestDeserializationMaxTest" time="0.003301">
+</testcase>
+<testcase assertions="1" classname="blockencodings_tests" name="TransactionsRequestDeserializationOverflowTest" time="0.004314">
+</testcase>
+<testcase assertions="200" classname="blockfilter_tests" name="gcsfilter_test" time="0.001436">
+</testcase>
+<testcase assertions="6" classname="blockfilter_tests" name="gcsfilter_default_constructor" time="0.000121">
+</testcase>
+<testcase assertions="15" classname="blockfilter_tests" name="blockfilter_basic_test" time="0.000156">
+</testcase>
+<testcase assertions="60" classname="blockfilter_tests" name="blockfilters_json_test" time="0.000746">
+</testcase>
+<testcase assertions="5" classname="blockfilter_tests" name="blockfilter_type_names" time="8.7e-05">
+</testcase>
+<testcase assertions="1575" classname="blockfilter_index_tests" name="blockfilter_index_initial_sync" time="0.447495">
+</testcase>
+<testcase assertions="11" classname="blockfilter_index_tests" name="blockfilter_index_init_destroy" time="0.003023">
+</testcase>
+<testcase assertions="7" classname="bloom_tests" name="bloom_create_insert_serialize" time="0.00324">
+</testcase>
+<testcase assertions="5" classname="bloom_tests" name="bloom_create_insert_serialize_with_tweak" time="0.001644">
+</testcase>
+<testcase assertions="1" classname="bloom_tests" name="bloom_create_insert_key" time="0.0017">
+</testcase>
+<testcase assertions="13" classname="bloom_tests" name="bloom_match" time="0.001722">
+</testcase>
+<testcase assertions="16" classname="bloom_tests" name="merkle_block_1" time="0.00177">
+</testcase>
+<testcase assertions="22" classname="bloom_tests" name="merkle_block_2" time="0.00181">
+</testcase>
+<testcase assertions="19" classname="bloom_tests" name="merkle_block_2_with_update_none" time="0.00182">
+</testcase>
+<testcase assertions="8" classname="bloom_tests" name="merkle_block_3_and_serialize" time="0.002911">
+</testcase>
+<testcase assertions="16" classname="bloom_tests" name="merkle_block_4" time="0.00177">
+</testcase>
+<testcase assertions="3" classname="bloom_tests" name="merkle_block_4_test_p2pubkey_only" time="0.001887">
+</testcase>
+<testcase assertions="3" classname="bloom_tests" name="merkle_block_4_test_update_none" time="0.00183">
+</testcase>
+<testcase assertions="2200" classname="bloom_tests" name="rolling_bloom" time="0.00603">
+</testcase>
+<testcase assertions="3" classname="bswap_tests" name="bswap_tests" time="0.000216">
+</testcase>
+<testcase assertions="1" classname="checkqueue_tests" name="test_CheckQueue_Correct_Zero" time="0.00417">
+</testcase>
+<testcase assertions="1" classname="checkqueue_tests" name="test_CheckQueue_Correct_One" time="0.005196">
+</testcase>
+<testcase assertions="1" classname="checkqueue_tests" name="test_CheckQueue_Correct_Max" time="0.023901">
+</testcase>
+<testcase assertions="209" classname="checkqueue_tests" name="test_CheckQueue_Correct_Random" time="2.11477">
+</testcase>
+<testcase assertions="1001" classname="checkqueue_tests" name="test_CheckQueue_Catches_Failure" time="0.160591">
+</testcase>
+<testcase assertions="20" classname="checkqueue_tests" name="test_CheckQueue_Recovers_From_Failure" time="0.007759">
+</testcase>
+<testcase assertions="2" classname="checkqueue_tests" name="test_CheckQueue_UniqueCheck" time="0.058541">
+</testcase>
+<testcase assertions="1000" classname="checkqueue_tests" name="test_CheckQueue_Memory" time="0.467765">
+</testcase>
+<testcase assertions="1" classname="checkqueue_tests" name="test_CheckQueue_FrozenCleanup" time="0.004509">
+</testcase>
+<testcase assertions="2" classname="checkqueue_tests" name="test_CheckQueueControl_Locks" time="0.034658">
+</testcase>
+<testcase assertions="1194861" classname="coins_tests" name="coins_cache_simulation_test" time="8.36107">
+</testcase>
+<testcase assertions="1495671" classname="coins_tests" name="updatecoins_simulation_test" time="3.46224">
+</testcase>
+<testcase assertions="13" classname="coins_tests" name="ccoins_serialization" time="0.00194">
+</testcase>
+<testcase assertions="135" classname="coins_tests" name="ccoins_access" time="0.001739">
+</testcase>
+<testcase assertions="135" classname="coins_tests" name="ccoins_spend" time="0.002059">
+</testcase>
+<testcase assertions="246" classname="coins_tests" name="ccoins_add" time="0.002638">
+</testcase>
+<testcase assertions="516" classname="coins_tests" name="ccoins_write" time="0.002568">
+</testcase>
+<testcase assertions="12" classname="coinstatsindex_tests" name="coinstatsindex_initial_sync" time="0.661304">
+</testcase>
+<testcase assertions="5" classname="compilerbug_tests" name="gccbug_90348" time="0.000122">
+</testcase>
+<testcase assertions="640006" classname="compress_tests" name="compress_amounts" time="0.895927">
+</testcase>
+<testcase assertions="5" classname="compress_tests" name="compress_script_to_ckey_id" time="0.002561">
+</testcase>
+<testcase assertions="5" classname="compress_tests" name="compress_script_to_cscript_id" time="0.002303">
+</testcase>
+<testcase assertions="5" classname="compress_tests" name="compress_script_to_compressed_pubkey_id" time="0.002321">
+</testcase>
+<testcase assertions="5" classname="compress_tests" name="compress_script_to_uncompressed_pubkey_id" time="0.002243">
+</testcase>
+<testcase assertions="3190" classname="crypto_tests" name="ripemd160_testvectors" time="0.169377">
+</testcase>
+<testcase assertions="3234" classname="crypto_tests" name="sha1_testvectors" time="0.220276">
+</testcase>
+<testcase assertions="3911" classname="crypto_tests" name="sha256_testvectors" time="0.229627">
+</testcase>
+<testcase assertions="4111" classname="crypto_tests" name="sha512_testvectors" time="0.179735">
+</testcase>
+<testcase assertions="3497" classname="crypto_tests" name="hmac_sha256_testvectors" time="0.006859">
+</testcase>
+<testcase assertions="3568" classname="crypto_tests" name="hmac_sha512_testvectors" time="0.013804">
+</testcase>
+<testcase assertions="10" classname="crypto_tests" name="aes_testvectors" time="0.001692">
+</testcase>
+<testcase assertions="168" classname="crypto_tests" name="aes_cbc_testvectors" time="0.002266">
+</testcase>
+<testcase assertions="8" classname="crypto_tests" name="chacha20_testvector" time="0.001592">
+</testcase>
+<testcase assertions="12" classname="crypto_tests" name="poly1305_testvector" time="0.001619">
+</testcase>
+<testcase assertions="3" classname="crypto_tests" name="hkdf_hmac_sha256_l32_tests" time="0.001571">
+</testcase>
+<testcase assertions="18019" classname="crypto_tests" name="chacha20_poly1305_aead_testvector" time="0.036614">
+</testcase>
+<testcase assertions="55512" classname="crypto_tests" name="countbits_tests" time="0.062021">
+</testcase>
+<testcase assertions="33" classname="crypto_tests" name="sha256d64" time="0.002361">
+</testcase>
+<testcase assertions="1" classname="crypto_tests" name="keccak_tests" time="0.354863">
+</testcase>
+<testcase assertions="110" classname="crypto_tests" name="sha3_256_tests" time="0.002089">
+</testcase>
+<testcase assertions="45" classname="crypto_tests" name="muhash_tests" time="0.33491">
+</testcase>
+<testcase assertions="100000" classname="cuckoocache_tests" name="test_cuckoocache_no_fakes" time="0.182152">
+</testcase>
+<testcase assertions="5" classname="cuckoocache_tests" name="cuckoocache_hit_rate_ok" time="0.150933">
+</testcase>
+<testcase assertions="32770" classname="cuckoocache_tests" name="cuckoocache_erase_ok" time="0.10786">
+</testcase>
+<testcase assertions="2" classname="cuckoocache_tests" name="cuckoocache_erase_parallel_ok" time="0.039037">
+</testcase>
+<testcase assertions="1311" classname="cuckoocache_tests" name="cuckoocache_generations" time="0.389585">
+</testcase>
+<testcase assertions="8" classname="denialofservice_tests" name="outbound_slow_chain_eviction" time="0.004253">
+</testcase>
+<testcase assertions="35" classname="denialofservice_tests" name="stale_tip_peer_management" time="0.006079">
+</testcase>
+<testcase assertions="22" classname="denialofservice_tests" name="peer_discouragement" time="0.133835">
+</testcase>
+<testcase assertions="2" classname="denialofservice_tests" name="DoS_bantime" time="0.093877">
+</testcase>
+<testcase assertions="77" classname="denialofservice_tests" name="DoS_mapOrphans" time="0.045273">
+</testcase>
+<testcase assertions="10749" classname="descriptor_tests" name="descriptor_test" time="0.319741">
+</testcase>
+<testcase assertions="2" classname="flatfile_tests" name="flatfile_filename" time="0.001818">
+</testcase>
+<testcase assertions="5" classname="flatfile_tests" name="flatfile_open" time="0.004908">
+</testcase>
+<testcase assertions="9" classname="flatfile_tests" name="flatfile_allocate" time="0.002713">
+</testcase>
+<testcase assertions="2" classname="flatfile_tests" name="flatfile_flush" time="0.007509">
+</testcase>
+<testcase assertions="16" classname="fs_tests" name="fsbridge_fstream" time="0.002165">
+</testcase>
+<testcase assertions="34" classname="getarg_tests" name="boolarg" time="0.001521">
+</testcase>
+<testcase assertions="15" classname="getarg_tests" name="stringarg" time="0.001564">
+</testcase>
+<testcase assertions="12" classname="getarg_tests" name="intarg" time="0.001499">
+</testcase>
+<testcase assertions="5" classname="getarg_tests" name="doubledash" time="0.001519">
+</testcase>
+<testcase assertions="15" classname="getarg_tests" name="boolargno" time="0.001501">
+</testcase>
+<testcase assertions="6" classname="getarg_tests" name="logargs" time="0.001528">
+</testcase>
+<testcase assertions="14" classname="hash_tests" name="murmurhash3" time="0.000169">
+</testcase>
+<testcase assertions="115" classname="hash_tests" name="siphash" time="0.000451">
+</testcase>
+<testcase assertions="1" classname="i2p_tests" name="unlimited_recv" time="0.002527">
+</testcase>
+<testcase assertions="21" classname="interfaces_tests" name="findBlock" time="0.042958">
+</testcase>
+<testcase assertions="4" classname="interfaces_tests" name="findFirstBlockWithTimeAndHeight" time="0.062105">
+</testcase>
+<testcase assertions="3" classname="interfaces_tests" name="findAncestorByHeight" time="0.038912">
+</testcase>
+<testcase assertions="3" classname="interfaces_tests" name="findAncestorByHash" time="0.043192">
+</testcase>
+<testcase assertions="10" classname="interfaces_tests" name="findCommonAncestor" time="0.069022">
+</testcase>
+<testcase assertions="23" classname="interfaces_tests" name="hasBlocks" time="0.05947">
+</testcase>
+<testcase assertions="312" classname="key_io_tests" name="key_io_valid_parse" time="0.003352">
+</testcase>
+<testcase assertions="124" classname="key_io_tests" name="key_io_valid_gen" time="0.00307">
+</testcase>
+<testcase assertions="560" classname="key_io_tests" name="key_io_invalid" time="0.005256">
+</testcase>
+<testcase assertions="553" classname="key_tests" name="key_test1" time="0.024361">
+</testcase>
+<testcase assertions="5" classname="key_tests" name="key_signature_tests" time="0.019441">
+</testcase>
+<testcase assertions="5" classname="key_tests" name="key_key_negation" time="0.004308">
+</testcase>
+<testcase assertions="24" classname="key_tests" name="pubkey_unserialize" time="0.0018">
+</testcase>
+<testcase assertions="151" classname="key_tests" name="bip340_test_vectors" time="0.009174">
+</testcase>
+<testcase assertions="3" classname="logging_tests" name="logging_timer" time="0.00165">
+</testcase>
+<testcase assertions="8" classname="dbwrapper_tests" name="dbwrapper" time="0.003354">
+</testcase>
+<testcase assertions="50" classname="dbwrapper_tests" name="dbwrapper_basic_data" time="0.015761">
+</testcase>
+<testcase assertions="12" classname="dbwrapper_tests" name="dbwrapper_batch" time="0.002156">
+</testcase>
+<testcase assertions="22" classname="dbwrapper_tests" name="dbwrapper_iterator" time="0.003108">
+</testcase>
+<testcase assertions="10" classname="dbwrapper_tests" name="existing_data_no_obfuscate" time="0.012193">
+</testcase>
+<testcase assertions="8" classname="dbwrapper_tests" name="existing_data_reindex" time="0.01314">
+</testcase>
+<testcase assertions="1788" classname="dbwrapper_tests" name="iterator_ordering" time="0.003599">
+</testcase>
+<testcase assertions="852" classname="dbwrapper_tests" name="iterator_string_ordering" time="0.003183">
+</testcase>
+<testcase assertions="1" classname="dbwrapper_tests" name="unicodepath" time="0.008942">
+</testcase>
+<testcase assertions="390" classname="validation_tests" name="block_subsidy_test" time="0.00688">
+</testcase>
+<testcase assertions="28001" classname="validation_tests" name="subsidy_limit_test" time="0.044812">
+</testcase>
+<testcase assertions="15" classname="validation_tests" name="signet_parse_tests" time="0.005201">
+</testcase>
+<testcase assertions="10" classname="validation_tests" name="test_assumeutxo" time="0.005031">
+</testcase>
+<testcase assertions="9" classname="mempool_tests" name="MempoolRemoveTest" time="0.005137">
+</testcase>
+<testcase assertions="70" classname="mempool_tests" name="MempoolIndexingTest" time="0.005253">
+</testcase>
+<testcase assertions="39" classname="mempool_tests" name="MempoolAncestorIndexingTest" time="0.005956">
+</testcase>
+<testcase assertions="24" classname="mempool_tests" name="MempoolSizeLimitTest" time="0.006212">
+</testcase>
+<testcase assertions="58" classname="mempool_tests" name="MempoolAncestryTests" time="0.004716">
+</testcase>
+<testcase assertions="1310" classname="merkle_tests" name="merkle_test" time="0.720834">
+</testcase>
+<testcase assertions="2" classname="merkle_tests" name="merkle_test_empty_block" time="0.003571">
+</testcase>
+<testcase assertions="2" classname="merkle_tests" name="merkle_test_oneTx_block" time="0.004069">
+</testcase>
+<testcase assertions="3" classname="merkle_tests" name="merkle_test_OddTxWithRepeatedLastTx_block" time="0.004352">
+</testcase>
+<testcase assertions="1" classname="merkle_tests" name="merkle_test_LeftSubtreeRightSubtree" time="0.003374">
+</testcase>
+<testcase assertions="1" classname="merkle_tests" name="merkle_test_BlockWitness" time="0.003331">
+</testcase>
+<testcase assertions="8" classname="merkleblock_tests" name="merkleblock_construct_from_txids_found" time="0.000186">
+</testcase>
+<testcase assertions="5" classname="merkleblock_tests" name="merkleblock_construct_from_txids_not_found" time="0.000365">
+</testcase>
+<testcase assertions="31" classname="metrics_tests" name="metrics_config" file="src/test/metrics_tests.cpp" line="51" time="0.002901">
+<failure message="failure" type="assertion error"><![CDATA[
+ASSERTION FAILURE:
+- file   : metrics_tests.cpp
+- line   : 51
+- message: metric non_existing_metric is not found
+
+]]></failure><system-err><![CDATA[Failures detected in:
+- test case: metrics_tests/metrics_config
+- file: metrics_tests.cpp
+- line: 8
+]]></system-err>
+</testcase>
+<testcase assertions="172" classname="miner_tests" name="CreateNewBlock_validity" time="2.73336">
+</testcase>
+<testcase assertions="110" classname="multisig_tests" name="multisig_verify" time="0.008736">
+</testcase>
+<testcase assertions="10" classname="multisig_tests" name="multisig_IsStandard" time="0.002419">
+</testcase>
+<testcase assertions="7" classname="multisig_tests" name="multisig_Sign" time="0.003858">
+</testcase>
+<testcase assertions="50" classname="net_peer_eviction_tests" name="peer_protection_test" time="0.002092">
+</testcase>
+<testcase assertions="1592" classname="net_peer_eviction_tests" name="peer_eviction_test" time="0.081947">
+</testcase>
+<testcase assertions="3" classname="net_tests" name="cnode_listen_port" time="0.002032">
+</testcase>
+<testcase assertions="15" classname="net_tests" name="caddrdb_read" time="0.00312">
+</testcase>
+<testcase assertions="10" classname="net_tests" name="caddrdb_read_corrupted" time="0.002212">
+</testcase>
+<testcase assertions="32" classname="net_tests" name="cnode_simple_test" time="0.003418">
+</testcase>
+<testcase assertions="71" classname="net_tests" name="cnetaddr_basic" time="0.002231">
+</testcase>
+<testcase assertions="120" classname="net_tests" name="cnetaddr_tostring_canonical_ipv6" time="0.00258">
+</testcase>
+<testcase assertions="9" classname="net_tests" name="cnetaddr_serialize_v1" time="0.002901">
+</testcase>
+<testcase assertions="10" classname="net_tests" name="cnetaddr_serialize_v2" time="0.002022">
+</testcase>
+<testcase assertions="58" classname="net_tests" name="cnetaddr_unserialize_v2" time="0.002406">
+</testcase>
+<testcase assertions="1" classname="net_tests" name="ipv4_peer_with_ipv6_addrMe_test" time="0.002323">
+</testcase>
+<testcase assertions="9" classname="net_tests" name="LimitedAndReachable_Network" time="0.002018">
+</testcase>
+<testcase assertions="4" classname="net_tests" name="LimitedAndReachable_NetworkCaseUnroutableAndInternal" time="0.002034">
+</testcase>
+<testcase assertions="2" classname="net_tests" name="LimitedAndReachable_CNetAddr" time="0.002686">
+</testcase>
+<testcase assertions="4" classname="net_tests" name="LocalAddress_BasicLifecycle" time="0.002249">
+</testcase>
+<testcase assertions="6" classname="netbase_tests" name="netbase_networks" time="0.001804">
+</testcase>
+<testcase assertions="25" classname="netbase_tests" name="netbase_properties" time="0.00185">
+</testcase>
+<testcase assertions="15" classname="netbase_tests" name="netbase_splithost" time="0.002749">
+</testcase>
+<testcase assertions="9" classname="netbase_tests" name="netbase_lookupnumeric" time="0.001622">
+</testcase>
+<testcase assertions="2" classname="netbase_tests" name="embedded_test" time="0.00184">
+</testcase>
+<testcase assertions="99" classname="netbase_tests" name="subnet_test" time="0.002318">
+</testcase>
+<testcase assertions="12" classname="netbase_tests" name="netbase_getgroup" time="0.0026">
+</testcase>
+<testcase assertions="12" classname="netbase_tests" name="netbase_parsenetwork" time="0.002501">
+</testcase>
+<testcase assertions="63" classname="netbase_tests" name="netpermissions_test" time="0.002515">
+</testcase>
+<testcase assertions="12" classname="netbase_tests" name="netbase_dont_resolve_strings_with_embedded_nul_characters" time="0.00253">
+</testcase>
+<testcase assertions="1" classname="netbase_tests" name="caddress_serialize_v1" time="0.002588">
+</testcase>
+<testcase assertions="1" classname="netbase_tests" name="caddress_unserialize_v1" time="0.001583">
+</testcase>
+<testcase assertions="1" classname="netbase_tests" name="caddress_serialize_v2" time="0.001797">
+</testcase>
+<testcase assertions="1" classname="netbase_tests" name="caddress_unserialize_v2" time="0.002336">
+</testcase>
+<testcase assertions="1344" classname="pmt_tests" name="pmt_test1" time="0.19541">
+</testcase>
+<testcase assertions="1" classname="pmt_tests" name="pmt_malleability" time="0.001579">
+</testcase>
+<testcase assertions="5" classname="policy_fee_tests" name="FeeRounder" time="0.000442">
+</testcase>
+<testcase assertions="61" classname="policyestimator_tests" name="BlockPolicyEstimates" time="0.234731">
+</testcase>
+<testcase assertions="1" classname="pow_tests" name="get_next_work" time="0.002467">
+</testcase>
+<testcase assertions="1" classname="pow_tests" name="get_next_work_pow_limit" time="0.001606">
+</testcase>
+<testcase assertions="1" classname="pow_tests" name="get_next_work_lower_limit_actual" time="0.001534">
+</testcase>
+<testcase assertions="1" classname="pow_tests" name="get_next_work_upper_limit_actual" time="0.001509">
+</testcase>
+<testcase assertions="1" classname="pow_tests" name="CheckProofOfWork_test_negative_target" time="0.001473">
+</testcase>
+<testcase assertions="1" classname="pow_tests" name="CheckProofOfWork_test_overflow_target" time="0.00159">
+</testcase>
+<testcase assertions="1" classname="pow_tests" name="CheckProofOfWork_test_too_easy_target" time="0.001604">
+</testcase>
+<testcase assertions="1" classname="pow_tests" name="CheckProofOfWork_test_biger_hash_than_target" time="0.001995">
+</testcase>
+<testcase assertions="1" classname="pow_tests" name="CheckProofOfWork_test_zero_target" time="0.001541">
+</testcase>
+<testcase assertions="1000" classname="pow_tests" name="GetBlockProofEquivalentTime_test" time="0.003904">
+</testcase>
+<testcase assertions="6" classname="pow_tests" name="ChainParams_MAIN_sanity" time="0.002169">
+</testcase>
+<testcase assertions="5" classname="pow_tests" name="ChainParams_REGTEST_sanity" time="0.001522">
+</testcase>
+<testcase assertions="6" classname="pow_tests" name="ChainParams_TESTNET_sanity" time="0.001524">
+</testcase>
+<testcase assertions="6" classname="pow_tests" name="ChainParams_SIGNET_sanity" time="0.00205">
+</testcase>
+<testcase assertions="64" classname="prevector_tests" name="PrevectorTestInt" time="0.219269">
+</testcase>
+<testcase assertions="6" classname="raii_event_tests" name="raii_event_creation" time="0.002168">
+</testcase>
+<testcase assertions="2" classname="raii_event_tests" name="raii_event_order" time="0.001902">
+</testcase>
+<testcase assertions="1" classname="random_tests" name="osrandom_tests" time="0.003208">
+</testcase>
+<testcase assertions="95" classname="random_tests" name="fastrandom_tests" time="0.002053">
+</testcase>
+<testcase assertions="126000" classname="random_tests" name="fastrandom_randbits" time="0.140494">
+</testcase>
+<testcase assertions="2200" classname="random_tests" name="stdrandom_test" time="0.005506">
+</testcase>
+<testcase assertions="3248" classname="random_tests" name="shuffle_stat_test" time="0.007337">
+</testcase>
+<testcase assertions="3" classname="reverselock_tests" name="reverselock_basics" time="0.000155">
+</testcase>
+<testcase assertions="4" classname="reverselock_tests" name="reverselock_multiple" time="0.000209">
+</testcase>
+<testcase assertions="7" classname="reverselock_tests" name="reverselock_errors" time="0.000227">
+</testcase>
+<testcase assertions="23" classname="rpc_tests" name="rpc_rawparams" time="0.006183">
+</testcase>
+<testcase assertions="6" classname="rpc_tests" name="rpc_togglenetwork" time="0.005577">
+</testcase>
+<testcase assertions="2" classname="rpc_tests" name="rpc_rawsign" time="0.007992">
+</testcase>
+<testcase assertions="5" classname="rpc_tests" name="rpc_createraw_op_return" time="0.004503">
+</testcase>
+<testcase assertions="37" classname="rpc_tests" name="rpc_format_monetary_values" time="0.003878">
+</testcase>
+<testcase assertions="52" classname="rpc_tests" name="rpc_parse_monetary_values" time="0.003674">
+</testcase>
+<testcase assertions="11" classname="rpc_tests" name="json_parse_errors" time="0.004072">
+</testcase>
+<testcase assertions="40" classname="rpc_tests" name="rpc_ban" time="0.027671">
+</testcase>
+<testcase assertions="14" classname="rpc_tests" name="rpc_convert_values_generatetoaddress" time="0.00494">
+</testcase>
+<testcase assertions="20" classname="rpc_tests" name="rpc_getblockstats_calculate_percentiles_by_weight" time="0.007239">
+</testcase>
+<testcase assertions="11" classname="rpc_tests" name="help_example" time="0.006358">
+</testcase>
+<testcase assertions="3" classname="sanity_tests" name="basic_sanity" time="0.001902">
+</testcase>
+<testcase assertions="15" classname="scheduler_tests" name="manythreads" time="0.002713">
+</testcase>
+<testcase assertions="6" classname="scheduler_tests" name="wait_until_past" time="0.000181">
+</testcase>
+<testcase assertions="2" classname="scheduler_tests" name="singlethreadedscheduler_ordered" time="0.001734">
+</testcase>
+<testcase assertions="4" classname="scheduler_tests" name="mockforward" time="0.001395">
+</testcase>
+<testcase assertions="81" classname="script_p2sh_tests" name="sign" time="0.005359">
+</testcase>
+<testcase assertions="4" classname="script_p2sh_tests" name="norecurse" time="0.002451">
+</testcase>
+<testcase assertions="17" classname="script_p2sh_tests" name="set" time="0.005244">
+</testcase>
+<testcase assertions="9" classname="script_p2sh_tests" name="is" time="0.002042">
+</testcase>
+<testcase assertions="4" classname="script_p2sh_tests" name="switchover" time="0.003754">
+</testcase>
+<testcase assertions="20" classname="script_p2sh_tests" name="AreInputsStandard" time="0.004643">
+</testcase>
+<testcase assertions="2191" classname="script_tests" name="script_build" time="0.196235">
+</testcase>
+<testcase assertions="19470" classname="script_tests" name="script_json_test" time="0.153832">
+</testcase>
+<testcase assertions="17" classname="script_tests" name="script_PushData" time="0.002116">
+</testcase>
+<testcase assertions="2" classname="script_tests" name="script_cltv_truncated" time="0.001943">
+</testcase>
+<testcase assertions="11" classname="script_tests" name="script_CHECKMULTISIG12" time="0.003331">
+</testcase>
+<testcase assertions="34" classname="script_tests" name="script_CHECKMULTISIG23" time="0.004926">
+</testcase>
+<testcase assertions="30" classname="script_tests" name="script_combineSigs" time="0.006205">
+</testcase>
+<testcase assertions="202563" classname="script_tests" name="script_standard_push" time="0.386973">
+</testcase>
+<testcase assertions="1" classname="script_tests" name="script_IsPushOnly_on_invalid_scripts" time="0.001865">
+</testcase>
+<testcase assertions="20" classname="script_tests" name="script_GetScriptAsm" time="0.001645">
+</testcase>
+<testcase assertions="32" classname="script_tests" name="script_FindAndDelete" time="0.002129">
+</testcase>
+<testcase assertions="4" classname="script_tests" name="script_HasValidOps" time="0.002124">
+</testcase>
+<testcase assertions="2" classname="script_tests" name="bitcoinconsensus_verify_script_returns_true" time="0.002177">
+</testcase>
+<testcase assertions="2" classname="script_tests" name="bitcoinconsensus_verify_script_tx_index_err" time="0.002419">
+</testcase>
+<testcase assertions="2" classname="script_tests" name="bitcoinconsensus_verify_script_tx_size" time="0.001443">
+</testcase>
+<testcase assertions="2" classname="script_tests" name="bitcoinconsensus_verify_script_tx_serialization" time="0.002135">
+</testcase>
+<testcase assertions="2" classname="script_tests" name="bitcoinconsensus_verify_script_amount_required_err" time="0.002333">
+</testcase>
+<testcase assertions="2" classname="script_tests" name="bitcoinconsensus_verify_script_invalid_flags" time="0.001925">
+</testcase>
+<testcase assertions="1" classname="script_tests" name="script_assets_test" time="0.001974">
+</testcase>
+<testcase assertions="1" classname="script_standard_tests" name="dest_default_is_no_dest" time="0.001461">
+</testcase>
+<testcase assertions="38" classname="script_standard_tests" name="script_standard_Solver_success" time="0.001636">
+</testcase>
+<testcase assertions="9" classname="script_standard_tests" name="script_standard_Solver_failure" time="0.001502">
+</testcase>
+<testcase assertions="14" classname="script_standard_tests" name="script_standard_ExtractDestination" time="0.001512">
+</testcase>
+<testcase assertions="22" classname="script_standard_tests" name="script_standard_ExtractDestinations" time="0.001602">
+</testcase>
+<testcase assertions="8" classname="script_standard_tests" name="script_standard_GetScriptFor_" time="0.001611">
+</testcase>
+<testcase assertions="49" classname="script_standard_tests" name="script_standard_taproot_builder" time="0.001679">
+</testcase>
+<testcase assertions="2385" classname="scriptnum_tests" name="creation" time="0.006495">
+</testcase>
+<testcase assertions="44928" classname="scriptnum_tests" name="operators" time="0.065096">
+</testcase>
+<testcase assertions="2047355" classname="serfloat_tests" name="double_serfloat_tests" time="2.49763">
+</testcase>
+<testcase assertions="1001" classname="serfloat_tests" name="doubles" time="0.00334">
+</testcase>
+<testcase assertions="20" classname="serialize_tests" name="sizes" time="0.001737">
+</testcase>
+<testcase assertions="200202" classname="serialize_tests" name="varints" time="0.324613">
+</testcase>
+<testcase assertions="16" classname="serialize_tests" name="varints_bitpatterns" time="0.001643">
+</testcase>
+<testcase assertions="52" classname="serialize_tests" name="compactsize" time="0.001765">
+</testcase>
+<testcase assertions="2" classname="serialize_tests" name="vector_bool" time="0.001864">
+</testcase>
+<testcase assertions="7" classname="serialize_tests" name="noncanonical" time="0.001723">
+</testcase>
+<testcase assertions="19" classname="serialize_tests" name="insert_delete" time="0.002299">
+</testcase>
+<testcase assertions="5" classname="serialize_tests" name="class_methods" time="0.001732">
+</testcase>
+<testcase assertions="12" classname="settings_tests" name="ReadWrite" time="0.037581">
+</testcase>
+<testcase assertions="4" classname="settings_tests" name="Simple" time="0.001575">
+</testcase>
+<testcase assertions="2" classname="settings_tests" name="NullOverride" time="0.001805">
+</testcase>
+<testcase assertions="1" classname="settings_tests" name="Merge" time="0.007416">
+</testcase>
+<testcase assertions="50000" classname="sighash_tests" name="sighash_test" time="0.352046">
+</testcase>
+<testcase assertions="1500" classname="sighash_tests" name="sighash_from_data" time="0.011399">
+</testcase>
+<testcase assertions="11" classname="sigopcount_tests" name="GetSigOpCount" time="0.001716">
+</testcase>
+<testcase assertions="6" classname="sigopcount_tests" name="GetTxSigOpCost" time="0.002113">
+</testcase>
+<testcase assertions="602999" classname="skiplist_tests" name="skiplist_test" time="0.920483">
+</testcase>
+<testcase assertions="302698" classname="skiplist_tests" name="getlocator_test" time="0.428112">
+</testcase>
+<testcase assertions="130000" classname="skiplist_tests" name="findearliestatleast_test" time="0.220263">
+</testcase>
+<testcase assertions="22" classname="skiplist_tests" name="findearliestatleast_edge_test" time="0.00189">
+</testcase>
+<testcase assertions="4" classname="sock_tests" name="constructor_and_destructor" time="0.001645">
+</testcase>
+<testcase assertions="4" classname="sock_tests" name="move_constructor" time="0.002691">
+</testcase>
+<testcase assertions="4" classname="sock_tests" name="move_assignment" time="0.001629">
+</testcase>
+<testcase assertions="4" classname="sock_tests" name="release" time="0.002138">
+</testcase>
+<testcase assertions="2" classname="sock_tests" name="reset" time="0.002262">
+</testcase>
+<testcase assertions="9" classname="sock_tests" name="send_and_receive" time="0.002125">
+</testcase>
+<testcase assertions="2" classname="sock_tests" name="wait" time="0.001618">
+</testcase>
+<testcase assertions="3" classname="sock_tests" name="recv_until_terminator_limit" time="0.002203">
+</testcase>
+<testcase assertions="14" classname="streams_tests" name="streams_vector_writer" time="0.001512">
+</testcase>
+<testcase assertions="16" classname="streams_tests" name="streams_vector_reader" time="0.001653">
+</testcase>
+<testcase assertions="2" classname="streams_tests" name="streams_vector_reader_rvalue" time="0.001474">
+</testcase>
+<testcase assertions="11" classname="streams_tests" name="bitstream_reader_writer" time="0.001911">
+</testcase>
+<testcase assertions="3" classname="streams_tests" name="streams_serializedata_xor" time="0.001454">
+</testcase>
+<testcase assertions="71" classname="streams_tests" name="streams_buffered_file" time="0.001649">
+</testcase>
+<testcase assertions="15558" classname="streams_tests" name="streams_buffered_file_rand" time="0.040945">
+</testcase>
+<testcase assertions="12" classname="sync_tests" name="potential_deadlock_detected" time="0.000156">
+</testcase>
+<testcase assertions="4" classname="sync_tests" name="inconsistent_lock_order_detected" time="0.00024">
+</testcase>
+<testcase assertions="1" classname="system_tests" name="dummy" time="0.002986">
+</testcase>
+<testcase assertions="15" classname="system_tests" name="run_command" time="0.025678">
+</testcase>
+<testcase assertions="0" classname="util_threadnames_tests" name="util_threadnames_test_rename_threaded" time="0.00018">
+</testcase>
+<testcase assertions="7" classname="timedata_tests" name="util_MedianFilter" time="0.001951">
+</testcase>
+<testcase assertions="8" classname="timedata_tests" name="addtimedata" time="0.027496">
+</testcase>
+<testcase assertions="20" classname="torcontrol_tests" name="util_SplitTorReplyLine" time="0.000203">
+</testcase>
+<testcase assertions="88" classname="torcontrol_tests" name="util_ParseTorReplyMapping" time="0.000221">
+</testcase>
+<testcase assertions="15524" classname="transaction_tests" name="tx_valid" time="0.314313">
+</testcase>
+<testcase assertions="7547" classname="transaction_tests" name="tx_invalid" time="0.073443">
+</testcase>
+<testcase assertions="2" classname="transaction_tests" name="basic_transaction_tests" time="0.00145">
+</testcase>
+<testcase assertions="1" classname="transaction_tests" name="test_Get" time="0.002338">
+</testcase>
+<testcase assertions="1" classname="transaction_tests" name="test_big_witness_transaction" time="4.45756">
+</testcase>
+<testcase assertions="21" classname="transaction_tests" name="test_witness" time="0.006803">
+</testcase>
+<testcase assertions="183" classname="transaction_tests" name="test_IsStandard" time="0.004044">
+</testcase>
+<testcase assertions="114" classname="txindex_tests" name="txindex_initial_sync" time="0.184152">
+</testcase>
+<testcase assertions="118474" classname="txrequest_tests" name="TxRequestTest" time="1.74628">
+</testcase>
+<testcase assertions="6" classname="txvalidation_tests" name="tx_mempool_reject_coinbase" time="0.044097">
+</testcase>
+<testcase assertions="19" classname="txvalidation_tests" name="package_tests" time="0.253989">
+</testcase>
+<testcase assertions="10" classname="txvalidationcache_tests" name="tx_mempool_block_doublespend" time="0.052178">
+</testcase>
+<testcase assertions="387090" classname="txvalidationcache_tests" name="checkinputs_test" time="1.55917">
+</testcase>
+<testcase assertions="41" classname="uint256_tests" name="basics" time="0.000353">
+</testcase>
+<testcase assertions="428" classname="uint256_tests" name="comparison" time="0.000849">
+</testcase>
+<testcase assertions="62" classname="uint256_tests" name="methods" time="0.000258">
+</testcase>
+<testcase assertions="12" classname="uint256_tests" name="conversion" time="0.000149">
+</testcase>
+<testcase assertions="4" classname="uint256_tests" name="operator_with_self" time="0.000196">
+</testcase>
+<testcase assertions="1" classname="uint256_tests" name="check_ONE" time="0.000133">
+</testcase>
+<testcase assertions="4" classname="util_tests" name="util_datadir" time="0.001372">
+</testcase>
+<testcase assertions="0" classname="util_tests" name="util_check" time="0.001406">
+</testcase>
+<testcase assertions="1" classname="util_tests" name="util_criticalsection" time="0.002046">
+</testcase>
+<testcase assertions="4" classname="util_tests" name="util_ParseHex" time="0.001786">
+</testcase>
+<testcase assertions="4" classname="util_tests" name="util_HexStr" time="0.001925">
+</testcase>
+<testcase assertions="6" classname="util_tests" name="util_Join" time="0.00306">
+</testcase>
+<testcase assertions="6" classname="util_tests" name="util_FormatParseISO8601DateTime" time="0.001446">
+</testcase>
+<testcase assertions="1" classname="util_tests" name="util_FormatISO8601Date" time="0.00308">
+</testcase>
+<testcase assertions="125" classname="util_tests" name="util_CheckValue" time="0.055658">
+</testcase>
+<testcase assertions="3" classname="util_tests" name="util_NoIncludeConf" time="0.00012">
+</testcase>
+<testcase assertions="14" classname="util_tests" name="util_ParseParameters" time="0.001894">
+</testcase>
+<testcase assertions="6" classname="util_tests" name="util_ParseInvalidParameters" time="0.001834">
+</testcase>
+<testcase assertions="155" classname="util_tests" name="util_ArgParsing" time="0.001566">
+</testcase>
+<testcase assertions="18" classname="util_tests" name="util_GetBoolArg" time="0.001788">
+</testcase>
+<testcase assertions="19" classname="util_tests" name="util_GetBoolArgEdgeCases" time="0.001855">
+</testcase>
+<testcase assertions="110" classname="util_tests" name="util_ReadConfigStream" time="0.002304">
+</testcase>
+<testcase assertions="13" classname="util_tests" name="util_GetArg" time="0.001962">
+</testcase>
+<testcase assertions="40" classname="util_tests" name="util_GetChainName" time="0.001575">
+</testcase>
+<testcase assertions="120589" classname="util_tests" name="util_ArgsMerge" time="0.412539">
+</testcase>
+<testcase assertions="5477" classname="util_tests" name="util_ChainMerge" time="0.021063">
+</testcase>
+<testcase assertions="1" classname="util_tests" name="util_ReadWriteSettings" time="0.00412">
+</testcase>
+<testcase assertions="28" classname="util_tests" name="util_FormatMoney" time="0.001647">
+</testcase>
+<testcase assertions="65" classname="util_tests" name="util_ParseMoney" time="0.002113">
+</testcase>
+<testcase assertions="10" classname="util_tests" name="util_IsHex" time="0.001759">
+</testcase>
+<testcase assertions="19" classname="util_tests" name="util_IsHexNumber" time="0.001397">
+</testcase>
+<testcase assertions="18" classname="util_tests" name="util_seed_insecure_rand" time="0.004746">
+</testcase>
+<testcase assertions="7" classname="util_tests" name="util_TimingResistantEqual" time="0.001323">
+</testcase>
+<testcase assertions="9" classname="util_tests" name="strprintf_numbers" time="0.001391">
+</testcase>
+<testcase assertions="1" classname="util_tests" name="gettime" time="0.002532">
+</testcase>
+<testcase assertions="10" classname="util_tests" name="util_time_GetTime" time="0.008869">
+</testcase>
+<testcase assertions="10" classname="util_tests" name="test_IsDigit" time="0.001384">
+</testcase>
+<testcase assertions="26" classname="util_tests" name="test_ParseInt32" time="0.001945">
+</testcase>
+<testcase assertions="20" classname="util_tests" name="test_ParseInt64" time="0.001361">
+</testcase>
+<testcase assertions="27" classname="util_tests" name="test_ParseUInt8" time="0.003309">
+</testcase>
+<testcase assertions="27" classname="util_tests" name="test_ParseUInt16" time="0.00322">
+</testcase>
+<testcase assertions="29" classname="util_tests" name="test_ParseUInt32" time="0.002791">
+</testcase>
+<testcase assertions="22" classname="util_tests" name="test_ParseUInt64" time="0.00265">
+</testcase>
+<testcase assertions="18" classname="util_tests" name="test_ParseDouble" time="0.001866">
+</testcase>
+<testcase assertions="16" classname="util_tests" name="test_FormatParagraph" time="0.002667">
+</testcase>
+<testcase assertions="3" classname="util_tests" name="test_FormatSubVersion" time="0.002114">
+</testcase>
+<testcase assertions="66" classname="util_tests" name="test_ParseFixedPoint" time="0.002424">
+</testcase>
+<testcase assertions="25" classname="util_tests" name="test_LockDirectory" time="0.007941">
+</testcase>
+<testcase assertions="3" classname="util_tests" name="test_DirIsWritable" time="0.00358">
+</testcase>
+<testcase assertions="9" classname="util_tests" name="test_ToLower" time="0.004141">
+</testcase>
+<testcase assertions="9" classname="util_tests" name="test_ToUpper" time="0.00367">
+</testcase>
+<testcase assertions="3" classname="util_tests" name="test_Capitalize" time="0.001846">
+</testcase>
+<testcase assertions="43" classname="util_tests" name="test_spanparsing" time="0.001403">
+</testcase>
+<testcase assertions="4" classname="util_tests" name="test_LogEscapeMessage" time="0.001871">
+</testcase>
+<testcase assertions="53" classname="util_tests" name="test_tracked_vector" time="0.001366">
+</testcase>
+<testcase assertions="5" classname="util_tests" name="message_sign" time="0.001918">
+</testcase>
+<testcase assertions="7" classname="util_tests" name="message_verify" time="0.001499">
+</testcase>
+<testcase assertions="2" classname="util_tests" name="message_hash" time="0.001413">
+</testcase>
+<testcase assertions="9" classname="util_tests" name="remove_prefix" time="0.004247">
+</testcase>
+<testcase assertions="391" classname="validation_block_tests" name="processnewblock_signals_ordering" time="1.26222">
+</testcase>
+<testcase assertions="443" classname="validation_block_tests" name="mempool_locks_reorg" time="0.745417">
+</testcase>
+<testcase assertions="1" classname="validation_block_tests" name="witness_commitment_index" time="0.005819">
+</testcase>
+<testcase assertions="3" classname="validation_chainstate_tests" name="validation_chainstate_resize_caches" time="0.581092">
+</testcase>
+<testcase assertions="24" classname="validation_chainstatemanager_tests" name="chainstatemanager" time="0.003575">
+</testcase>
+<testcase assertions="8" classname="validation_chainstatemanager_tests" name="chainstatemanager_rebalance_caches" time="0.010752">
+</testcase>
+<testcase assertions="346" classname="validation_chainstatemanager_tests" name="chainstatemanager_activate_snapshot" time="0.138163">
+</testcase>
+<testcase assertions="1019" classname="validation_flush_tests" name="getcoinscachesizestate" time="0.003978">
+</testcase>
+<testcase assertions="1" classname="validationinterface_tests" name="unregister_validation_interface_race" time="0.046755">
+</testcase>
+<testcase assertions="3" classname="validationinterface_tests" name="unregister_all_during_call" time="0.004106">
+</testcase>
+<testcase assertions="54456" classname="versionbits_tests" name="versionbits_test" time="0.513325">
+</testcase>
+<testcase assertions="26597" classname="versionbits_tests" name="versionbits_computeblockversion" time="0.360787">
+</testcase>
+</testsuite>

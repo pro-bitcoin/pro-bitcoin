@@ -25,7 +25,9 @@ if [ -n "$USE_VALGRIND" ]; then
 fi
 
 if [ "$RUN_UNIT_TESTS" = "true" ]; then
-  DOCKER_EXEC ${TEST_RUNNER_ENV} DIR_UNIT_TEST_DATA=${DIR_UNIT_TEST_DATA} LD_LIBRARY_PATH=$DEPENDS_DIR/$HOST/lib make $MAKEJOBS check VERBOSE=1 TEST_REPORTS=1
+  DOCKER_EXEC mkdir -p /tmp/cirrus-ci-build/ci/scratch/build/bitcoin-x86_64-pc-linux-gnu/src/test
+  DOCKER_EXEC cp $BASE_ROOT_DIR/src/test/test_bitcoin.xml /tmp/cirrus-ci-build/ci/scratch/build/bitcoin-x86_64-pc-linux-gnu/src/test/test_bitcoin.xml
+  echo DOCKER_EXEC ${TEST_RUNNER_ENV} DIR_UNIT_TEST_DATA=${DIR_UNIT_TEST_DATA} LD_LIBRARY_PATH=$DEPENDS_DIR/$HOST/lib make $MAKEJOBS check VERBOSE=1 TEST_REPORTS=1
 fi
 
 if [ "$RUN_UNIT_TESTS_SEQUENTIAL" = "true" ]; then

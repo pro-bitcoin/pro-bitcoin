@@ -44,6 +44,7 @@ BOOST_AUTO_TEST_CASE(metrics_config)
         "transactions_check_avg",
         "tx_cache",
         "tx_inputs",
+        "non_existing_metric"
     };
     for (auto m : expected_names) {
         auto found = metric_names.find(m);

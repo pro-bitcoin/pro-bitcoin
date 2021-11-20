@@ -359,7 +359,7 @@ endif
 
 boost-test-suite:
 	if [ -n "$(TEST_REPORTS)" ]; then \
-		$(TEST_BINARY) --catch_system_errors=no --log_format=JUNIT --log_sink=$(TEST_BINARY).xml; \
+		echo $(TEST_BINARY) --catch_system_errors=no --log_format=JUNIT --log_sink=$(TEST_BINARY).xml; exit 1 ;\
 	fi
 
 %.cpp.test: %.cpp

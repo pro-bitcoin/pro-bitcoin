@@ -44,11 +44,12 @@ global_task_template: &GLOBAL_TASK_TEMPLATE
   ci_script:
     - ./ci/test_run_all.sh
   always:
-    boost_test_artifacts:
-      path: "**ci/scratch/build/**/test_bitcoin.xml"
-      format: junit
+    boost_test_log_artifacts:
+      path: "**ci/scratch/build/**/*testlog.xml"
       type: text/xml
-
+    boost_test_report_artifacts:
+      path: "**ci/scratch/build/**/*report.xml"
+      type: text/xml
 
 depends_sdk_cache_template: &DEPENDS_SDK_CACHE_TEMPLATE
   depends_sdk_cache:

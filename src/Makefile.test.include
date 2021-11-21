@@ -2,8 +2,9 @@
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-# used by boost-test-suite to produce xml test reports
-TEST_REPORTS ?=
+# used by boost test suite
+BOOST_TEST_REPORT_FORMAT ?= HRF
+BOOST_TEST_FILE_SUFFIX ?= log
 
 if ENABLE_FUZZ_BINARY
 noinst_PROGRAMS += test/fuzz/fuzz
@@ -318,7 +319,7 @@ nodist_test_test_bitcoin_SOURCES = $(GENERATED_TEST_FILES)
 
 $(BITCOIN_TESTS): $(GENERATED_TEST_FILES)
 
-CLEAN_BITCOIN_TEST = test/*.gcda test/*.gcno test/fuzz/*.gcda test/fuzz/*.gcno test/util/*.gcda test/util/*.gcno $(GENERATED_TEST_FILES) $(BITCOIN_TESTS:=.log)
+CLEAN_BITCOIN_TEST = test/*.gcda test/*.gcno test/fuzz/*.gcda test/fuzz/*.gcno test/util/*.gcda test/util/*.gcno $(GENERATED_TEST_FILES) $(BITCOIN_TESTS:=_report.log) $(BITCOIN_TESTS:=_testlog.log) $(BITCOIN_TESTS:=_report.xml) $(BITCOIN_TESTS:=_testlog.xml)
 
 CLEANFILES += $(CLEAN_BITCOIN_TEST)
 
@@ -338,7 +339,7 @@ bitcoin_test_check: $(TEST_BINARY) FORCE
 bitcoin_test_clean : FORCE
 	rm -f $(CLEAN_BITCOIN_TEST) $(test_test_bitcoin_OBJECTS) $(TEST_BINARY)
 
-check-local: $(BITCOIN_TESTS:.cpp=.cpp.test) boost-test-suite
+check-local: $(BITCOIN_TESTS:.cpp=.cpp.test)
 if BUILD_BITCOIN_TX
 	@echo "Running test/util/bitcoin-util-test.py..."
 	$(PYTHON) $(top_builddir)/test/util/bitcoin-util-test.py
@@ -357,16 +358,16 @@ if EMBEDDED_UNIVALUE
 	$(AM_V_at)$(MAKE) $(AM_MAKEFLAGS) -C univalue check
 endif
 
-boost-test-suite:
-	if [ -n "$(TEST_REPORTS)" ]; then \
-		$(TEST_BINARY) --catch_system_errors=no --log_format=JUNIT --log_sink=$(TEST_BINARY).xml; \
-	fi
-
 %.cpp.test: %.cpp
-	$(AM_V_at)if [ -z "$(TEST_REPORTS)" ] ; then \
-		echo Running tests: `cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1` from $< \
-		$(TEST_BINARY) --catch_system_errors=no -l test_suite -t "`cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1`" -- DEBUG_LOG_OUT > $<.log 2>&1 || (cat $<.log && false)  \
-		fi
+	$(AM_V_at)export test_suite="`cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1`"; \
+		report_file=$<_report.$(BOOST_TEST_FILE_SUFFIX); test_log=$<_testlog.$(BOOST_TEST_FILE_SUFFIX); \
+		echo Running tests: $$test_suite; \
+		$(TEST_BINARY) --catch_system_errors=no --log_format=$(BOOST_TEST_REPORT_FORMAT) --report_format=$(BOOST_TEST_REPORT_FORMAT) --log_level=test_suite --run_test=$$test_suite --report_sink=$$report_file --log_sink=$$test_log; \
+		let exitCode=$$?; \
+		if [ $(BOOST_TEST_REPORT_FORMAT) == "XML" ]; then \
+			(xmllint --format --output /tmp/format.xml $$test_log && cat  /tmp/format.xml | sed '/reason="disabled"/d' > $$test_log); \
+		fi; \
+		exit $$exitCode
 
 %.json.h: %.json
 	@$(MKDIR_P) $(@D)

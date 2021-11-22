@@ -362,7 +362,7 @@ endif
 	$(AM_V_at)export test_suite="`cat $< | grep -E "(BOOST_FIXTURE_TEST_SUITE\\(|BOOST_AUTO_TEST_SUITE\\()" | cut -d '(' -f 2 | cut -d ',' -f 1 | cut -d ')' -f 1`"; \
 		report_file=$<_report.$(BOOST_TEST_FILE_SUFFIX); test_log=$<_testlog.$(BOOST_TEST_FILE_SUFFIX); \
 		echo Running tests: $$test_suite; \
-		$(TEST_BINARY) --catch_system_errors=no --log_format=$(BOOST_TEST_REPORT_FORMAT) --report_format=$(BOOST_TEST_REPORT_FORMAT) --log_level=test_suite --run_test=$$test_suite --report_sink=$$report_file --log_sink=$$test_log; \
+		$(TEST_BINARY) --catch_system_errors=no --log_format=$(BOOST_TEST_REPORT_FORMAT) --report_format=$(BOOST_TEST_REPORT_FORMAT) --log_level=test_suite --run_test=$$test_suite  2> $$report_file  > $$test_log; \
 		let exitCode=$$?; \
 		if [ $(BOOST_TEST_REPORT_FORMAT) == "XML" ]; then \
 			(xmllint --format --output /tmp/format.xml $$test_log && cat  /tmp/format.xml | sed '/reason="disabled"/d' > $$test_log); \

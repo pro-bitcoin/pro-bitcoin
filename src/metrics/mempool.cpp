@@ -58,11 +58,11 @@ void MemPoolMetricsImpl::Incoming(size_t in, size_t out, unsigned int byte_size,
 
 void MemPoolMetricsImpl::Removed(size_t reason)
 {
-    if (reason > _removed_counter.size()) {
+    if (reason + 1 > _removed_counter.size()) {
         _removed_unknown_counter->Increment();
         return;
     }
-    _removed_counter[reason - 1]->Increment();
+    _removed_counter[reason]->Increment();
 }
 
 void MemPoolMetricsImpl::Orphans(size_t map, size_t outpoint)

@@ -43,7 +43,6 @@ if [ "$RUN_FUZZ_TESTS" = "true" ] || [ "$RUN_UNIT_TESTS" = "true" ] || [ "$RUN_U
   [ -d "${DIR_QA_ASSETS}" ] || git clone --depth=1 https://github.com/bitcoin-core/qa-assets "${DIR_QA_ASSETS}"
   export DIR_FUZZ_IN=${DIR_QA_ASSETS}/fuzz_seed_corpus/
   export DIR_UNIT_TEST_DATA=${DIR_QA_ASSETS}/unit_test_data/
-  DOCKER_EXEC apt-get install --no-install-recommends --no-upgrade -y libxml2-utils
 fi
 
   DOCKER_ID=$(docker run $DOCKER_ADMIN --rm --interactive --detach --tty \

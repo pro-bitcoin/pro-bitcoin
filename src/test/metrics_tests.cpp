@@ -1,6 +1,7 @@
 #include <boost/test/unit_test.hpp>
 #include <metrics/container.h>
 #include <test/util/setup_common.h>
+#include <txmempool.h>
 
 BOOST_FIXTURE_TEST_SUITE(metrics_tests, BasicTestingSetup)
 
@@ -49,5 +50,24 @@ BOOST_AUTO_TEST_CASE(metrics_config)
         auto found = metric_names.find(m);
         BOOST_CHECK_MESSAGE(found != metric_names.end(), strprintf("metric %s is not found", m));
     }
+}
+
+void check_mempool_reason(size_t reason)
+{
+    auto& mempoolMetrics = metrics::Instance()->MemPool();
+    mempoolMetrics.Removed(reason);
+    auto v = mempoolMetrics.GetRemoved(reason);
+    BOOST_CHECK(v);
+    BOOST_CHECK_EQUAL(1, *v);
+}
+
+BOOST_AUTO_TEST_CASE(metrics_mempool_remove)
+{
+    check_mempool_reason(static_cast<size_t>(MemPoolRemovalReason::BLOCK));
+    check_mempool_reason(static_cast<size_t>(MemPoolRemovalReason::CONFLICT));
+    check_mempool_reason(static_cast<size_t>(MemPoolRemovalReason::EXPIRY));
+    check_mempool_reason(static_cast<size_t>(MemPoolRemovalReason::REORG));
+    check_mempool_reason(static_cast<size_t>(MemPoolRemovalReason::REPLACED));
+    check_mempool_reason(static_cast<size_t>(MemPoolRemovalReason::SIZELIMIT));
 }
 BOOST_AUTO_TEST_SUITE_END()

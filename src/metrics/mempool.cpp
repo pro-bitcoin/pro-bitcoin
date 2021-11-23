@@ -31,6 +31,7 @@ MemPoolMetricsImpl::MemPoolMetricsImpl(const std::string& chain, prometheus::Reg
         &incoming_family.Add({{"type", "removed"}, {"reason", "expiry"}}),
         &incoming_family.Add({{"type", "removed"}, {"reason", "size-limit"}}),
         &incoming_family.Add({{"type", "removed"}, {"reason", "reorg"}}),
+        &incoming_family.Add({{"type", "removed"}, {"reason", "block"}}),
         &incoming_family.Add({{"type", "removed"}, {"reason", "conflict"}}),
         &incoming_family.Add({{"type", "removed"}, {"reason", "replaced"}}),
     };
@@ -62,6 +63,7 @@ void MemPoolMetricsImpl::Removed(size_t reason)
         _removed_unknown_counter->Increment();
         return;
     }
+
     _removed_counter[reason]->Increment();
 }
 
@@ -69,5 +71,13 @@ void MemPoolMetricsImpl::Orphans(size_t map, size_t outpoint)
 {
     _orphan_size_gauge->Set((double)map);
     _orphan_outpoint_gauge->Set((double)outpoint);
+}
+
+std::optional<double> MemPoolMetricsImpl::GetRemoved(size_t reason)
+{
+    if (reason + 1 > _removed_counter.size()) {
+        return std::nullopt;
+    }
+    return _removed_counter[reason]->Value();
 }
 } // namespace metrics

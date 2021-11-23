@@ -1,5 +1,6 @@
 #ifndef BITCOIN_METRICS_METRICS_H
 #define BITCOIN_METRICS_METRICS_H
+#include <optional>
 #include <prometheus/counter.h>
 #include <prometheus/exposer.h>
 #include <prometheus/gauge.h>
@@ -356,6 +357,8 @@ public:
     virtual void Incoming(size_t in, size_t out, unsigned int byte_size, int64_t amt){};
     virtual void Removed(size_t reason){};
     virtual void Orphans(size_t map, size_t outpoint){};
+
+    virtual std::optional<double> GetRemoved(size_t reason) { return std::nullopt; };
 };
 class MemPoolMetricsImpl : virtual public MemPoolMetrics, Metrics
 {
@@ -380,6 +383,8 @@ public:
     void Incoming(size_t in, size_t out, unsigned int byte_size, int64_t amt) override;
     void Removed(size_t reason) override;
     void Orphans(size_t map, size_t outpoint) override;
+
+    std::optional<double> GetRemoved(size_t reason) override;
 };
 
 

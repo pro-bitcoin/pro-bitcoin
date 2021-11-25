@@ -3,6 +3,7 @@
 
 #include <cassert>
 #include <metrics/metrics.h>
+#include <metrics/rpc.h>
 
 namespace metrics {
 static auto prom_registry = std::make_shared<prometheus::Registry>();
@@ -18,6 +19,7 @@ protected:
     //std::unique_ptr<UtxoMetrics> _utxo_metrics;
     std::unique_ptr<MemPoolMetrics> _mempool_metrics;
     std::unique_ptr<ConfigMetrics> _cfg_metrics;
+    std::unique_ptr<RpcMetrics> _rpc_metrics;
     std::atomic<bool> _init{false};
 
 public:
@@ -31,6 +33,7 @@ public:
     //UtxoMetrics& Utxo();
     MemPoolMetrics& MemPool();
     ConfigMetrics& Config();
+    RpcMetrics& Rpc();
 };
 
 void Init(const std::string& bind, const std::string& chain, bool noop = false);

@@ -177,6 +177,7 @@ BITCOIN_CORE_H = \
   merkleblock.h \
   metrics/container.h \
   metrics/metrics.h \
+  metrics/rpc.h \
   metrics_notifications_interface.h \
   miner.h \
   net.h \
@@ -556,6 +557,7 @@ libbitcoin_common_a_SOURCES = \
   metrics/mempool.cpp \
   metrics/net.cpp \
   metrics/peer.cpp \
+  metrics/rpc.cpp \
   metrics/tx.cpp \
   metrics/utxo.cpp \
   metrics_notifications_interface.cpp \
@@ -687,7 +689,7 @@ bitcoin_node_LDADD = $(LIBBITCOIN_SERVER) $(bitcoin_bin_ldadd) $(LIBBITCOIN_IPC)
 bitcoin_cli_SOURCES = bitcoin-cli.cpp
 bitcoin_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
 bitcoin_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-bitcoin_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+bitcoin_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS) $(PROMETHEUS_LIBS)
 
 if TARGET_WINDOWS
 bitcoin_cli_SOURCES += bitcoin-cli-res.rc

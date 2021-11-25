@@ -365,7 +365,7 @@ endif
 		$(TEST_BINARY) --catch_system_errors=no --log_format=$(BOOST_TEST_REPORT_FORMAT) --report_format=$(BOOST_TEST_REPORT_FORMAT) --log_level=test_suite --run_test=$$test_suite  2> $$report_file  > $$test_log; \
 		let exitCode=$$?; \
 		if [ $(BOOST_TEST_REPORT_FORMAT) == "XML" ]; then \
-			(xmllint --format --output /tmp/format.xml $$test_log && cat  /tmp/format.xml | sed '/reason="disabled"/d' > $$test_log); \
+			(xmllint --format --output $$test_log $$test_log && sed -i '/reason="disabled"/d' $$test_log); \
 		fi; \
 		exit $$exitCode
 

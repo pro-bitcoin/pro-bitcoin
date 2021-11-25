@@ -37,6 +37,12 @@ ConfigMetrics& Container::Config()
     return *this->_cfg_metrics;
 }
 
+RpcMetrics& Container::Rpc()
+{
+    assert(this->_rpc_metrics);
+    return *this->_rpc_metrics;
+}
+
 void Container::Init(const std::string& chain, bool noop)
 {
     LogPrint(BCLog::METRICS, "Init metrics on %s\n", chain);
@@ -52,6 +58,7 @@ void Container::Init(const std::string& chain, bool noop)
     //_utxo_metrics =  std::make_unique<UtxoMetrics>(chain, *prom_registry);
     _mempool_metrics = MemPoolMetrics::make(chain, *prom_registry, noop);
     _cfg_metrics = std::make_unique<ConfigMetrics>(chain, *prom_registry);
+    _rpc_metrics = RpcMetrics::make(chain, *prom_registry, noop);
 }
 
 void Init(const std::string& bind, const std::string& chain, bool noop)

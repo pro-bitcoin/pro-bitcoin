@@ -70,4 +70,33 @@ BOOST_AUTO_TEST_CASE(metrics_mempool_remove)
     check_mempool_reason(static_cast<size_t>(MemPoolRemovalReason::REPLACED));
     check_mempool_reason(static_cast<size_t>(MemPoolRemovalReason::SIZELIMIT));
 }
+
+BOOST_AUTO_TEST_CASE(metrics_rpc_counters)
+{
+    auto& rpcMetrics = metrics::Instance()->Rpc();
+    rpcMetrics.ObserveMethod("amethod", 1000);
+    rpcMetrics.ObserveMethod("amethod", 2000);
+    BOOST_CHECK(rpcMetrics.HasMethod("amethod"));
+
+    rpcMetrics.IncrementError("amethod");
+    rpcMetrics.IncrementError("amethod");
+    BOOST_CHECK(rpcMetrics.GetErrorCount("amethod").has_value());
+    BOOST_CHECK_EQUAL(2, *rpcMetrics.GetErrorCount("amethod"));
+
+    std::map<std::string, prometheus::MetricType> metric_names;
+    auto& reg = metrics::Registry();
+    BOOST_CHECK(reg.Collect().size() > 0);
+
+    for (auto m : reg.Collect()) {
+        metric_names.insert({m.name, m.type});
+    }
+    std::vector<std::string> expected_names = {
+        "rpc_access",
+        "rpc_error",
+    };
+    for (auto m : expected_names) {
+        auto found = metric_names.find(m);
+        BOOST_CHECK_MESSAGE(found != metric_names.end(), strprintf("metric %s is not found", m));
+    }
+}
 BOOST_AUTO_TEST_SUITE_END()

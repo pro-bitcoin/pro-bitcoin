@@ -21,6 +21,10 @@ void RpcMetricsImpl::ObserveMethod(const std::string& method, double amt)
 {
     auto counter = _method_counter.find(method);
     if (counter == this->_method_counter.end()) {
+        if (this->_method_counter.size() > MAX_ACCESS_METHODS) {
+            LogPrint(BCLog::METRICS, "reached max number of metrics for rpc_access (%s)\n", method);
+            return;
+        }
         {
             LOCK(g_rpc_mutex);
             LogPrint(BCLog::METRICS, "creaing rpc_access metric with method \"%s\"\n", method);
@@ -39,6 +43,10 @@ void RpcMetricsImpl::IncrementError(const std::string& method)
 {
     auto counter = _error_counter.find(method);
     if (counter == this->_error_counter.end()) {
+        if (this->_method_counter.size() > MAX_ERROR_METHODS) {
+            LogPrint(BCLog::METRICS, "reached max number of metrics for rpc_error (%s)\n", method);
+            return;
+        }
         {
             LOCK(g_rpc_mutex);
             this->_error_counter.insert({method, &_error_family->Add({{"method", method}})});

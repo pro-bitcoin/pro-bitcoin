@@ -6,7 +6,7 @@
 
   * Verify metrics endpoint is running
 """
-import requests
+import http.client
 
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import (
@@ -29,21 +29,15 @@ class MetricsTest(BitcoinTestFramework):
 
 
     def setup_network(self):
-        """Setup the test network topology
-
-        Often you won't need to override this, since the standard network topology
-        (linear: node0 <-> node1 <-> node2 <-> ...) is fine for most tests.
-
-        If you do override this method, remember to start the nodes, assign
-        them to self.nodes, connect them and then sync."""
-
         self.setup_nodes()
 
 
     def run_test(self):
-        metrics = requests.get(f"http://localhost:{self.get_metrics_port()}/metrics").text;
+        c = http.client.HTTPConnection(f"localhost:{self.get_metrics_port()}")
+        c.request("GET", "/metrics")
+        metrics = c.getresponse().read()
         assert_greater_than(len(metrics), 1)
-        assert 'bitcoin_conf{' in metrics
+        assert 'bitcoin_conf{' in str(metrics)
 
 
 if __name__ == '__main__':

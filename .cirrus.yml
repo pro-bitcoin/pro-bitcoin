@@ -91,6 +91,11 @@ task:
     - ./ci/lint_run_all.sh
   env:
     << : *CIRRUS_EPHEMERAL_WORKER_TEMPLATE_ENV
+  always:
+    lint_artifacts:
+      path: "**ci/scratch/lint/*cirrus.json"
+      type: application/json
+      format: "cirrus"
 
 task:
   name: 'ARM [unit tests, no functional tests] [buster]'

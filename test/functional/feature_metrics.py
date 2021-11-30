@@ -13,7 +13,10 @@ from test_framework.util import (
     assert_greater_than,
 )
 
+import requests
 
+def deadcode():
+    return 0
 class MetricsTest(BitcoinTestFramework):
     # TODO generating a random port
     metrics_port = 59142
@@ -36,7 +39,7 @@ class MetricsTest(BitcoinTestFramework):
         c = http.client.HTTPConnection(f"localhost:{self.get_metrics_port()}")
         c.request("GET", "/metrics")
         metrics = c.getresponse().read()
-        assert_greater_than(len(metrics), 1)
+        assert_greater_than(len(metrics), 1);
         assert 'bitcoin_conf{' in str(metrics)
 
 

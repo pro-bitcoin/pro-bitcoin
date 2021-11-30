@@ -12,22 +12,24 @@ EXIT_CODE=0
 
 # PRE31-C (SEI CERT C Coding Standard):
 # "Assertions should not contain assignments, increment, or decrement operators."
-OUTPUT=$(git grep -E '[^_]assert\(.*(\+\+|\-\-|[^=!<>]=[^=!<>]).*\);' -- "*.cpp" "*.h")
+OUTPUT=$(git grep -H -n -E '[^_]assert\(.*(\+\+|\-\-|[^=!<>]=[^=!<>]).*\);' -- "*.cpp" "*.h")
 if [[ ${OUTPUT} != "" ]]; then
     echo "Assertions should not have side effects:"
     echo
     echo "${OUTPUT}"
+    [ "$CIRRUS_BASE_SHA" ] && cirrus_grep_format "$0" "Assertion should not have side effect" "$OUTPUT"
     EXIT_CODE=1
 fi
 
 # Macro CHECK_NONFATAL(condition) should be used instead of assert for RPC code, where it
 # is undesirable to crash the whole program. See: src/util/check.h
 # src/rpc/server.cpp is excluded from this check since it's mostly meta-code.
-OUTPUT=$(git grep -nE '\<(A|a)ssert *\(.*\);' -- "src/rpc/" "src/wallet/rpc*" ":(exclude)src/rpc/server.cpp")
+OUTPUT=$(git grep -H -nE '\<(A|a)ssert *\(.*\);' -- "src/rpc/" "src/wallet/rpc*" ":(exclude)src/rpc/server.cpp")
 if [[ ${OUTPUT} != "" ]]; then
     echo "CHECK_NONFATAL(condition) should be used instead of assert for RPC code."
     echo
     echo "${OUTPUT}"
+    [ "$CIRRUS_BASE_SHA" ] && cirrus_grep_format "$0" "CHECK_NONFATAL should be used" "$OUTPUT"
     EXIT_CODE=1
 fi
 

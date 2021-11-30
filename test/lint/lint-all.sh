@@ -18,6 +18,31 @@ LINTALL=$(basename "${BASH_SOURCE[0]}")
 
 EXIT_CODE=0
 
+function cirrus_grep_format()
+{
+    log=$(basename "${1:?}")
+    msg="${2:?}"
+    IFS=
+    echo "${3:?}" | while read -r LINE; do
+            path=$(echo "$LINE" | cut -d: -f 1)
+            line=$(echo "$LINE" | cut -d: -f 2)
+           cirrus_format "$0" "$msg" "$path" "$line"
+    done
+}
+
+function cirrus_format()
+{
+    log=$(basename "${1:?}")
+    msg="${2:?}"
+    path="${3:?}"
+    line="${4:?}"
+    msg=${msg/\"//g}
+    printf '{"level": "failure", "message": "mypy: %s", "path": "%s", "start_line": %s, "end_line": %s}\n'  "$msg" "$path" "$line" "$line" >> "$REPORTS_DIR/${log}-cirrus.json"
+}
+
+export -f cirrus_format
+export -f cirrus_grep_format
+
 for f in "${SCRIPTDIR}"/lint-*.sh; do
   if [ "$(basename "$f")" != "$LINTALL" ]; then
     if ! "$f"; then

@@ -23,10 +23,10 @@ def find_free_port() -> int:
         return s.getsockname()[1]
 
 class MetricsTest(BitcoinTestFramework):
-    metrics_port: int = None
+    metrics_port: int = 0
 
     def get_metrics_port(self):
-        if self.metrics_port is None:
+        if self.metrics_port == 0:
             self.metrics_port = find_free_port()
         return self.metrics_port
 

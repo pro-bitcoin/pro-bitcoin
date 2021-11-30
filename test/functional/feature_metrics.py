@@ -7,6 +7,8 @@
   * Verify metrics endpoint is running
 """
 import http.client
+import socket
+from contextlib import closing
 
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import (
@@ -14,11 +16,18 @@ from test_framework.util import (
 )
 
 
+def find_free_port() -> int:
+    with closing(socket.socket(socket.AF_INET, socket.SOCK_STREAM)) as s:
+        s.bind(('', 0))
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        return s.getsockname()[1]
+
 class MetricsTest(BitcoinTestFramework):
-    # TODO generating a random port
-    metrics_port = 59142
+    metrics_port: int = None
 
     def get_metrics_port(self):
+        if self.metrics_port is None:
+            self.metrics_port = find_free_port()
         return self.metrics_port
 
 

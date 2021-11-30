@@ -96,7 +96,7 @@ EXIT_CODE=0
 
 FLAKE_FORMAT="'%(path)s:%(row)d: [%(code)s] %(text)s'"
 if [ -n "$CIRRUS_BASE_SHA" ]; then
-    FLAKE_FORMAT='{"level": "failure", "message": "%(code)s %(text)s", "path": "%(path)s", "start_line": %(row)d, "end_line": %(row)d}'
+    FLAKE_FORMAT='{"level": "failure", "message": "flake: %(code)s %(text)s", "path": "%(path)s", "start_line": %(row)d, "end_line": %(row)d}'
 fi
 
 if ! PYTHONWARNINGS="ignore" flake8 --format "$FLAKE_FORMAT" --ignore=B,C,E,F,I,N,W --select=$(IFS=","; echo "${enabled[*]}") $(
@@ -116,11 +116,12 @@ if ! mypy --ignore-missing-imports --show-error-codes $(git ls-files "test/funct
     # example:
     # test/functional/test_runner.py:43: error: Module has no attribute "getwindowsversion"  [attr-defined]
     if [ -n "$CIRRUS_BASE_SHA" ] ; then
-        grep " error: " "/tmp/$$" | while read LINE; do
+        IFS=
+        grep " error: " "/tmp/$$" |while read LINE; do
             msg="$(echo $LINE | cut -d : -f 4 | sed 's/"//g' | sed 's/  / /g')"
             p=$(echo $LINE | cut -d : -f 1)
             line=$(echo $LINE | cut -d : -f 2)
-            printf '{"level": "failure", "message": "%s", "path": "%s", "start_line": %s, "end_line": %s}\n'  "$msg" "$p" "$line" "$line"
+            printf '{"level": "failure", "message": "mypy: %s", "path": "%s", "start_line": %s, "end_line": %s}\n'  "$msg" "$p" "$line" "$line"
         done > $MYPY_REPORT_FILE
     fi
     EXIT_CODE=1

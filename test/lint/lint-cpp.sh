@@ -10,11 +10,12 @@ export LC_ALL=C
 
 EXIT_CODE=0
 
-OUTPUT=$(git grep -E "boost::bind\(" -- "*.cpp" "*.h")
+OUTPUT=$(git grep -H -n -E "boost::bind\(" -- "*.cpp" "*.h")
 if [[ ${OUTPUT} != "" ]]; then
     echo "Use of boost::bind detected. Use std::bind instead."
     echo
     echo "${OUTPUT}"
+    [ -n "$CIRRUS_BASE_SHA" ] && cirrus_grep_format "$0" "use of boost:bind" "$OUTPUT"
     EXIT_CODE=1
 fi
 

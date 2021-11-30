@@ -8,8 +8,7 @@
 
 export LC_ALL=C
 export MYPY_CACHE_DIR="${BASE_ROOT_DIR:-/tmp}/test/.mypy_cache"
-MYPY_REPORT_FILE="${REPORTS_DIR:?}/mypy-cirrus.json"
-FLAKE_REPORT_FILE="$REPORTS_DIR/flake-cirrus.json"
+FLAKE_REPORT_FILE="${REPORTS_DIR:-/tmp}/flake-cirrus.json"
 
 enabled=(
     E101 # indentation contains mixed spaces and tabs
@@ -117,12 +116,12 @@ if ! mypy --ignore-missing-imports --show-error-codes $(git ls-files "test/funct
     # test/functional/test_runner.py:43: error: Module has no attribute "getwindowsversion"  [attr-defined]
     if [ -n "$CIRRUS_BASE_SHA" ] ; then
         IFS=
-        grep " error: " "/tmp/$$" |while read LINE; do
-            msg="$(echo $LINE | cut -d : -f 4 | sed 's/"//g' | sed 's/  / /g')"
-            p=$(echo $LINE | cut -d : -f 1)
-            line=$(echo $LINE | cut -d : -f 2)
-            printf '{"level": "failure", "message": "mypy: %s", "path": "%s", "start_line": %s, "end_line": %s}\n'  "$msg" "$p" "$line" "$line"
-        done > $MYPY_REPORT_FILE
+        grep " error: " "/tmp/$$" |while read -r LINE; do
+            msg="$(echo "$LINE" | cut -d : -f 4 | sed 's/"//g' | sed 's/  / /g')"
+            p=$(echo "$LINE" | cut -d : -f 1)
+            line=$(echo "$LINE" | cut -d : -f 2)
+            cirrus_format "$0" "$msg" "$p" "$line"
+        done
     fi
     EXIT_CODE=1
 fi

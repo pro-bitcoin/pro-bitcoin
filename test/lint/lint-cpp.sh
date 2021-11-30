@@ -15,7 +15,7 @@ if [[ ${OUTPUT} != "" ]]; then
     echo "Use of boost::bind detected. Use std::bind instead."
     echo
     echo "${OUTPUT}"
-    [ "$CIRRUS_BASE_SHA" ] && cirrus_grep_format "$0" "use of boost:bind" "$OUTPUT"
+    [ -n "$CIRRUS_BASE_SHA" ] && cirrus_grep_format "$0" "use of boost:bind" "$OUTPUT"
     EXIT_CODE=1
 fi
 

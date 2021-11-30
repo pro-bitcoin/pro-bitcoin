@@ -37,7 +37,7 @@ function cirrus_format()
     path="${3:?}"
     line="${4:?}"
     msg=${msg/\"//g}
-    printf '{"level": "failure", "message": "mypy: %s", "path": "%s", "start_line": %s, "end_line": %s}\n'  "$msg" "$path" "$line" "$line" >> "$REPORTS_DIR/${log}-cirrus.json"
+    printf '{"level": "failure", "message": "%s: %s", "path": "%s", "start_line": %s, "end_line": %s}\n'  "$log" "$msg" "$path" "$line" "$line" >> "$REPORTS_DIR/${log}-cirrus.json"
 }
 
 export -f cirrus_format

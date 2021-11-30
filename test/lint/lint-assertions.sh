@@ -17,7 +17,7 @@ if [[ ${OUTPUT} != "" ]]; then
     echo "Assertions should not have side effects:"
     echo
     echo "${OUTPUT}"
-    [ "$CIRRUS_BASE_SHA" ] && cirrus_grep_format "$0" "Assertion should not have side effect" "$OUTPUT"
+    [ -n "$CIRRUS_BASE_SHA" ] && cirrus_grep_format "$0" "Assertion should not have side effect" "$OUTPUT"
     EXIT_CODE=1
 fi
 
@@ -29,7 +29,7 @@ if [[ ${OUTPUT} != "" ]]; then
     echo "CHECK_NONFATAL(condition) should be used instead of assert for RPC code."
     echo
     echo "${OUTPUT}"
-    [ "$CIRRUS_BASE_SHA" ] && cirrus_grep_format "$0" "CHECK_NONFATAL should be used" "$OUTPUT"
+    [ -n "$CIRRUS_BASE_SHA" ] && cirrus_grep_format "$0" "CHECK_NONFATAL should be used" "$OUTPUT"
     EXIT_CODE=1
 fi
 

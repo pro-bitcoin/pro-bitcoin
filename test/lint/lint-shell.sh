@@ -29,7 +29,20 @@ fi
 SHELLCHECK_CMD=(shellcheck --external-sources --check-sourced)
 EXCLUDE="--exclude=$(IFS=','; echo "${disabled[*]}")"
 SOURCED_FILES=$(git ls-files | xargs gawk '/^# shellcheck shell=/ {print FILENAME} {nextfile}')  # Check shellcheck directive used for sourced files
-if ! "${SHELLCHECK_CMD[@]}" "$EXCLUDE" $SOURCED_FILES $(git ls-files -- '*.sh' | grep -vE 'src/(leveldb|secp256k1|univalue)/'); then
+LOG_FILE=/tmp/$$
+if ! "${SHELLCHECK_CMD[@]}" --format=gcc "$EXCLUDE" $SOURCED_FILES $(git ls-files -- '*.sh' | grep -vE 'src/(leveldb|secp256k1|univalue)/') > "$LOG_FILE"; then
+    cat "$LOG_FILE"
+    # test/lint/lint-python.sh:11:1: warning: MYPY_REPORT_FILE appears unused. Verify use (or export if used externally). [SC2034]
+    OLDIFS="$IFS"
+    IFS=
+    set -x
+    while read -r LINE; do
+        msg="$(echo "$LINE" | cut -d : -f 4- | sed 's/"//g')"
+        path="$(echo "$LINE" | cut -d : -f 1)"
+        line="$(echo "$LINE" | cut -d : -f 2)"
+        [ -n "$CIRRUS_BASE_SHA" ] && cirrus_format "$0" "$msg" "$path" "$line"
+    done < "$LOG_FILE"
+    IFS="$OLDIFS"
     EXIT_CODE=1
 fi
 

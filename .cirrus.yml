@@ -92,7 +92,7 @@ task:
   env:
     << : *CIRRUS_EPHEMERAL_WORKER_TEMPLATE_ENV
   always:
-    lint_artifacts:
+    cilint_artifacts:
       path: "**ci/scratch/lint/*cirrus.json"
       type: application/json
       format: "cirrus"

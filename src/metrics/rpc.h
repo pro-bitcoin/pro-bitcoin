@@ -19,6 +19,9 @@ public:
 class RpcMetricsImpl : virtual public RpcMetrics, Metrics
 {
 protected:
+    // Limit number of tagged methods to prevent overflow
+    const static uint32_t MAX_ERROR_METHODS{75};
+    const static uint32_t MAX_ACCESS_METHODS{75};
     std::map<std::string, prometheus::Summary*> _method_counter;
     std::map<std::string, prometheus::Counter*> _error_counter;
     prometheus::Family<prometheus::Summary>* _method_family;

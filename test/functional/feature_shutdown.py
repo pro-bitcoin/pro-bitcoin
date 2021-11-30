@@ -18,6 +18,8 @@ class ShutdownTest(BitcoinTestFramework):
         self.setup_clean_chain = True
         self.num_nodes = 1
         self.supports_cli = False
+        self.extra_args = [["-metrics=0"]]
+
 
     def run_test(self):
         node = get_rpc_proxy(self.nodes[0].url, 1, timeout=600, coveragedir=self.nodes[0].coverage_dir)

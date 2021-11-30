@@ -8,8 +8,7 @@
 
 export LC_ALL=C
 export MYPY_CACHE_DIR="${BASE_ROOT_DIR:-/tmp}/test/.mypy_cache"
-MYPY_REPORT_FILE="${REPORTS_DIR:?}/mypy-cirrus.json"
-FLAKE_REPORT_FILE="$REPORTS_DIR/flake-cirrus.json"
+FLAKE_REPORT_FILE="${REPORTS_DIR:-/tmp}/flake-cirrus.json"
 
 enabled=(
     E101 # indentation contains mixed spaces and tabs

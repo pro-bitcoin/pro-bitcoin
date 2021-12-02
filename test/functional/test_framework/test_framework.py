@@ -17,6 +17,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import traceback
 
 from typing import List
 from .address import ADDRESS_BCRT1_P2WSH_OP_TRUE
@@ -132,9 +133,10 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
         except SkipTest as e:
             self.log.warning("Test Skipped: %s" % e.message)
             self.success = TestStatus.SKIPPED
-        except AssertionError:
+        except AssertionError as e:
             self.log.exception("Assertion failed")
             self.success = TestStatus.FAILED
+            self.cirrus_annotation_log(e)
         except KeyError:
             self.log.exception("Key error")
             self.success = TestStatus.FAILED
@@ -866,3 +868,21 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
     def is_bdb_compiled(self):
         """Checks whether the wallet module was compiled with BDB support."""
         return self.config["components"].getboolean("USE_BDB")
+
+    def cirrus_annotation_log(self, e: AssertionError):
+        tb = e.__traceback__
+        if tb is None:
+            return
+        exc_cause: traceback.TracebackException = traceback.TracebackException(AssertionError, e, tb)
+        summary: traceback.FrameSummary = exc_cause.stack[-1]
+        msg = 'AssertionError in {}'.format(summary.name)
+        fname = summary.filename.replace(os.getcwd() + '/', '')
+        line = summary.lineno
+        if 'CIRRUS_BASE_SHA' not in os.environ:
+            return
+        try:
+            with open(self.options.tmpdir + '/cirrus.json', 'a', encoding='utf8') as f:
+                f.write('{"level": "failure", "message": "%s", "path": "%s", "start_line": %s, "end_line": %s}\n' % (msg, fname, line, line))
+        except Exception as ex:
+            self.log.warning('failed to write cirrus annotation file %s' % str(ex))
+            pass

@@ -22,6 +22,7 @@ def find_free_port() -> int:
         s.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         return s.getsockname()[1]
 
+
 class MetricsTest(BitcoinTestFramework):
     metrics_port: int = 0
 
@@ -30,16 +31,13 @@ class MetricsTest(BitcoinTestFramework):
             self.metrics_port = find_free_port()
         return self.metrics_port
 
-
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 1
         self.extra_args = [[f"-metricsbind={self.get_metrics_port()}"]]
 
-
     def setup_network(self):
         self.setup_nodes()
-
 
     def run_test(self):
         c = http.client.HTTPConnection(f"localhost:{self.get_metrics_port()}")

@@ -104,8 +104,10 @@ if ! PYTHONWARNINGS="ignore" flake8 --format "$FLAKE_FORMAT" --ignore=B,C,E,F,I,
     else
         echo "$@"
     fi
-) > $FLAKE_REPORT_FILE ; then
-    cat $FLAKE_REPORT_FILE
+) > "$FLAKE_REPORT_FILE" ; then
+    cat "$FLAKE_REPORT_FILE"
+    # only save file if in PR
+    [ -n "$CIRRUS_BASE_SHA" ] && rm "$FLAKE_REPORT_FILE"
     EXIT_CODE=1
 fi
 

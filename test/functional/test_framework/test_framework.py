@@ -795,13 +795,7 @@ class BitcoinTestFramework(metaclass=BitcoinTestMetaClass):
 
     def skip_if_no_wallet(self):
         """Skip the running test if wallet has not been compiled."""
-        self.requires_wallet = True
-        if not self.is_wallet_compiled():
-            raise SkipTest("wallet has not been compiled.")
-        if self.options.descriptors:
-            self.skip_if_no_sqlite()
-        else:
-            self.skip_if_no_bdb()
+        raise SkipTest("Disabled all wallet functional tests on purpose.")
 
     def skip_if_no_sqlite(self):
         """Skip the running test if sqlite has not been compiled."""

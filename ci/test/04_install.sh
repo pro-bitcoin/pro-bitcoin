@@ -104,7 +104,7 @@ fi
 
 if [ -z "$DANGER_RUN_CI_ON_HOST" ]; then
   echo "Create $BASE_ROOT_DIR"
-  DOCKER_EXEC rsync -a --info=progress2 --exclude '*.o' --exclude .git --exclude depends/ --exclude  ci/scratch /ro_base/ $BASE_ROOT_DIR
+  DOCKER_EXEC rsync -a --exclude '*.o' --exclude .git --exclude depends/ --exclude  ci/scratch /ro_base/ "$BASE_ROOT_DIR"
 fi
 
 if [ "$USE_BUSY_BOX" = "true" ]; then
@@ -124,7 +124,9 @@ if [ "$USE_BUSY_BOX" = "true" ]; then
   DOCKER_EXEC for util in \$\(busybox --list \| grep -v "^ar$" \| grep -v "^tar$" \| grep -v "^find$"\)\; do ln -s \$\(command -v busybox\) $BASE_SCRATCH_DIR/bins/\$util\; done
   # Print BusyBox version
   DOCKER_EXEC patch --help
- else
+fi
+
+if [ "$(lsb_release -r -s)" == "20.04" ] ; then
 # update cmake
   DOCKER_EXEC "curl -s --fail -L https://apt.kitware.com/keys/kitware-archive-latest.asc  | gpg --dearmor - > /etc/apt/trusted.gpg.d/kitware.gpg"
   DOCKER_EXEC "apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'"

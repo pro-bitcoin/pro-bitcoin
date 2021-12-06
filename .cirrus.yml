@@ -47,9 +47,7 @@ global_task_template: &GLOBAL_TASK_TEMPLATE
     boost_test_log_artifacts:
       path: "**ci/scratch/build/**/*testlog.xml"
       type: text/xml
-    boost_test_report_artifacts:
-      path: "**ci/scratch/build/**/*report.xml"
-      type: text/xml
+      format: "boost"
     functional_log_artifacts:
       path: "**ci/scratch/test_runner/**/*.log"
       type: text/plain

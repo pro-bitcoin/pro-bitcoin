@@ -366,7 +366,7 @@ endif
 	(echo FAILED && cat $$report_file && false); \
 	let exitCode=$$?; \
 	if [ $(BOOST_TEST_REPORT_FORMAT) == "XML" ]; then \
-		(xmllint --format --output $$test_log $$test_log && sed -i '/reason="disabled"/d' $$test_log) || \
+		(xmllint --format --output $$test_log $$test_log && sed -i '/reason="disabled"/d' $$test_log && sed -i 's| file="test/| file="src/test/|' $$test_log) || \
 		(cat $$test_log || true); \
 	fi; \
 	exit $$exitCode

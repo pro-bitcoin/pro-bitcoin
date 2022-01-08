@@ -27,10 +27,6 @@ Check out [https://pro-bitcoin.io](https://pro-bitcoin.io) for a running demo wi
 Mostly curiosity. I really wanted to explor what's really happening with bitcoin nodes, especially network communication and consensus.
 I learning by tinkering and with the help of [grafana](http://docs.grafana.org/guides/getting_started/) and [prometheus](https://github.com/jupp0r/prometheus-cpp), I built a visual aid to explore the code
 
-## Dashboards
-
-Coming soon
-
 ### Special Thanks
 
 * [jupp0r](https://github.com/jupp0r)

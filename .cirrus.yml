@@ -245,7 +245,7 @@ task:
 
 task:
   name: '[TSan, depends, gui] [jammy]'
-  only_if: true
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:jammy
@@ -257,7 +257,7 @@ task:
 
 task:
   name: '[MSan, depends] [focal]'
-  only_if: true
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:focal

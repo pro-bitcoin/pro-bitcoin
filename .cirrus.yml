@@ -68,7 +68,7 @@ global_task_template: &GLOBAL_TASK_TEMPLATE
       format: cirrus
     functional_report_artifacts:
       path: "**ci/scratch/test_runner/**/report.json"
-      type: applicaiton/json
+      type: application/json
     bench_json_artifacts:
       path: "**ci/scratch/bench.json"
       type: application/json

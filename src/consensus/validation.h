@@ -9,6 +9,7 @@
 #include <string>
 #include <version.h>
 #include <consensus/consensus.h>
+#include <metrics/container.h>
 #include <primitives/transaction.h>
 #include <primitives/block.h>
 
@@ -108,6 +109,7 @@ public:
         m_reject_reason = reject_reason;
         m_debug_message = debug_message;
         if (m_mode != ModeState::M_ERROR) m_mode = ModeState::M_INVALID;
+        metrics::Instance()->Tx().IncInvalid(reject_reason);
         return false;
     }
     bool Error(const std::string& reject_reason)

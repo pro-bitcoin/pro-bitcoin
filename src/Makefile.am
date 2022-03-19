@@ -170,6 +170,10 @@ BITCOIN_CORE_H = \
   mapport.h \
   memusage.h \
   merkleblock.h \
+  metrics/container.h \
+  metrics/metrics.h \
+  metrics/rpc.h \
+  metrics_notifications_interface.h \
   net.h \
   net_permissions.h \
   net_processing.h \
@@ -569,6 +573,16 @@ libbitcoin_common_a_SOURCES = \
   key.cpp \
   key_io.cpp \
   merkleblock.cpp \
+  metrics/metrics.cpp \
+  metrics/block.cpp \
+  metrics/container.cpp \
+  metrics/mempool.cpp \
+  metrics/net.cpp \
+  metrics/peer.cpp \
+  metrics/rpc.cpp \
+  metrics/tx.cpp \
+  metrics/utxo.cpp \
+  metrics_notifications_interface.cpp \
   net_types.cpp \
   netaddress.cpp \
   netbase.cpp \
@@ -673,7 +687,8 @@ bitcoin_bin_ldadd = \
   $(LIBLEVELDB) \
   $(LIBLEVELDB_SSE42) \
   $(LIBMEMENV) \
-  $(LIBSECP256K1)
+  $(LIBSECP256K1) \
+  $(PROMETHEUS_LIBS)
 
 bitcoin_bin_ldadd += $(BDB_LIBS) $(MINIUPNPC_LIBS) $(NATPMP_LIBS) $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(ZMQ_LIBS) $(SQLITE_LIBS)
 
@@ -693,7 +708,7 @@ bitcoin_node_LDADD = $(LIBBITCOIN_NODE) $(bitcoin_bin_ldadd) $(LIBBITCOIN_IPC) $
 bitcoin_cli_SOURCES = bitcoin-cli.cpp
 bitcoin_cli_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(EVENT_CFLAGS)
 bitcoin_cli_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-bitcoin_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+bitcoin_cli_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS) $(PROMETHEUS_LIBS)
 
 if TARGET_WINDOWS
 bitcoin_cli_SOURCES += bitcoin-cli-res.rc
@@ -703,7 +718,8 @@ bitcoin_cli_LDADD = \
   $(LIBBITCOIN_CLI) \
   $(LIBUNIVALUE) \
   $(LIBBITCOIN_UTIL) \
-  $(LIBBITCOIN_CRYPTO)
+  $(LIBBITCOIN_CRYPTO) \
+  $(PROMETHEUS_LIBS)
 
 bitcoin_cli_LDADD += $(EVENT_LIBS)
 #
@@ -724,7 +740,8 @@ bitcoin_tx_LDADD = \
   $(LIBBITCOIN_UTIL) \
   $(LIBBITCOIN_CONSENSUS) \
   $(LIBBITCOIN_CRYPTO) \
-  $(LIBSECP256K1)
+  $(LIBSECP256K1) \
+  $(PROMETHEUS_LIBS)
 #
 
 # bitcoin-wallet binary #
@@ -743,7 +760,8 @@ bitcoin_wallet_LDADD = \
   $(LIBBITCOIN_CRYPTO) \
   $(LIBSECP256K1) \
   $(BDB_LIBS) \
-  $(SQLITE_LIBS)
+  $(SQLITE_LIBS) \
+  $(PROMETHEUS_LIBS)
 
 if TARGET_WINDOWS
 bitcoin_wallet_SOURCES += bitcoin-wallet-res.rc
@@ -754,7 +772,7 @@ endif
 bitcoin_util_SOURCES = bitcoin-util.cpp
 bitcoin_util_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 bitcoin_util_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
-bitcoin_util_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS)
+bitcoin_util_LDFLAGS = $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS) $(PTHREAD_FLAGS) $(PROMETHEUS_LIBS)
 
 if TARGET_WINDOWS
 bitcoin_util_SOURCES += bitcoin-util-res.rc

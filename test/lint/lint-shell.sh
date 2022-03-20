@@ -26,7 +26,20 @@ EXCLUDE="--exclude=$(IFS=','; echo "${disabled[*]}")"
 mapfile -t SOURCED_FILES < <(git ls-files | xargs gawk '/^# shellcheck shell=/ {print FILENAME} {nextfile}')
 mapfile -t GUIX_FILES < <(git ls-files contrib/guix contrib/shell | xargs gawk '/^#!\/usr\/bin\/env bash/ {print FILENAME} {nextfile}')
 mapfile -t FILES < <(git ls-files -- '*.sh' | grep -vE 'src/(leveldb|secp256k1|minisketch|univalue)/')
-if ! "${SHELLCHECK_CMD[@]}" "$EXCLUDE" "${SOURCED_FILES[@]}" "${GUIX_FILES[@]}" "${FILES[@]}"; then
+SHELLCHECK_LOG=/tmp/$$
+if ! "${SHELLCHECK_CMD[@]}" "$EXCLUDE" "${SOURCED_FILES[@]}" "${GUIX_FILES[@]}" "${FILES[@]}" > $SHELLCHECK_LOG; then
+    cat "$SHELLCHECK_LOG"
+    # test/lint/lint-python.sh:11:1: warning: MYPY_REPORT_FILE appears unused. Verify use (or export if used externally). [SC2034]
+    OLDIFS="$IFS"
+    IFS=
+    set -x
+    while read -r LINE; do
+        msg="$(echo "$LINE" | cut -d : -f 4- | sed 's/"//g')"
+        path="$(echo "$LINE" | cut -d : -f 1)"
+        line="$(echo "$LINE" | cut -d : -f 2)"
+        [ -n "$CIRRUS_BASE_SHA" ] && cirrus_format "$0" "$msg" "$path" "$line"
+    done < "$SHELLCHECK_LOG"
+    IFS="$OLDIFS"
     EXIT_CODE=1
 fi
 

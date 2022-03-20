@@ -150,3 +150,5 @@ osx_volname
 dist/
 
 /guix-build-*
+
+.idea

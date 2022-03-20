@@ -63,6 +63,7 @@ namespace BCLog {
         LOCK        = (1 << 24),
         UTIL        = (1 << 25),
         BLOCKSTORE  = (1 << 26),
+        METRICS     = (1 << 27),
         ALL         = ~(uint32_t)0,
     };
 

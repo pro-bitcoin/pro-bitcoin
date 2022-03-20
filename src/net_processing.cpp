@@ -16,6 +16,7 @@
 #include <hash.h>
 #include <index/blockfilterindex.h>
 #include <merkleblock.h>
+#include <metrics/metrics.h>
 #include <netbase.h>
 #include <netmessagemaker.h>
 #include <node/blockstorage.h>
@@ -172,6 +173,8 @@ static constexpr double MAX_ADDR_RATE_PER_SECOND{0.1};
  *  based increments won't go above this, but the MAX_ADDR_TO_SEND increment following GETADDR
  *  is exempt from this limit). */
 static constexpr size_t MAX_ADDR_PROCESSING_TOKEN_BUCKET{MAX_ADDR_TO_SEND};
+
+static const auto& metricsContainer = metrics::Instance();
 
 // Internal stuff
 namespace {
@@ -1366,8 +1369,10 @@ void PeerManagerImpl::Misbehaving(const NodeId pnode, const int howmuch, const s
 
     if (score_now >= DISCOURAGEMENT_THRESHOLD && score_before < DISCOURAGEMENT_THRESHOLD) {
         warning = " DISCOURAGE THRESHOLD EXCEEDED";
+        metricsContainer->Peer().IncDiscourage();
         peer->m_should_discourage = true;
     }
+    metricsContainer->Peer().IncMisbehaveAmount(howmuch);
 
     LogPrint(BCLog::NET, "Misbehaving: peer=%d (%d -> %d)%s%s\n",
              pnode, score_before, score_now, warning, message_prefixed);
@@ -1425,6 +1430,9 @@ bool PeerManagerImpl::MaybePunishNodeForBlock(NodeId nodeid, const BlockValidati
 
 bool PeerManagerImpl::MaybePunishNodeForTx(NodeId nodeid, const TxValidationState& state, const std::string& message)
 {
+    if (!state.IsValid())
+        metricsContainer->Peer().IncTxValidationResult(static_cast<int>(state.GetResult()));
+
     switch (state.GetResult()) {
     case TxValidationResult::TX_RESULT_UNSET:
         break;
@@ -2987,6 +2995,7 @@ void PeerManagerImpl::ProcessMessage(CNode& pfrom, const std::string& msg_type, 
             LogPrint(BCLog::NET, "addrfetch connection completed peer=%d; disconnecting\n", pfrom.GetId());
             pfrom.fDisconnect = true;
         }
+        metricsContainer->Peer().Known(m_addrman.size());
         return;
     }
 
@@ -3936,6 +3945,7 @@ void PeerManagerImpl::ProcessMessage(CNode& pfrom, const std::string& msg_type, 
                     // Matching pong received, this ping is no longer outstanding
                     bPingFinished = true;
                     const auto ping_time = ping_end - peer->m_ping_start.load();
+                    metricsContainer->Net().PingTime(ping_time.count());
                     if (ping_time.count() >= 0) {
                         // Let connman know about this successful ping-pong
                         pfrom.PongReceived(ping_time);
@@ -3962,6 +3972,7 @@ void PeerManagerImpl::ProcessMessage(CNode& pfrom, const std::string& msg_type, 
         }
 
         if (!(sProblem.empty())) {
+            metricsContainer->Net().IncPingProblem();
             LogPrint(BCLog::NET, "pong peer=%d: %s, %x expected, %x received, %u bytes\n",
                 pfrom.GetId(),
                 sProblem,
@@ -4131,7 +4142,7 @@ bool PeerManagerImpl::MaybeDiscourageAndDisconnect(CNode& pnode, Peer& peer)
 bool PeerManagerImpl::ProcessMessages(CNode* pfrom, std::atomic<bool>& interruptMsgProc)
 {
     bool fMoreWork = false;
-
+    static auto& peerMetrics = metricsContainer->Peer();
     PeerRef peer = GetPeerRef(pfrom->GetId());
     if (peer == nullptr) return false;
 
@@ -4195,7 +4206,11 @@ bool PeerManagerImpl::ProcessMessages(CNode* pfrom, std::atomic<bool>& interrupt
     msg.SetVersion(pfrom->GetCommonVersion());
 
     try {
+        auto start = std::chrono::high_resolution_clock::now();
         ProcessMessage(*pfrom, msg.m_type, msg.m_recv, msg.m_time, interruptMsgProc);
+        auto end = std::chrono::high_resolution_clock::now();
+        auto diff = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        peerMetrics.ProcessMsgType(msg.m_type, diff.count());
         if (interruptMsgProc) return false;
         {
             LOCK(peer->m_getdata_requests_mutex);
@@ -4586,6 +4601,7 @@ bool PeerManagerImpl::SetupAddressRelay(const CNode& node, Peer& peer)
 
 bool PeerManagerImpl::SendMessages(CNode* pto)
 {
+    auto start = std::chrono::high_resolution_clock::now();
     PeerRef peer = GetPeerRef(pto->GetId());
     if (!peer) return false;
     const Consensus::Params& consensusParams = m_chainparams.GetConsensus();
@@ -5057,5 +5073,8 @@ bool PeerManagerImpl::SendMessages(CNode* pto)
 
         MaybeSendFeefilter(*pto, current_time);
     } // release cs_main
+    auto end = std::chrono::high_resolution_clock::now();
+    auto diff = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    metricsContainer->Peer().SendMessageTime(diff.count());
     return true;
 }

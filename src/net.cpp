@@ -3064,7 +3064,7 @@ void CConnman::RecordBytesSent(uint64_t bytes)
     }
 
     nMaxOutboundTotalBytesSentInCycle += bytes;
-    netMetrics.MaxOutbound(nMaxOutboundTotalBytesSentInCycle);
+    netMetrics.BandwidthGauge(metrics::NetDirection::TX, "total", bytes);
 }
 
 uint64_t CConnman::GetMaxOutboundTarget() const

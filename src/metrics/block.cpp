@@ -1,7 +1,8 @@
 #include <logging.h>
-#include <metrics/metrics.h>
+#include <metrics/block.h>
 #include <prometheus/histogram.h>
 
+namespace metrics {
 #define P_BLK_LOAD 0
 #define P_BLK_CONNECT 1
 #define P_BLK_FLUSH_VIEW 2
@@ -10,7 +11,6 @@
 #define P_BLK_FORK_CHECK 5
 #define P_BLK_INDEX 6
 
-namespace metrics {
 std::unique_ptr<BlockMetrics> BlockMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)
 {
     LogPrint(BCLog::METRICS, "creaing TxMetrics on %s\n", chain);
@@ -20,30 +20,28 @@ std::unique_ptr<BlockMetrics> BlockMetrics::make(const std::string& chain, prome
 BlockMetricsImpl::BlockMetricsImpl(const std::string& chain, prometheus::Registry& registry) : Metrics(chain, registry)
 {
     auto& family = FamilyGauge("block_tip");
-    auto& block_timers = FamilyHistory("block_connect");
-    auto& family_block_avg = FamilyGauge("block_avg");
+    auto& family_block_connect_avg = FamilyGauge("block_connect_avg");
+    auto& family_block_connect_tip = FamilyGauge("block_connect_tip");
     for (const auto& type : _block_types) {
         _block_tip_gauge.insert({type, &family.Add({{"type", type}})});
     }
-    const std::pair<std::string, std::string> tip_method = {"method", "ConnectTip"};
-    const std::pair<std::string, std::string> connect_method = {"method", "ConnectBlock"};
-    _block_bucket_timers = {
-        &block_timers.Add({{"operation", BLOCK_LOAD.name()}, tip_method}, BLOCK_LOAD.buckets()),
-        &block_timers.Add({{"operation", BLOCK_CONNECT.name()}, tip_method}, BLOCK_CONNECT.buckets()),
-        &block_timers.Add({{"operation", BLOCK_FLUSH_VIEW.name()}, tip_method}, BLOCK_FLUSH_VIEW.buckets()),
-        &block_timers.Add({{"operation", BLOCK_FLUSH_DISK.name()}, tip_method}, BLOCK_FLUSH_DISK.buckets()),
-        &block_timers.Add({{"operation", BLOCK_UPDATE_TIP.name()}, tip_method}, BLOCK_UPDATE_TIP.buckets()),
-        &block_timers.Add({{"operation", BLOCK_FORK_CHK.name()}, connect_method}, BLOCK_FORK_CHK.buckets()),
-        &block_timers.Add({{"operation", BLOCK_UPDATE_INDEX.name()}, connect_method}, BLOCK_UPDATE_INDEX.buckets()),
+    _block_connect_avg = {
+        &family_block_connect_avg.Add({{"operation", BLOCK_LOAD.name()}}),
+        &family_block_connect_avg.Add({{"operation", BLOCK_CONNECT.name()}}),
+        &family_block_connect_avg.Add({{"operation", BLOCK_FLUSH_VIEW.name()}}),
+        &family_block_connect_avg.Add({{"operation", BLOCK_FLUSH_DISK.name()}}),
+        &family_block_connect_avg.Add({{"operation", BLOCK_UPDATE_TIP.name()}}),
+        &family_block_connect_avg.Add({{"operation", BLOCK_FORK_CHK.name()}}),
+        &family_block_connect_avg.Add({{"operation", BLOCK_UPDATE_INDEX.name()}}),
     };
-    _block_avg = {
-        &family_block_avg.Add({{"operation", BLOCK_LOAD.name()}, tip_method}),
-        &family_block_avg.Add({{"operation", BLOCK_CONNECT.name()}, tip_method}),
-        &family_block_avg.Add({{"operation", BLOCK_FLUSH_VIEW.name()}, tip_method}),
-        &family_block_avg.Add({{"operation", BLOCK_FLUSH_DISK.name()}, tip_method}),
-        &family_block_avg.Add({{"operation", BLOCK_UPDATE_TIP.name()}, tip_method}),
-        &family_block_avg.Add({{"operation", BLOCK_FORK_CHK.name()}, connect_method}),
-        &family_block_avg.Add({{"operation", BLOCK_UPDATE_INDEX.name()}, connect_method}),
+    _block_connect_tip = {
+        &family_block_connect_tip.Add({{"operation", BLOCK_LOAD.name()}}),
+        &family_block_connect_tip.Add({{"operation", BLOCK_CONNECT.name()}}),
+        &family_block_connect_tip.Add({{"operation", BLOCK_FLUSH_VIEW.name()}}),
+        &family_block_connect_tip.Add({{"operation", BLOCK_FLUSH_DISK.name()}}),
+        &family_block_connect_tip.Add({{"operation", BLOCK_UPDATE_TIP.name()}}),
+        &family_block_connect_tip.Add({{"operation", BLOCK_FORK_CHK.name()}}),
+        &family_block_connect_tip.Add({{"operation", BLOCK_UPDATE_INDEX.name()}}),
     };
 }
 
@@ -120,37 +118,37 @@ void BlockMetricsImpl::ValueOut(double amt)
 
 void BlockMetricsImpl::TipLoadBlockDisk(int64_t current, double avg)
 {
-    _block_avg[P_BLK_LOAD]->Set(avg);
-    _block_bucket_timers[P_BLK_LOAD]->Observe((double)current);
+    _block_connect_avg[P_BLK_LOAD]->Set(avg);
+    _block_connect_tip[P_BLK_LOAD]->Set(current);
 }
 void BlockMetricsImpl::TipConnectBlock(int64_t current, double avg)
 {
-    _block_avg[P_BLK_CONNECT]->Set(avg);
-    _block_bucket_timers[P_BLK_CONNECT]->Observe((double)current);
+    _block_connect_avg[P_BLK_CONNECT]->Set(avg);
+    _block_connect_tip[P_BLK_CONNECT]->Set(current);
 }
 void BlockMetricsImpl::TipFlushView(int64_t current, double avg)
 {
-    _block_avg[P_BLK_FLUSH_VIEW]->Set(avg);
-    _block_bucket_timers[P_BLK_FLUSH_VIEW]->Observe((double)current);
+    _block_connect_avg[P_BLK_FLUSH_VIEW]->Set(avg);
+    _block_connect_tip[P_BLK_FLUSH_VIEW]->Set(current);
 }
 void BlockMetricsImpl::TipFlushDisk(int64_t current, double avg)
 {
-    _block_avg[P_BLK_FLUSH_DISK]->Set(avg);
-    _block_bucket_timers[P_BLK_FLUSH_DISK]->Observe((double)current);
+    _block_connect_avg[P_BLK_FLUSH_DISK]->Set(avg);
+    _block_connect_tip[P_BLK_FLUSH_DISK]->Set(current);
 }
 void BlockMetricsImpl::TipUpdate(int64_t current, double avg)
 {
-    _block_avg[P_BLK_UPDATE_TIP]->Set(avg);
-    _block_bucket_timers[P_BLK_UPDATE_TIP]->Observe((double)current);
+    _block_connect_avg[P_BLK_UPDATE_TIP]->Set(avg);
+    _block_connect_tip[P_BLK_UPDATE_TIP]->Set(current);
 }
 void BlockMetricsImpl::ForkCheck(int64_t current, double avg)
 {
-    _block_avg[P_BLK_FORK_CHECK]->Set(avg);
-    _block_bucket_timers[P_BLK_FORK_CHECK]->Observe((double)current);
+    _block_connect_avg[P_BLK_FORK_CHECK]->Set(avg);
+    _block_connect_tip[P_BLK_FORK_CHECK]->Set(current);
 }
 void BlockMetricsImpl::UpdateIndex(int64_t current, double avg)
 {
-    _block_avg[P_BLK_INDEX]->Set(avg);
-    _block_bucket_timers[P_BLK_INDEX]->Observe((double)current);
+    _block_connect_avg[P_BLK_INDEX]->Set(avg);
+    _block_connect_tip[P_BLK_INDEX]->Set(current);
 }
 } // namespace metrics

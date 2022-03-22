@@ -1,5 +1,6 @@
 #include <logging.h>
-#include <metrics/metrics.h>
+#include <metrics/peer.h>
+
 namespace metrics {
 std::unique_ptr<PeerMetrics> PeerMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)
 {

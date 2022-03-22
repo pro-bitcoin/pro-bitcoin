@@ -1,5 +1,5 @@
 #include <logging.h>
-#include <metrics/metrics.h>
+#include <metrics/net.h>
 
 namespace metrics {
 std::unique_ptr<NetMetrics> NetMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)

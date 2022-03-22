@@ -1,18 +1,13 @@
+#include <consensus/validation.h>
+#include <logging.h>
 #include <metrics_notifications_interface.h>
+#include <version.h>
 
 namespace metrics {
-MetricsNotificationsInterface::MetricsNotificationsInterface(BlockMetrics& blockMetrics, MemPoolMetrics& mempoolMetrics) : _blockMetrics(blockMetrics), _memPoolMetrics(mempoolMetrics) {}
+MetricsNotificationsInterface::MetricsNotificationsInterface(BlockMetrics& blockMetrics, MemPoolMetrics& mempoolMetrics, ChainstateManager& chainman) : _blockMetrics(blockMetrics), _memPoolMetrics(mempoolMetrics), _chainman(chainman) {}
 
 void MetricsNotificationsInterface::UpdatedBlockTip(const CBlockIndex* pindexNew, const CBlockIndex* pindexFork, bool fInitialDownload)
 {
-    if (fInitialDownload || pindexNew == pindexFork) {
-        return;
-    }
-    _blockMetrics.Transactions(pindexNew->nTx);
-    _blockMetrics.Height(pindexNew->nHeight);
-    _blockMetrics.HeaderTime(pindexNew->GetBlockHeader().GetBlockTime());
-    _blockMetrics.Version(pindexNew->nVersion);
-    //_blockMetrics.Difficulty(GetDifficulty(pindexNew));
 }
 
 void MetricsNotificationsInterface::TransactionAddedToMempool(const CTransactionRef& tx, uint64_t mempool_sequence)
@@ -27,6 +22,42 @@ void MetricsNotificationsInterface::TransactionRemovedFromMempool(const CTransac
                                                                   uint64_t mempool_sequence)
 {
     _memPoolMetrics.Removed(static_cast<size_t>(reason));
+}
+
+void MetricsNotificationsInterface::BlockConnected(const std::shared_ptr<const CBlock>& block, const CBlockIndex* pindex)
+{
+    for (CChainState* chainstate : _chainman.GetAll()) {
+        if (chainstate->IsInitialBlockDownload()) {
+            return;
+        }
+    }
+    LogPrint(BCLog::METRICS, "BlockConnected at %d\n", pindex->nHeight);
+    _blockMetrics.Size(::GetSerializeSize(block, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS));
+    _blockMetrics.SizeWitness(::GetSerializeSize(block, PROTOCOL_VERSION));
+    _blockMetrics.Weight(::GetBlockWeight(*block));
+    _blockMetrics.Transactions(pindex->nTx);
+    _blockMetrics.Height(pindex->nHeight);
+    _blockMetrics.HeaderTime(pindex->GetBlockHeader().GetBlockTime());
+    _blockMetrics.Version(pindex->nVersion);
+    CAmount nValueOut{0};
+    for (auto& tx : block->vtx) {
+        if (tx->IsCoinBase()) {
+            _blockMetrics.Reward(tx->GetValueOut());
+        } else {
+            nValueOut += tx->GetValueOut();
+        }
+    }
+    _blockMetrics.ValueOut(nValueOut);
+}
+
+void MetricsNotificationsInterface::BlockDisconnected(const std::shared_ptr<const CBlock>& block, const CBlockIndex* pindex)
+{
+}
+void MetricsNotificationsInterface::ChainStateFlushed(const CBlockLocator& locator)
+{
+}
+void MetricsNotificationsInterface::BlockChecked(const CBlock& block, const BlockValidationState& state)
+{
 }
 
 } // namespace metrics

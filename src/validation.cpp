@@ -2250,19 +2250,8 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     );
     if (!this->IsInitialBlockDownload()) {
         // TODO move to MetricsNotificationInterface
-        blockMetrics.Size(::GetSerializeSize(block, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS));
-        blockMetrics.SizeWitness(::GetSerializeSize(block, PROTOCOL_VERSION));
         blockMetrics.SigOps(nSigOpsCost);
-        blockMetrics.Weight(::GetBlockWeight(block));
         blockMetrics.Fees(nFees);
-        blockMetrics.Reward(blockReward);
-        CAmount nValueOut{0};
-        for (auto& tx : block.vtx) {
-            if (!tx->IsCoinBase()) {
-                nValueOut += tx->GetValueOut();
-            }
-        }
-        blockMetrics.ValueOut(nValueOut);
     }
     return true;
 }

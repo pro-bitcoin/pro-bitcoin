@@ -1,6 +1,5 @@
 #include <logging.h>
-#include <metrics/metrics.h>
-
+#include <metrics/mempool.h>
 
 namespace metrics {
 std::unique_ptr<MemPoolMetrics> MemPoolMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)

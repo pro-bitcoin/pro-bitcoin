@@ -1,6 +1,6 @@
 #include <algorithm>
 #include <logging.h>
-#include <metrics/metrics.h>
+#include <metrics/tx.h>
 
 namespace metrics {
 std::unique_ptr<TxMetrics> TxMetrics::make(const std::string& chain, prometheus::Registry& registry, bool noop)

@@ -17,8 +17,8 @@ BOOST_AUTO_TEST_CASE(metrics_config)
     }
     std::vector<std::string> expected_names = {
         "bitcoin_boot_time",
-        "block_avg",
-        "block_connect",
+        "block_connect_avg",
+        "block_connect_tip",
         "block_tip",
         "initial_block_download",
         "mempool",

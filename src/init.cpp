@@ -1396,7 +1396,7 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
             return InitError(ResolveErrMsg("externalip", strAddr));
     }
 
-    auto metricsInterface = std::make_shared<metrics::MetricsNotificationsInterface>(metrics::Instance()->Block(), metrics::Instance()->MemPool());
+    auto metricsInterface = std::make_shared<metrics::MetricsNotificationsInterface>(metrics::Instance()->Block(), metrics::Instance()->MemPool(), chainman);
     RegisterSharedValidationInterface(metricsInterface);
 
 #if ENABLE_ZMQ

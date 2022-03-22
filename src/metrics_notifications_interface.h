@@ -1,6 +1,7 @@
 #ifndef BITCOIN_METRICS_NOTIFICATIONS_INTERFACE_H
 #define BITCOIN_METRICS_NOTIFICATIONS_INTERFACE_H
 
+#include "validation.h"
 #include <chain.h>
 #include <metrics/block.h>
 #include <metrics/mempool.h>

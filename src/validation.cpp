@@ -2117,7 +2117,7 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     int64_t nTime2 = GetTimeMicros(); nTimeForks += nTime2 - nTime1;
     int64_t nCurrentTime = nTime2 - nTime1;
     double nAvgTime = (double)nTimeForks / double(nBlocksTotal);
-    blockMetrics.ForkCheck(nCurrentTime, nAvgTime);
+    blockMetrics.ConnectForkCheck(nCurrentTime, nAvgTime);
     LogPrint(BCLog::BENCH, "    - Fork checks: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * nCurrentTime, nTimeForks * MICRO, nAvgTime);
 
     CBlockUndo blockundo;
@@ -2238,6 +2238,7 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     view.SetBestBlock(pindex->GetBlockHash());
 
     int64_t nTime5 = GetTimeMicros(); nTimeIndex += nTime5 - nTime4;
+    blockMetrics.ConnectUpdateIndex(nCurrentTime, nAvgTime);
     LogPrint(BCLog::BENCH, "    - Index writing: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5 - nTime4), nTimeIndex * MICRO, nTimeIndex * MILLI / nBlocksTotal);
 
     TRACE6(validation, block_connected,
@@ -2657,7 +2658,7 @@ bool CChainState::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew
     int64_t nTime3;
     int64_t nCurrentTime = nTime2 - nTime1;
     double nAvgTime = (double)nTimeReadFromDisk / (nBlocksTotal == 0 ? 1.0 : (double)nBlocksTotal);
-    blockMetrics.TipLoadBlockDisk(nCurrentTime, nAvgTime);
+    blockMetrics.ConnectLoadBlockDisk(nCurrentTime, nAvgTime);
     LogPrint(BCLog::BENCH, "  - Load block from disk: %.2fms [%.2fs]\n", nCurrentTime * MILLI, nTimeReadFromDisk * MICRO);
     {
         CCoinsViewCache view(&CoinsTip());
@@ -2672,7 +2673,7 @@ bool CChainState::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew
         assert(nBlocksTotal > 0);
         nCurrentTime = nTime3 - nTime2;
         nAvgTime = (double)nTimeConnectTotal / (double)nBlocksTotal;
-        blockMetrics.TipConnectBlock(nCurrentTime, nAvgTime);
+        blockMetrics.ConnectBlockTotal(nCurrentTime, nAvgTime);
         LogPrint(BCLog::BENCH, "  - Connect total: %.2fms [%.2fs (%.2fms/blk)]\n", nCurrentTime * MILLI, nTimeConnectTotal * MICRO, nAvgTime * MILLI);
         bool flushed = view.Flush();
         assert(flushed);
@@ -2680,7 +2681,7 @@ bool CChainState::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew
     int64_t nTime4 = GetTimeMicros(); nTimeFlush += nTime4 - nTime3;
     nCurrentTime = nTime4 - nTime3;
     nAvgTime = (double)nTimeFlush / (double)nBlocksTotal;
-    blockMetrics.TipFlushView(nCurrentTime, nAvgTime);
+    blockMetrics.ConnectFlushView(nCurrentTime, nAvgTime);
     LogPrint(BCLog::BENCH, "  - Flush: %.2fms [%.2fs (%.2fms/blk)]\n", nCurrentTime * MILLI, nTimeFlush * MICRO, nAvgTime * MILLI);
     // Write the chain state to disk, if necessary.
     if (!FlushStateToDisk(state, FlushStateMode::IF_NEEDED)) {
@@ -2689,7 +2690,7 @@ bool CChainState::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew
     int64_t nTime5 = GetTimeMicros(); nTimeChainState += nTime5 - nTime4;
     nCurrentTime = nTime5 - nTime4;
     nAvgTime = (double)nTimeChainState / (double)nBlocksTotal;
-    blockMetrics.TipFlushDisk(nCurrentTime, nAvgTime);
+    blockMetrics.ConnectFlushDisk(nCurrentTime, nAvgTime);
     LogPrint(BCLog::BENCH, "  - Writing chainstate: %.2fms [%.2fs (%.2fms/blk)]\n", nCurrentTime * MILLI, nTimeChainState * MICRO, nAvgTime * MILLI);
     // Remove conflicting transactions from the mempool.;
     if (m_mempool) {
@@ -2703,7 +2704,7 @@ bool CChainState::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew
     int64_t nTime6 = GetTimeMicros(); nTimePostConnect += nTime6 - nTime5; nTimeTotal += nTime6 - nTime1;
     nCurrentTime = nTime6 - nTime5;
     nAvgTime = (double)nTimePostConnect / (double)nBlocksTotal;
-    blockMetrics.TipUpdate(nCurrentTime, nAvgTime);
+    blockMetrics.ConnectUpdate(nCurrentTime, nAvgTime);
     LogPrint(BCLog::BENCH, "  - Connect postprocess: %.2fms [%.2fs (%.2fms/blk)]\n", nCurrentTime * MILLI, nTimePostConnect * MICRO, nAvgTime * MILLI);
     LogPrint(BCLog::BENCH, "- Connect block: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime6 - nTime1) * MILLI, nTimeTotal * MICRO, nTimeTotal * MILLI / nBlocksTotal);
     connectTrace.BlockConnected(pindexNew, std::move(pthisBlock));

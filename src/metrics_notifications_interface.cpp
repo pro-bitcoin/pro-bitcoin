@@ -26,12 +26,9 @@ void MetricsNotificationsInterface::TransactionRemovedFromMempool(const CTransac
 
 void MetricsNotificationsInterface::BlockConnected(const std::shared_ptr<const CBlock>& block, const CBlockIndex* pindex)
 {
-    for (CChainState* chainstate : _chainman.GetAll()) {
-        if (chainstate->IsInitialBlockDownload()) {
-            return;
-        }
+    if (_chainman.ActiveChainstate().IsInitialBlockDownload()) {
+        return;
     }
-    LogPrint(BCLog::METRICS, "BlockConnected at %d\n", pindex->nHeight);
     _blockMetrics.Size(::GetSerializeSize(block, PROTOCOL_VERSION | SERIALIZE_TRANSACTION_NO_WITNESS));
     _blockMetrics.SizeWitness(::GetSerializeSize(block, PROTOCOL_VERSION));
     _blockMetrics.Weight(::GetBlockWeight(*block));
@@ -48,6 +45,8 @@ void MetricsNotificationsInterface::BlockConnected(const std::shared_ptr<const C
         }
     }
     _blockMetrics.ValueOut(nValueOut);
+    _blockMetrics.TimeDeltaPrev(pindex->GetBlockTime() - pindex->pprev->GetMedianTimePast());
+    LogPrint(BCLog::METRICS, "BlockConnected at %d\n", pindex->nHeight);
 }
 
 void MetricsNotificationsInterface::BlockDisconnected(const std::shared_ptr<const CBlock>& block, const CBlockIndex* pindex)

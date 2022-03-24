@@ -80,30 +80,10 @@ public:
     prometheus::Family<prometheus::Counter>& FamilyCounter(const std::string&, const std::map<std::string, std::string>& labels = {});
     prometheus::Family<prometheus::Gauge>& FamilyGauge(const std::string&, const std::map<std::string, std::string>& labels = {});
     prometheus::Family<prometheus::Histogram>& FamilyHistory(const std::string& name, const std::map<std::string, std::string>& labels = {});
-    static inline std::pair<std::string, std::string> GAUGE_LABEL = {"mtype", "gauge"};
-    static inline std::pair<std::string, std::string> COUNTER_LABEL = {"mtype", "counter"};
-    static inline std::pair<std::string, std::string> SUMMARY_LABEL = {"mtype", "summary"};
-    static inline std::pair<std::string, std::string> HISTOGRAM_LABEL = {"mtype", "histogram"};
     std::pair<std::string, std::string> _chain_lbl;
     prometheus::Registry& _registry;
     Metrics(const std::string& chain, prometheus::Registry& registry);
 };
-
-struct BlockTimerOp {
-    BlockTimerOp(std::string name, prometheus::Histogram::BucketBoundaries buckets);
-    std::string name() const;
-    prometheus::Histogram::BucketBoundaries buckets() const;
-    std::string _name;
-    prometheus::Histogram::BucketBoundaries _buckets;
-};
-
-static BlockTimerOp BLOCK_LOAD = BlockTimerOp("load", prometheus::Histogram::BucketBoundaries{500, 5000, 50000, 100000});
-static BlockTimerOp BLOCK_CONNECT = BlockTimerOp("connect", prometheus::Histogram::BucketBoundaries{500000, 1000000, 2000000, 4000000, 8000000});
-static BlockTimerOp BLOCK_FLUSH_VIEW = BlockTimerOp("flush-view", prometheus::Histogram::BucketBoundaries{100, 200, 500, 1000});
-static BlockTimerOp BLOCK_FLUSH_DISK = BlockTimerOp("flush-disk", prometheus::Histogram::BucketBoundaries{10, 25, 75, 100});
-static BlockTimerOp BLOCK_UPDATE_TIP = BlockTimerOp("update-tip", prometheus::Histogram::BucketBoundaries{25, 75, 100, 200});
-static BlockTimerOp BLOCK_FORK_CHK = BlockTimerOp("fork-check", prometheus::Histogram::BucketBoundaries{10000, 50000, 100000, 200000});
-static BlockTimerOp BLOCK_UPDATE_INDEX = BlockTimerOp("update-index", prometheus::Histogram::BucketBoundaries{5000, 10000, 15000, 20000});
 
 class ConfigMetrics : Metrics
 {

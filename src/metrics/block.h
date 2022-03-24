@@ -20,42 +20,55 @@ public:
     virtual void Fees(int64_t amt){};
     virtual void Difficulty(double amt){};
     virtual void ValueOut(double amt){};
+    virtual void TimeDeltaPrev(int64_t amt){};
 
-    virtual void TipLoadBlockDisk(int64_t current, double avg){};
-    virtual void TipConnectBlock(int64_t current, double avg){};
-    virtual void TipFlushView(int64_t current, double avg){};
-    virtual void TipFlushDisk(int64_t current, double avg){};
-    virtual void TipUpdate(int64_t current, double avg){};
+    virtual void ConnectLoadBlockDisk(int64_t current, double avg){};
+    virtual void ConnectBlockTotal(int64_t current, double avg){};
+    virtual void ConnectFlushView(int64_t current, double avg){};
+    virtual void ConnectFlushDisk(int64_t current, double avg){};
+    virtual void ConnectUpdate(int64_t current, double avg){};
 
-    virtual void ForkCheck(int64_t current, double avg){};
-    virtual void UpdateIndex(int64_t current, double avg){};
+    virtual void ConnectForkCheck(int64_t current, double avg){};
+    virtual void ConnectUpdateIndex(int64_t current, double avg){};
 };
 
 class BlockMetricsImpl : virtual public BlockMetrics, Metrics
 {
 protected:
-    void set(const std::string& type, double amt);
+    void setTip(const std::string& type, double amt);
+    void setConnect(const std::string& type, double current, double avg);
     std::vector<std::string> _block_types{
-            "size",
-            "size-witness",
-            "weight",
-            "height",
-            "version",
-            "transactions",
-            "sigops",
-            "time",
-            "header-time",
-            "fees",
-            "reward",
-            "difficulty",
-            "valueout"};
+        "size",
+        "size-witness",
+        "weight",
+        "height",
+        "version",
+        "transactions",
+        "sigops",
+        "time",
+        "header-time",
+        "fees",
+        "reward",
+        "valueout",
+        "time-delta-prev"};
+    std::vector<std::string> _block_operations{
+        "load",
+        "connect-total",
+        "flush-view",
+        "flush-disk",
+        "update-tip",
+        "fork-check",
+        "update-index",
+    };
     std::map<const std::string, prometheus::Gauge*> _block_tip_gauge;
-    std::vector<prometheus::Gauge*> _block_connect_avg;
-    std::vector<prometheus::Gauge*> _block_connect_tip;
+    std::map<const std::string, prometheus::Gauge*> _block_connect_avg;
+    std::map<const std::string, prometheus::Gauge*> _block_connect_tip;
 
 public:
     ~BlockMetricsImpl(){};
     explicit BlockMetricsImpl(const std::string& chain, prometheus::Registry& registry);
+
+    // TIP of blockchain
     void Size(size_t amt) override;
     void SizeWitness(size_t amt) override;
     void Height(int amt) override;
@@ -66,17 +79,17 @@ public:
     void HeaderTime(int64_t amt) override;
     void Reward(int64_t amt) override;
     void Fees(int64_t amt) override;
-    void Difficulty(double amt) override;
-    virtual void ValueOut(double amt) override;
+    void ValueOut(double amt) override;
+    void TimeDeltaPrev(int64_t amt) override;
 
-    void TipLoadBlockDisk(int64_t current, double avg) override;
-    void TipConnectBlock(int64_t current, double avg) override;
-    void TipFlushView(int64_t current, double avg) override;
-    void TipFlushDisk(int64_t current, double avg) override;
-    void TipUpdate(int64_t current, double avg) override;
-
-    void ForkCheck(int64_t current, double avg) override;
-    void UpdateIndex(int64_t current, double avg) override;
+    // Timers for connecting a block
+    void ConnectLoadBlockDisk(int64_t current, double avg) override;
+    void ConnectBlockTotal(int64_t current, double avg) override;
+    void ConnectFlushView(int64_t current, double avg) override;
+    void ConnectFlushDisk(int64_t current, double avg) override;
+    void ConnectUpdate(int64_t current, double avg) override;
+    void ConnectForkCheck(int64_t current, double avg) override;
+    void ConnectUpdateIndex(int64_t current, double avg) override;
 };
 }
 #endif // BITCOIN_METRICS_BLOCK_H

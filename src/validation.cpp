@@ -1946,7 +1946,6 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
 
     int64_t nTimeStart = GetTimeMicros();
     static auto& blockMetrics = metricsContainer->Block();
-    static auto& txMetrics = metricsContainer->Tx();
     // Check it again in case a previous version let a bad block in
     // NOTE: We don't currently (re-)invoke ContextualCheckBlock() or
     // ContextualCheckBlockHeader() here. This means that if we add a new
@@ -2205,7 +2204,7 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
     nCurrentTime = nTime3 - nTime2;
     nAvgTime = double(nTimeConnect) / double(nBlocksTotal);
-    txMetrics.TransactionCheck(nCurrentTime, nAvgTime);
+    blockMetrics.ConnectTransactionsCheck(nCurrentTime, nAvgTime);
     LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs (%.2fms/blk)]\n", (unsigned)block.vtx.size(), MILLI * nCurrentTime, MILLI * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : MILLI * (nTime3 - nTime2) / (nInputs - 1), nTimeConnect * MICRO, nAvgTime * MILLI);
 
     CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, m_params.GetConsensus());
@@ -2238,6 +2237,8 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
     view.SetBestBlock(pindex->GetBlockHash());
 
     int64_t nTime5 = GetTimeMicros(); nTimeIndex += nTime5 - nTime4;
+    nAvgTime = double(nTimeIndex) / double(nBlocksTotal);
+    nCurrentTime = nTime5 - nTime4;
     blockMetrics.ConnectUpdateIndex(nCurrentTime, nAvgTime);
     LogPrint(BCLog::BENCH, "    - Index writing: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime5 - nTime4), nTimeIndex * MICRO, nTimeIndex * MILLI / nBlocksTotal);
 
@@ -2250,7 +2251,6 @@ bool CChainState::ConnectBlock(const CBlock& block, BlockValidationState& state,
         nTime5 - nTimeStart // in microseconds (µs)
     );
     if (!this->IsInitialBlockDownload()) {
-        // TODO move to MetricsNotificationInterface
         blockMetrics.SigOps(nSigOpsCost);
         blockMetrics.Fees(nFees);
     }
@@ -2705,10 +2705,12 @@ bool CChainState::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew
     nCurrentTime = nTime6 - nTime5;
     nAvgTime = (double)nTimePostConnect / (double)nBlocksTotal;
     blockMetrics.ConnectUpdateTip(nCurrentTime, nAvgTime);
-    blockMetrics.ConnectTotal(nTime6 - nTime1, nTimeTotal / nBlocksTotal);
     LogPrint(BCLog::BENCH, "  - Connect postprocess: %.2fms [%.2fs (%.2fms/blk)]\n", nCurrentTime * MILLI, nTimePostConnect * MICRO, nAvgTime * MILLI);
     LogPrint(BCLog::BENCH, "- Connect block: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime6 - nTime1) * MILLI, nTimeTotal * MICRO, nTimeTotal * MILLI / nBlocksTotal);
     connectTrace.BlockConnected(pindexNew, std::move(pthisBlock));
+    nAvgTime = double(nTimeTotal) / double(nBlocksTotal);
+    nCurrentTime = GetTimeMicros() - nTime1;
+    blockMetrics.ConnectTotal(nCurrentTime, nAvgTime);
     return true;
 }
 

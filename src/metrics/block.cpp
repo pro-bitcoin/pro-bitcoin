@@ -136,4 +136,8 @@ void BlockMetricsImpl::ConnectTotal(int64_t current, double avg)
 {
     this->setConnect("connect-total", current, avg);
 }
+void BlockMetricsImpl::ConnectTransactionsCheck(int64_t current, double avg)
+{
+    this->setConnect("transactions-check", current, avg);
+}
 } // namespace metrics

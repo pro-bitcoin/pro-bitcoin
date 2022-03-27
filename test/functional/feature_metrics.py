@@ -199,6 +199,7 @@ class MetricsTest(BitcoinTestFramework):
             "update-tip",
             "fork-check",
             "update-index",
+            "transactions-check",
         ]
         for m in metrics['block_tip']:
             assert 'chain' in m.labels
@@ -219,7 +220,7 @@ class MetricsTest(BitcoinTestFramework):
             assert m.labels['operation'] in block_connect
             # ignore checking load operation value, too many false negatives
             if m.labels['operation'] != 'load':
-                self.log.info('Checking value of %s (%s)', m.labels['operation'], m.value)
+                self.log.info('Checking value of %s %s (%s)', m.name, m.labels['operation'], m.value)
                 assert_greater_than(m.value, 0)
 
     def run_test(self):

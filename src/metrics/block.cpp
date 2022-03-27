@@ -108,9 +108,9 @@ void BlockMetricsImpl::ConnectLoadBlockDisk(int64_t current, double avg)
 {
     this->setConnect("load", current, avg);
 }
-void BlockMetricsImpl::ConnectBlockTotal(int64_t current, double avg)
+void BlockMetricsImpl::ConnectBlock(int64_t current, double avg)
 {
-    this->setConnect("connect-total", current, avg);
+    this->setConnect("connect", current, avg);
 }
 void BlockMetricsImpl::ConnectFlushView(int64_t current, double avg)
 {
@@ -120,7 +120,7 @@ void BlockMetricsImpl::ConnectFlushDisk(int64_t current, double avg)
 {
     this->setConnect("flush-disk", current, avg);
 }
-void BlockMetricsImpl::ConnectUpdate(int64_t current, double avg)
+void BlockMetricsImpl::ConnectUpdateTip(int64_t current, double avg)
 {
     this->setConnect("update-tip", current, avg);
 }
@@ -131,5 +131,9 @@ void BlockMetricsImpl::ConnectForkCheck(int64_t current, double avg)
 void BlockMetricsImpl::ConnectUpdateIndex(int64_t current, double avg)
 {
     this->setConnect("update-index", current, avg);
+}
+void BlockMetricsImpl::ConnectTotal(int64_t current, double avg)
+{
+    this->setConnect("connect-total", current, avg);
 }
 } // namespace metrics

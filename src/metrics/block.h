@@ -18,15 +18,15 @@ public:
     virtual void HeaderTime(int64_t amt) {}
     virtual void Reward(int64_t amt){};
     virtual void Fees(int64_t amt){};
-    virtual void Difficulty(double amt){};
     virtual void ValueOut(double amt){};
     virtual void TimeDeltaPrev(int64_t amt){};
 
     virtual void ConnectLoadBlockDisk(int64_t current, double avg){};
-    virtual void ConnectBlockTotal(int64_t current, double avg){};
+    virtual void ConnectBlock(int64_t current, double avg){};
     virtual void ConnectFlushView(int64_t current, double avg){};
     virtual void ConnectFlushDisk(int64_t current, double avg){};
-    virtual void ConnectUpdate(int64_t current, double avg){};
+    virtual void ConnectUpdateTip(int64_t current, double avg){};
+    virtual void ConnectTotal(int64_t current, double avg){};
 
     virtual void ConnectForkCheck(int64_t current, double avg){};
     virtual void ConnectUpdateIndex(int64_t current, double avg){};
@@ -54,6 +54,7 @@ protected:
     std::vector<std::string> _block_operations{
         "load",
         "connect-total",
+        "connect",
         "flush-view",
         "flush-disk",
         "update-tip",
@@ -84,12 +85,13 @@ public:
 
     // Timers for connecting a block
     void ConnectLoadBlockDisk(int64_t current, double avg) override;
-    void ConnectBlockTotal(int64_t current, double avg) override;
+    void ConnectBlock(int64_t current, double avg) override;
     void ConnectFlushView(int64_t current, double avg) override;
     void ConnectFlushDisk(int64_t current, double avg) override;
-    void ConnectUpdate(int64_t current, double avg) override;
+    void ConnectUpdateTip(int64_t current, double avg) override;
     void ConnectForkCheck(int64_t current, double avg) override;
     void ConnectUpdateIndex(int64_t current, double avg) override;
+    void ConnectTotal(int64_t current, double avg) override;
 };
 }
 #endif // BITCOIN_METRICS_BLOCK_H

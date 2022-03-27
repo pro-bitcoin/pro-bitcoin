@@ -2673,7 +2673,7 @@ bool CChainState::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew
         assert(nBlocksTotal > 0);
         nCurrentTime = nTime3 - nTime2;
         nAvgTime = (double)nTimeConnectTotal / (double)nBlocksTotal;
-        blockMetrics.ConnectBlockTotal(nCurrentTime, nAvgTime);
+        blockMetrics.ConnectBlock(nCurrentTime, nAvgTime);
         LogPrint(BCLog::BENCH, "  - Connect total: %.2fms [%.2fs (%.2fms/blk)]\n", nCurrentTime * MILLI, nTimeConnectTotal * MICRO, nAvgTime * MILLI);
         bool flushed = view.Flush();
         assert(flushed);
@@ -2704,7 +2704,8 @@ bool CChainState::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew
     int64_t nTime6 = GetTimeMicros(); nTimePostConnect += nTime6 - nTime5; nTimeTotal += nTime6 - nTime1;
     nCurrentTime = nTime6 - nTime5;
     nAvgTime = (double)nTimePostConnect / (double)nBlocksTotal;
-    blockMetrics.ConnectUpdate(nCurrentTime, nAvgTime);
+    blockMetrics.ConnectUpdateTip(nCurrentTime, nAvgTime);
+    blockMetrics.ConnectTotal(nTime6 - nTime1, nTimeTotal / nBlocksTotal);
     LogPrint(BCLog::BENCH, "  - Connect postprocess: %.2fms [%.2fs (%.2fms/blk)]\n", nCurrentTime * MILLI, nTimePostConnect * MICRO, nAvgTime * MILLI);
     LogPrint(BCLog::BENCH, "- Connect block: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime6 - nTime1) * MILLI, nTimeTotal * MICRO, nTimeTotal * MILLI / nBlocksTotal);
     connectTrace.BlockConnected(pindexNew, std::move(pthisBlock));

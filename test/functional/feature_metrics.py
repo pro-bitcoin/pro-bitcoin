@@ -193,6 +193,7 @@ class MetricsTest(BitcoinTestFramework):
         block_connect = [
             "load",
             "connect-total",
+            "connect",
             "flush-view",
             "flush-disk",
             "update-tip",
@@ -214,6 +215,7 @@ class MetricsTest(BitcoinTestFramework):
             assert_equal(len(m.labels), 2)
             assert 'chain' in m.labels
             assert 'operation' in m.labels
+#            self.log.info('Checking label %s', m.labels['operation'])
             assert m.labels['operation'] in block_connect
             # ignore checking load operation value, too many false negatives
             if m.labels['operation'] != 'load':

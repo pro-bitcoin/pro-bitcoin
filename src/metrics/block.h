@@ -30,6 +30,7 @@ public:
 
     virtual void ConnectForkCheck(int64_t current, double avg){};
     virtual void ConnectUpdateIndex(int64_t current, double avg){};
+    virtual void ConnectTransactionsCheck(int64_t current, double avg){};
 };
 
 class BlockMetricsImpl : virtual public BlockMetrics, Metrics
@@ -59,6 +60,7 @@ protected:
         "flush-disk",
         "update-tip",
         "fork-check",
+        "transactions-check",
         "update-index",
     };
     std::map<const std::string, prometheus::Gauge*> _block_tip_gauge;
@@ -92,6 +94,7 @@ public:
     void ConnectForkCheck(int64_t current, double avg) override;
     void ConnectUpdateIndex(int64_t current, double avg) override;
     void ConnectTotal(int64_t current, double avg) override;
+    void ConnectTransactionsCheck(int64_t current, double avg) override;
 };
 }
 #endif // BITCOIN_METRICS_BLOCK_H

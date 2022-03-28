@@ -42,9 +42,7 @@ BOOST_AUTO_TEST_CASE(metrics_config)
         "peer_process",
         "peer_validation_result",
         "transaction",
-        "transactions_check_avg",
         "tx_cache",
-        "tx_inputs",
     };
     for (auto m : expected_names) {
         auto found = metric_names.find(m);

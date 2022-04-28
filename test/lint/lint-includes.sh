@@ -40,10 +40,11 @@ for CPP_FILE in $(filter_suffix cpp); do
     fi
 done
 
-INCLUDED_CPP_FILES=$(git grep -E "^#include [<\"][^>\"]+\.cpp[>\"]" -- "*.cpp" "*.h")
+INCLUDED_CPP_FILES=$(git grep -H -n -E "^#include [<\"][^>\"]+\.cpp[>\"]" -- "*.cpp" "*.h")
 if [[ ${INCLUDED_CPP_FILES} != "" ]]; then
     echo "The following files #include .cpp files:"
     echo "${INCLUDED_CPP_FILES}"
+    [ -n "$CIRRUS_BASE_SHA" ] && cirrus_grep_format "$0" "include .cpp files" "$INCLUDED_CPP_FILES"
     echo
     EXIT_CODE=1
 fi

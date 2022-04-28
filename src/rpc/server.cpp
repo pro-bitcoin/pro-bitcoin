@@ -20,6 +20,8 @@
 #include <mutex>
 #include <unordered_map>
 
+#include <metrics/container.h>
+
 static Mutex g_rpc_warmup_mutex;
 static std::atomic<bool> g_rpc_running{false};
 static bool fRPCInWarmup GUARDED_BY(g_rpc_warmup_mutex) = true;
@@ -472,13 +474,20 @@ static bool ExecuteCommand(const CRPCCommand& command, const JSONRPCRequest& req
 {
     try
     {
+        auto start = std::chrono::high_resolution_clock::now();
+        static auto& rpcMetrics = metrics::Instance()->Rpc();
         RPCCommandExecution execution(request.strMethod);
         // Execute, convert arguments to array if necessary
+        bool actorResult = false;
         if (request.params.isObject()) {
-            return command.actor(transformNamedArguments(request, command.argNames), result, last_handler);
+            actorResult = command.actor(transformNamedArguments(request, command.argNames), result, last_handler);
         } else {
-            return command.actor(request, result, last_handler);
+            actorResult = command.actor(request, result, last_handler);
         }
+        auto end = std::chrono::high_resolution_clock::now();
+        auto diff = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        rpcMetrics.ObserveMethod(request.strMethod, diff.count());
+        return actorResult;
     }
     catch (const std::exception& e)
     {

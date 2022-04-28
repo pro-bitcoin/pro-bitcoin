@@ -29,6 +29,8 @@
 #include <interfaces/init.h>
 #include <interfaces/node.h>
 #include <mapport.h>
+#include <metrics/metrics.h>
+#include <metrics_notifications_interface.h>
 #include <net.h>
 #include <net_permissions.h>
 #include <net_processing.h>
@@ -477,6 +479,8 @@ void SetupServerArgs(ArgsManager& argsman)
     argsman.AddArg("-peertimeout=<n>", strprintf("Specify a p2p connection timeout delay in seconds. After connecting to a peer, wait this amount of time before considering disconnection based on inactivity (minimum: 1, default: %d)", DEFAULT_PEER_CONNECT_TIMEOUT), ArgsManager::ALLOW_ANY | ArgsManager::DEBUG_ONLY, OptionsCategory::CONNECTION);
     argsman.AddArg("-torcontrol=<ip>:<port>", strprintf("Tor control port to use if onion listening enabled (default: %s)", DEFAULT_TOR_CONTROL), ArgsManager::ALLOW_ANY, OptionsCategory::CONNECTION);
     argsman.AddArg("-torpassword=<pass>", "Tor control port password (default: empty)", ArgsManager::ALLOW_ANY | ArgsManager::SENSITIVE, OptionsCategory::CONNECTION);
+    argsman.AddArg("-metricsbind=<ip:port>", strprintf("Bind metrics endpoint to ip:port (default: %s)", "localhost:8335"), ArgsManager::ALLOW_ANY | ArgsManager::NETWORK_ONLY, OptionsCategory::CONNECTION);
+    argsman.AddArg("-metrics", strprintf("use metrics (default: 1)"), ArgsManager::ALLOW_ANY | ArgsManager::NETWORK_ONLY, OptionsCategory::OPTIONS);
 #ifdef USE_UPNP
 #if USE_UPNP
     argsman.AddArg("-upnp", "Use UPnP to map the listening port (default: 1 when listening and no -proxy)", ArgsManager::ALLOW_ANY, OptionsCategory::CONNECTION);
@@ -1141,6 +1145,20 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
                   args.GetArg("-datadir", ""), fs::PathToString(fs::current_path()));
     }
 
+    // Metrics
+    auto metrics_endpoint = args.GetArg("-metricsbind", chainparams.IsTestChain() ? "localhost:18335" : "localhost:8335");
+    auto use_metrics = args.GetBoolArg("-metrics", false);
+    if (!use_metrics) {
+        LogPrintf("Using noop Metrics\n");
+    } else {
+        LogPrintf("Bound metrics endpoint to %s/metrics\n", metrics_endpoint);
+    }
+    try {
+        metrics::Init(metrics_endpoint, chainparams.IsTestChain() ? "test" : "main", !use_metrics);
+    } catch (std::exception& e) {
+        return InitError(strprintf(_("Metrics init error %s %s\n"), metrics_endpoint, e.what()));
+    }
+
     InitSignatureCache();
     InitScriptExecutionCache();
 
@@ -1378,6 +1396,9 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
             return InitError(ResolveErrMsg("externalip", strAddr));
     }
 
+    auto metricsInterface = std::make_shared<metrics::MetricsNotificationsInterface>(metrics::Instance()->Block(), metrics::Instance()->MemPool(), chainman);
+    RegisterSharedValidationInterface(metricsInterface);
+
 #if ENABLE_ZMQ
     g_zmq_notification_interface = CZMQNotificationInterface::Create();
 
@@ -1406,6 +1427,76 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     }
     LogPrintf("* Using %.1f MiB for chain state database\n", cache_sizes.coins_db * (1.0 / 1024 / 1024));
     LogPrintf("* Using %.1f MiB for in-memory UTXO set (plus up to %.1f MiB of unused mempool space)\n", cache_sizes.coins * (1.0 / 1024 / 1024), nMempoolSizeMax * (1.0 / 1024 / 1024));
+
+    auto& configMetrics = metrics::Instance()->Config();
+    configMetrics.SetFlag("alertnotify", static_cast<size_t>(OptionsCategory::OPTIONS), args.GetArg("-alertnotify", "") != "");
+    configMetrics.SetFlag("acceptnonstdtxn", static_cast<size_t>(OptionsCategory::NODE_RELAY), args.GetBoolArg("-acceptnonstdtxn", !chainparams.RequireStandard()));
+    std::string blockfilterindex_value = args.GetArg("-blockfilterindex", DEFAULT_BLOCKFILTERINDEX);
+    configMetrics.SetFlag("blockfilterindex", static_cast<size_t>(OptionsCategory::OPTIONS), blockfilterindex_value != DEFAULT_BLOCKFILTERINDEX);
+    configMetrics.SetFlag("blocksonly", static_cast<size_t>(OptionsCategory::NODE_RELAY), ignores_incoming_txs);
+    configMetrics.SetFlag("blocknotify", static_cast<size_t>(OptionsCategory::OPTIONS), args.GetArg("-blocknotify", "") != "");
+    configMetrics.SetFlag("checkpoints", static_cast<size_t>(OptionsCategory::DEBUG_TEST), fCheckpointsEnabled);
+    configMetrics.SetFlag("checkblockindex", static_cast<size_t>(OptionsCategory::DEBUG_TEST), fCheckBlockIndex);
+    configMetrics.SetFlag("coinstatsindex", static_cast<size_t>(OptionsCategory::OPTIONS), args.GetBoolArg("-coinstatsindex", DEFAULT_COINSTATSINDEX));
+    configMetrics.SetFlag("daemon", static_cast<size_t>(OptionsCategory::OPTIONS), args.GetBoolArg("-daemon", DEFAULT_DAEMON));
+    configMetrics.SetFlag("daemonnowait", static_cast<size_t>(OptionsCategory::OPTIONS), args.GetBoolArg("-daemon", DEFAULT_DAEMONWAIT));
+    configMetrics.SetFlag("datacarrier", static_cast<size_t>(OptionsCategory::NODE_RELAY), fAcceptDatacarrier);
+    configMetrics.SetFlag("discover", static_cast<size_t>(OptionsCategory::CONNECTION), args.GetBoolArg("-discover", true));
+    configMetrics.SetFlag("dns", static_cast<size_t>(OptionsCategory::CONNECTION), fNameLookup);
+    configMetrics.SetFlag("dnsseed", static_cast<size_t>(OptionsCategory::CONNECTION), gArgs.GetBoolArg("-dnsseed", DEFAULT_DNSSEED));
+    configMetrics.SetFlag("forcednsseed", static_cast<size_t>(OptionsCategory::CONNECTION), gArgs.GetBoolArg("-forcednsseed", DEFAULT_FORCEDNSSEED));
+    configMetrics.SetFlag("fixedseeds", static_cast<size_t>(OptionsCategory::CONNECTION), gArgs.GetBoolArg("-fixedseeds", DEFAULT_FIXEDSEEDS));
+    configMetrics.SetFlag("i2pacceptincoming", static_cast<size_t>(OptionsCategory::CONNECTION), args.GetBoolArg("-i2pacceptincoming", true));
+    configMetrics.SetFlag("listen", static_cast<size_t>(OptionsCategory::CONNECTION), fListen);
+    configMetrics.SetFlag("listenonion", static_cast<size_t>(OptionsCategory::CONNECTION), args.GetBoolArg("-listenonion", DEFAULT_LISTEN_ONION));
+    configMetrics.SetFlag("peerbloomfilters", static_cast<size_t>(OptionsCategory::CONNECTION), nLocalServices & NODE_BLOOM);
+    configMetrics.SetFlag("peerblockfilters", static_cast<size_t>(OptionsCategory::CONNECTION), args.GetBoolArg("-peerblockfilters", DEFAULT_PEERBLOCKFILTERS));
+    configMetrics.SetFlag("permitbaremultisig", static_cast<size_t>(OptionsCategory::CONNECTION), fIsBareMultisigStd);
+    configMetrics.SetFlag("persistmempool", static_cast<size_t>(OptionsCategory::OPTIONS), args.GetBoolArg("-persistmempool", DEFAULT_PERSIST_MEMPOOL));
+    configMetrics.SetFlag("proxyrandomize", static_cast<size_t>(OptionsCategory::CONNECTION), proxyRandomize);
+    configMetrics.SetFlag("reindex", static_cast<size_t>(OptionsCategory::OPTIONS), fReindex);
+    configMetrics.SetFlag("reindex-chainstate", static_cast<size_t>(OptionsCategory::OPTIONS), fReindexChainState);
+    configMetrics.SetFlag("rest", static_cast<size_t>(OptionsCategory::RPC), args.GetBoolArg("-rest", DEFAULT_REST_ENABLE));
+    configMetrics.SetFlag("rpcauth", static_cast<size_t>(OptionsCategory::RPC), args.GetArg("-rpcauth", "") != "");
+    configMetrics.SetFlag("server", static_cast<size_t>(OptionsCategory::RPC), args.GetBoolArg("-server", false));
+    configMetrics.SetFlag("startupnotify", static_cast<size_t>(OptionsCategory::OPTIONS), args.GetArg("-startupnotify", "") != "");
+    configMetrics.SetFlag("sysperms", static_cast<size_t>(OptionsCategory::OPTIONS), args.GetBoolArg("-sysperms", false));
+    configMetrics.SetFlag("txindex", static_cast<size_t>(OptionsCategory::OPTIONS), args.GetBoolArg("-txindex", DEFAULT_TXINDEX));
+    configMetrics.SetFlag("upnp", static_cast<size_t>(OptionsCategory::CONNECTION), args.GetBoolArg("-upnp", DEFAULT_UPNP));
+    configMetrics.SetFlag("natpmp", static_cast<size_t>(OptionsCategory::CONNECTION), gArgs.GetBoolArg("-natpmp", DEFAULT_NATPMP));
+    configMetrics.SetFlag("whitelistforcerelay", static_cast<size_t>(OptionsCategory::NODE_RELAY), args.GetBoolArg("-whitelistforcerelay", DEFAULT_WHITELISTFORCERELAY));
+    configMetrics.SetFlag("whitelistrelay", static_cast<size_t>(OptionsCategory::NODE_RELAY), args.GetBoolArg("-whitelistrelay", DEFAULT_WHITELISTRELAY));
+    configMetrics.SetIBD(true); // reset by CChainState::IsInitialBlockDownload()
+    configMetrics.Set("bantime", static_cast<size_t>(OptionsCategory::CONNECTION), "seconds", args.GetIntArg("-bantime", DEFAULT_MISBEHAVING_BANTIME));
+    configMetrics.Set("blockmaxweight", static_cast<size_t>(OptionsCategory::BLOCK_CREATION), "int", args.GetIntArg("-blockmaxweight", DEFAULT_BLOCK_MAX_WEIGHT));
+    configMetrics.Set("blockmintxfee", static_cast<size_t>(OptionsCategory::BLOCK_CREATION), "int", args.GetIntArg("-blockmintxfee", DEFAULT_BLOCK_MIN_TX_FEE));
+    configMetrics.Set("bytespersigop", static_cast<size_t>(OptionsCategory::NODE_RELAY), "bytes", nBytesPerSigOp);
+    configMetrics.Set("checkblocks", static_cast<size_t>(OptionsCategory::DEBUG_TEST), "int", args.GetIntArg("-checkblocks", DEFAULT_CHECKBLOCKS));
+    configMetrics.Set("checklevel", static_cast<size_t>(OptionsCategory::DEBUG_TEST), "int", args.GetIntArg("-checklevel", DEFAULT_CHECKLEVEL));
+    configMetrics.Set("checkmempool", static_cast<size_t>(OptionsCategory::DEBUG_TEST), "int", check_ratio);
+    configMetrics.Set("datacarriersize", static_cast<size_t>(OptionsCategory::NODE_RELAY), "bytes", nMaxDatacarrierBytes);
+    configMetrics.Set("dbcache", static_cast<size_t>(OptionsCategory::OPTIONS), "bytes", args.GetIntArg("-dbcache", nDefaultDbCache) * 1024 * 1024);
+    configMetrics.Set("maxmempool", static_cast<size_t>(OptionsCategory::OPTIONS), "bytes", nMempoolSizeMax);
+    int64_t nExpiryTimeout = gArgs.GetIntArg("-mempoolexpiry", DEFAULT_MEMPOOL_EXPIRY) * 60 * 60;
+    configMetrics.Set("mempoolexpiry", static_cast<size_t>(OptionsCategory::OPTIONS), "seconds", nExpiryTimeout);
+    configMetrics.Set("maxorphantx", static_cast<size_t>(OptionsCategory::OPTIONS), "int", args.GetIntArg("-maxorphantx", DEFAULT_MAX_ORPHAN_TRANSACTIONS));
+    configMetrics.Set("maxsigcachesize", static_cast<size_t>(OptionsCategory::DEBUG_TEST), "bytes", args.GetIntArg("-maxsigcachesizze", DEFAULT_MAX_SIG_CACHE_SIZE) * 1024 * 1024);
+    configMetrics.Set("maxtipage", static_cast<size_t>(OptionsCategory::DEBUG_TEST), "seconds", nMaxTipAge);
+    configMetrics.Set("maxconnections", static_cast<size_t>(OptionsCategory::CONNECTION), "int", nMaxConnections);
+    int64_t max_adjustment = std::max<int64_t>(0, gArgs.GetIntArg("-maxtimeadjustment", DEFAULT_MAX_TIME_ADJUSTMENT));
+    configMetrics.Set("maxtimeadjustment", static_cast<size_t>(OptionsCategory::CONNECTION), "seconds", max_adjustment);
+    configMetrics.Set("minrelaytxfee", static_cast<size_t>(OptionsCategory::NODE_RELAY), "int", args.GetIntArg("-minrelaytxfee", DEFAULT_MIN_RELAY_TX_FEE));
+    configMetrics.Set("par", static_cast<size_t>(OptionsCategory::OPTIONS), "int", script_threads);
+    configMetrics.Set("peertimeout", static_cast<size_t>(OptionsCategory::CONNECTION), "seconds", peer_connect_timeout);
+    configMetrics.SetU("prune", static_cast<size_t>(OptionsCategory::OPTIONS), "int", nPruneTarget);
+    configMetrics.Set("rpcserialversion", static_cast<size_t>(OptionsCategory::RPC), "int", args.GetIntArg("-rpcserialversion", DEFAULT_RPC_SERIALIZE_VERSION));
+    configMetrics.Set("rpcthreads", static_cast<size_t>(OptionsCategory::RPC), "int", args.GetIntArg("-rpcthreads", DEFAULT_HTTP_THREADS));
+    configMetrics.Set("rpcallowip", static_cast<size_t>(OptionsCategory::RPC), "int", args.GetArgs("-rpcallowip").size());
+    configMetrics.Set("timeout", static_cast<size_t>(OptionsCategory::CONNECTION), "seconds", nConnectTimeout);
+    LogPrintf("Registered %d metrics\n", metrics::Registry().Collect().size());
+    for (auto& m : metrics::Registry().Collect()) {
+        LogPrint(BCLog::METRICS, "Registered metric %s:%d\n", m.name, static_cast<int32_t>(m.type));
+    }
 
     bool fLoaded = false;
     while (!fLoaded && !ShutdownRequested()) {
@@ -1779,6 +1870,7 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     connOptions.m_use_addrman_outgoing = !args.IsArgSet("-connect");
     if (!connOptions.m_use_addrman_outgoing) {
         const auto connect = args.GetArgs("-connect");
+        configMetrics.Set("connect", static_cast<size_t>(OptionsCategory::CONNECTION), "int", connect.size());
         if (connect.size() != 1 || connect[0] != "0") {
             connOptions.m_specified_outgoing = connect;
         }
@@ -1796,6 +1888,12 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     }
 
     connOptions.m_i2p_accept_incoming = args.GetBoolArg("-i2pacceptincoming", true);
+    configMetrics.Set("maxuploadtarget", static_cast<size_t>(OptionsCategory::CONNECTION), "bytes", connOptions.nMaxOutboundLimit);
+    configMetrics.Set("maxsendbuffer", static_cast<size_t>(OptionsCategory::CONNECTION), "bytes", connOptions.nSendBufferMaxSize);
+    configMetrics.Set("maxreceivebuffer", static_cast<size_t>(OptionsCategory::CONNECTION), "bytes", connOptions.nReceiveFloodSize);
+    configMetrics.Set("seednode", static_cast<size_t>(OptionsCategory::CONNECTION), "int", connOptions.vSeedNodes.size());
+    configMetrics.Set("whitelist", static_cast<size_t>(OptionsCategory::CONNECTION), "int", connOptions.vWhitelistedRange.size());
+    configMetrics.Set("whitelistbind", static_cast<size_t>(OptionsCategory::CONNECTION), "int", connOptions.vWhiteBinds.size());
 
     if (!node.connman->Start(*node.scheduler, connOptions)) {
         return false;

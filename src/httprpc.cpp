@@ -7,6 +7,7 @@
 #include <chainparams.h>
 #include <crypto/hmac_sha256.h>
 #include <httpserver.h>
+#include <metrics/container.h>
 #include <rpc/protocol.h>
 #include <rpc/server.h>
 #include <util/strencodings.h>
@@ -146,6 +147,7 @@ static bool RPCAuthorized(const std::string& strAuth, std::string& strAuthUserna
 
 static bool HTTPReq_JSONRPC(const std::any& context, HTTPRequest* req)
 {
+    static auto& rpcMetrics = metrics::Instance()->Rpc();
     // JSONRPC handles only POST
     if (req->GetRequestMethod() != HTTPRequest::POST) {
         req->WriteReply(HTTP_BAD_METHOD, "JSONRPC server handles only POST requests");
@@ -230,9 +232,11 @@ static bool HTTPReq_JSONRPC(const std::any& context, HTTPRequest* req)
         req->WriteHeader("Content-Type", "application/json");
         req->WriteReply(HTTP_OK, strReply);
     } catch (const UniValue& objError) {
+        rpcMetrics.IncrementError(jreq.strMethod);
         JSONErrorReply(req, objError, jreq.id);
         return false;
     } catch (const std::exception& e) {
+        rpcMetrics.IncrementError(jreq.strMethod);
         JSONErrorReply(req, JSONRPCError(RPC_PARSE_ERROR, e.what()), jreq.id);
         return false;
     }

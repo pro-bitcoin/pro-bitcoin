@@ -41,6 +41,8 @@
 
 #include <boost/test/unit_test.hpp>
 
+#define DISABLE_TEST_LOCK_DIRECTORY 1
+
 using namespace std::literals;
 static const std::string STRING_WITH_EMBEDDED_NULL_CHAR{"1"s "\0" "1"s};
 
@@ -2014,12 +2016,13 @@ BOOST_AUTO_TEST_CASE(test_ParseFixedPoint)
     BOOST_CHECK(!ParseFixedPoint("31.999999999999999999999", 3, &amount));
 }
 
+#ifndef DISABLE_TEST_LOCK_DIRECTORY
 static void TestOtherThread(fs::path dirname, std::string lockname, bool *result)
 {
     *result = LockDirectory(dirname, lockname);
 }
 
-#ifndef WIN32 // Cannot do this test on WIN32 due to lack of fork()
+// #ifndef WIN32 // Cannot do this test on WIN32 due to lack of fork()
 static constexpr char LockCommand = 'L';
 static constexpr char UnlockCommand = 'U';
 static constexpr char ExitCommand = 'X';
@@ -2054,6 +2057,9 @@ static constexpr char ExitCommand = 'X';
 
 BOOST_AUTO_TEST_CASE(test_LockDirectory)
 {
+#ifdef DISABLE_TEST_LOCK_DIRECTORY
+    BOOST_TEST_MESSAGE("disable test due to fork() call");
+#else
     fs::path dirname = m_args.GetDataDirBase() / "lock_dir";
     const std::string lockname = ".lock";
 #ifndef WIN32
@@ -2138,6 +2144,7 @@ BOOST_AUTO_TEST_CASE(test_LockDirectory)
     // Clean up
     ReleaseDirectoryLocks();
     fs::remove_all(dirname);
+#endif
 }
 
 BOOST_AUTO_TEST_CASE(test_DirIsWritable)

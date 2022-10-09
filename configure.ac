@@ -145,6 +145,12 @@ AC_ARG_WITH([sqlite],
   [use_sqlite=$withval],
   [use_sqlite=auto])
 
+AC_ARG_WITH([prometheus],
+  [AS_HELP_STRING([--with-prometheus=yes|no|auto],
+  [enable prometheus])],
+  [use_prometheus=$withval],
+  [use_prometheus=yes])
+
 AC_ARG_WITH([bdb],
   [AS_HELP_STRING([--without-bdb],
   [disable bdb wallet support (default is enabled if wallet is enabled)])],
@@ -1669,6 +1675,10 @@ else
   build_multiprocess=no
 fi
 
+dnl Prometheus Check
+
+PKG_CHECK_MODULES([PROMETHEUS], [prometheus-cpp-core >= 0.12.0, prometheus-cpp-pull >= 0.12.0], [use_prometheus=yes], [AC_MSG_ERROR([libprometheus-cpp-core version 0.12.0 or greater not found.])])
+
 AM_CONDITIONAL([BUILD_MULTIPROCESS], [test "$build_multiprocess" = "yes"])
 AM_CONDITIONAL([BUILD_BITCOIN_NODE], [test "$build_multiprocess" = "yes"])
 AM_CONDITIONAL([BUILD_BITCOIN_GUI], [test "$build_multiprocess" = "yes"])
@@ -1985,6 +1995,7 @@ AC_SUBST(HAVE_MM_PREFETCH)
 AC_SUBST(HAVE_STRONG_GETAUXVAL)
 AC_SUBST(ANDROID_ARCH)
 AC_SUBST(HAVE_EVHTTP_CONNECTION_GET_PEER_CONST_CHAR)
+AC_SUBST(PROMETHEUS_LIBS)
 AC_CONFIG_FILES([Makefile src/Makefile doc/man/Makefile share/setup.nsi share/qt/Info.plist test/config.ini])
 AC_CONFIG_FILES([contrib/devtools/split-debug.sh],[chmod +x contrib/devtools/split-debug.sh])
 AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([doc/Doxyfile])])

@@ -93,8 +93,8 @@ static const auto& metricsContainer = metrics::Instance();
 
 /** Used to pass flags to the Bind() function */
 enum BindFlags {
-    BF_NONE         = 0,
-    BF_EXPLICIT     = (1U << 0),
+    BF_NONE = 0,
+    BF_EXPLICIT = (1U << 0),
     BF_REPORT_ERROR = (1U << 1),
     /**
      * Do not call AddLocal() for our special addresses, e.g., for incoming
@@ -2927,7 +2927,7 @@ void CConnman::PushMessage(CNode* pnode, CSerializedNetMsg&& msg)
         LOCK(pnode->cs_vSend);
         bool optimisticSend(pnode->vSendMsg.empty());
 
-        //log total amount of bytes per message type
+        // log total amount of bytes per message type
         pnode->mapSendBytesPerMsgType[msg.m_type] += nTotalSize;
         pnode->nSendSize += nTotalSize;
         netMetrics.BandwidthGauge(metrics::NetDirection::TX, msg.m_type, nTotalSize);

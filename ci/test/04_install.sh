@@ -145,3 +145,15 @@ if [ "$USE_BUSY_BOX" = "true" ]; then
   # Print BusyBox version
   CI_EXEC patch --help
 fi
+
+if [ "$(lsb_release -r -s)" == "18.04" ] ; then
+# update cmake
+  CI_EXEC "curl -s --fail -L https://apt.kitware.com/keys/kitware-archive-latest.asc  | gpg --dearmor - > /etc/apt/trusted.gpg.d/kitware.gpg"
+  CI_EXEC "apt-add-repository 'deb https://apt.kitware.com/ubuntu/ bionic main'"
+  CI_EXEC "apt-get update && apt-get install -y cmake"
+fi
+
+# install prometheus if NO_DEPENDS
+if [ -n "$NO_DEPENDS" ]; then
+    CI_EXEC ./contrib/install_prometheus.sh
+fi

@@ -24,6 +24,7 @@
 #include <hash.h>
 #include <logging.h>
 #include <logging/timer.h>
+#include <metrics/container.h>
 #include <node/blockstorage.h>
 #include <node/interface_ui.h>
 #include <node/utxo_snapshot.h>
@@ -107,6 +108,8 @@ const std::vector<std::string> CHECKLEVEL_DOC {
  *  noticeably interfere with the pruning mechanism.
  * */
 static constexpr int PRUNE_LOCK_BUFFER{10};
+
+static const auto& metricsContainer = metrics::Instance();
 
 /**
  * Mutex to guard access to validation specific variables, such as reading
@@ -1169,6 +1172,7 @@ bool MemPoolAccept::SubmitPackage(const ATMPArgs& args, std::vector<Workspace>& 
 
 MempoolAcceptResult MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs& args)
 {
+    static auto& mempoolMetrics = metricsContainer->MemPool();
     AssertLockHeld(cs_main);
     LOCK(m_pool.cs); // mempool "read lock" (held through GetMainSignals().TransactionAddedToMempool())
 
@@ -1192,7 +1196,11 @@ MempoolAcceptResult MemPoolAccept::AcceptSingleTransaction(const CTransactionRef
     if (!Finalize(args, ws)) return MempoolAcceptResult::Failure(ws.m_state);
 
     GetMainSignals().TransactionAddedToMempool(ptx, m_pool.GetAndIncrementSequence());
-
+    mempoolMetrics.Transactions(metrics::MemPoolType::POOL_SIZE, m_pool.size());
+    mempoolMetrics.Transactions(metrics::MemPoolType::POOL_TRANSACTION_BYTES, m_pool.GetTotalTxSize());
+    mempoolMetrics.Transactions(metrics::MemPoolType::POOl_USAGE, m_pool.DynamicMemoryUsage());
+    mempoolMetrics.Transactions(metrics::MemPoolType::POOL_FEE, m_pool.GetTotalFee());
+    mempoolMetrics.Transactions(metrics::MemPoolType::POOL_UPDATE, m_pool.GetTransactionsUpdated());
     return MempoolAcceptResult::Success(std::move(ws.m_replaced_transactions), ws.m_vsize, ws.m_base_fees);
 }
 
@@ -1415,6 +1423,7 @@ MempoolAcceptResult AcceptToMemoryPool(Chainstate& active_chainstate, const CTra
                                        int64_t accept_time, bool bypass_limits, bool test_accept)
     EXCLUSIVE_LOCKS_REQUIRED(::cs_main)
 {
+    auto start = std::chrono::high_resolution_clock::now();
     AssertLockHeld(::cs_main);
     const CChainParams& chainparams{active_chainstate.m_params};
     assert(active_chainstate.GetMempool() != nullptr);
@@ -1435,6 +1444,11 @@ MempoolAcceptResult AcceptToMemoryPool(Chainstate& active_chainstate, const CTra
     // After we've (potentially) uncached entries, ensure our coins cache is still within its size limits
     BlockValidationState state_dummy;
     active_chainstate.FlushStateToDisk(state_dummy, FlushStateMode::PERIODIC);
+    auto end = std::chrono::high_resolution_clock::now();
+    auto diff = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+    if (result.m_result_type == MempoolAcceptResult::ResultType::VALID) {
+        metricsContainer->MemPool().AcceptTime(diff.count());
+    }
     return result;
 }
 
@@ -1553,6 +1567,7 @@ bool Chainstate::IsInitialBlockDownload() const
     if (m_chain.Tip()->GetBlockTime() < (GetTime() - nMaxTipAge))
         return true;
     LogPrintf("Leaving InitialBlockDownload (latching to false)\n");
+    metricsContainer->Config().SetIBD(false);
     m_cached_finished_ibd.store(true, std::memory_order_relaxed);
     return false;
 }
@@ -1879,7 +1894,6 @@ DisconnectResult Chainstate::DisconnectBlock(const CBlock& block, const CBlockIn
 
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
-
     return fClean ? DISCONNECT_OK : DISCONNECT_UNCLEAN;
 }
 
@@ -1987,7 +2001,7 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
     assert(*pindex->phashBlock == block_hash);
 
     int64_t nTimeStart = GetTimeMicros();
-
+    static auto& blockMetrics = metricsContainer->Block();
     // Check it again in case a previous version let a bad block in
     // NOTE: We don't currently (re-)invoke ContextualCheckBlock() or
     // ContextualCheckBlockHeader() here. This means that if we add a new
@@ -2155,8 +2169,12 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
     // Get the script flags for this block
     unsigned int flags{GetBlockScriptFlags(*pindex, m_chainman)};
 
-    int64_t nTime2 = GetTimeMicros(); nTimeForks += nTime2 - nTime1;
-    LogPrint(BCLog::BENCH, "    - Fork checks: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime2 - nTime1), nTimeForks * MICRO, nTimeForks * MILLI / nBlocksTotal);
+    int64_t nTime2 = GetTimeMicros();
+    nTimeForks += nTime2 - nTime1;
+    int64_t nCurrentTime = nTime2 - nTime1;
+    double nAvgTime = (double)nTimeForks / double(nBlocksTotal);
+    blockMetrics.ConnectForkCheck(nCurrentTime, nAvgTime);
+    LogPrint(BCLog::BENCH, "    - Fork checks: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * nCurrentTime, nTimeForks * MICRO, nTimeForks * MILLI / nBlocksTotal);
 
     CBlockUndo blockundo;
 
@@ -2240,8 +2258,12 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
         }
         UpdateCoins(tx, view, i == 0 ? undoDummy : blockundo.vtxundo.back(), pindex->nHeight);
     }
-    int64_t nTime3 = GetTimeMicros(); nTimeConnect += nTime3 - nTime2;
-    LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs (%.2fms/blk)]\n", (unsigned)block.vtx.size(), MILLI * (nTime3 - nTime2), MILLI * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : MILLI * (nTime3 - nTime2) / (nInputs-1), nTimeConnect * MICRO, nTimeConnect * MILLI / nBlocksTotal);
+    int64_t nTime3 = GetTimeMicros();
+    nTimeConnect += nTime3 - nTime2;
+    nCurrentTime = nTime3 - nTime2;
+    nAvgTime = double(nTimeConnect) / double(nBlocksTotal);
+    blockMetrics.ConnectTransactionsCheck(nCurrentTime, nAvgTime);
+    LogPrint(BCLog::BENCH, "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs (%.2fms/blk)]\n", (unsigned)block.vtx.size(), MILLI * nCurrentTime, MILLI * (nTime3 - nTime2) / block.vtx.size(), nInputs <= 1 ? 0 : MILLI * (nTime3 - nTime2) / (nInputs - 1), nTimeConnect * MICRO, nAvgTime * MILLI);
 
     CAmount blockReward = nFees + GetBlockSubsidy(pindex->nHeight, m_params.GetConsensus());
     if (block.vtx[0]->GetValueOut() > blockReward) {
@@ -2274,18 +2296,25 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
     // add this block to the view's block chain
     view.SetBestBlock(pindex->GetBlockHash());
 
-    int64_t nTime6 = GetTimeMicros(); nTimeIndex += nTime6 - nTime5;
-    LogPrint(BCLog::BENCH, "    - Index writing: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nTime6 - nTime5), nTimeIndex * MICRO, nTimeIndex * MILLI / nBlocksTotal);
+    int64_t nTime6 = GetTimeMicros();
+    nTimeIndex += nTime6 - nTime5;
+    nAvgTime = double(nTimeIndex) / double(nBlocksTotal);
+    nCurrentTime = nTime5 - nTime4;
+    blockMetrics.ConnectUpdateIndex(nCurrentTime, nAvgTime);
+    LogPrint(BCLog::BENCH, "    - Index writing: %.2fms [%.2fs (%.2fms/blk)]\n", MILLI * (nCurrentTime), nTimeIndex * MICRO, nTimeIndex * MILLI / nBlocksTotal);
 
     TRACE6(validation, block_connected,
-        block_hash.data(),
-        pindex->nHeight,
-        block.vtx.size(),
-        nInputs,
-        nSigOpsCost,
-        nTime5 - nTimeStart // in microseconds (µs)
+           block_hash.data(),
+           pindex->nHeight,
+           block.vtx.size(),
+           nInputs,
+           nSigOpsCost,
+           nTime5 - nTimeStart // in microseconds (µs)
     );
-
+    if (!this->IsInitialBlockDownload()) {
+        blockMetrics.SigOps(nSigOpsCost);
+        blockMetrics.Fees(nFees);
+    }
     return true;
 }
 
@@ -2695,7 +2724,7 @@ bool Chainstate::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew,
 {
     AssertLockHeld(cs_main);
     if (m_mempool) AssertLockHeld(m_mempool->cs);
-
+    static auto& blockMetrics = metricsContainer->Block();
     assert(pindexNew->pprev == m_chain.Tip());
     // Read block from disk.
     int64_t nTime1 = GetTimeMicros();
@@ -2712,8 +2741,12 @@ bool Chainstate::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew,
     }
     const CBlock& blockConnecting = *pthisBlock;
     // Apply the block atomically to the chain state.
-    int64_t nTime2 = GetTimeMicros(); nTimeReadFromDiskTotal += nTime2 - nTime1;
+    int64_t nTime2 = GetTimeMicros();
+    nTimeReadFromDiskTotal += nTime2 - nTime1;
     int64_t nTime3;
+    int64_t nCurrentTime = nTime2 - nTime1;
+    double nAvgTime = (double)nTimeReadFromDiskTotal / (nBlocksTotal == 0 ? 1.0 : (double)nBlocksTotal);
+    blockMetrics.ConnectLoadBlockDisk(nCurrentTime, nAvgTime);
     LogPrint(BCLog::BENCH, "  - Load block from disk: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime2 - nTime1) * MILLI, nTimeReadFromDiskTotal * MICRO, nTimeReadFromDiskTotal * MILLI / nBlocksTotal);
     {
         CCoinsViewCache view(&CoinsTip());
@@ -2724,20 +2757,32 @@ bool Chainstate::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew,
                 InvalidBlockFound(pindexNew, state);
             return error("%s: ConnectBlock %s failed, %s", __func__, pindexNew->GetBlockHash().ToString(), state.ToString());
         }
-        nTime3 = GetTimeMicros(); nTimeConnectTotal += nTime3 - nTime2;
+        nTime3 = GetTimeMicros();
+        nTimeConnectTotal += nTime3 - nTime2;
         assert(nBlocksTotal > 0);
-        LogPrint(BCLog::BENCH, "  - Connect total: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime3 - nTime2) * MILLI, nTimeConnectTotal * MICRO, nTimeConnectTotal * MILLI / nBlocksTotal);
+        nCurrentTime = nTime3 - nTime2;
+        nAvgTime = (double)nTimeConnectTotal / (double)nBlocksTotal;
+        blockMetrics.ConnectBlock(nCurrentTime, nAvgTime);
+        LogPrint(BCLog::BENCH, "  - Connect total: %.2fms [%.2fs (%.2fms/blk)]\n", nCurrentTime * MILLI, nTimeConnectTotal * MICRO, nAvgTime * MILLI);
         bool flushed = view.Flush();
         assert(flushed);
     }
-    int64_t nTime4 = GetTimeMicros(); nTimeFlush += nTime4 - nTime3;
-    LogPrint(BCLog::BENCH, "  - Flush: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime4 - nTime3) * MILLI, nTimeFlush * MICRO, nTimeFlush * MILLI / nBlocksTotal);
+    int64_t nTime4 = GetTimeMicros();
+    nTimeFlush += nTime4 - nTime3;
+    nCurrentTime = nTime4 - nTime3;
+    nAvgTime = (double)nTimeFlush / (double)nBlocksTotal;
+    blockMetrics.ConnectFlushView(nCurrentTime, nAvgTime);
+    LogPrint(BCLog::BENCH, "  - Flush: %.2fms [%.2fs (%.2fms/blk)]\n", nCurrentTime * MILLI, nTimeFlush * MICRO, nAvgTime * MILLI);
     // Write the chain state to disk, if necessary.
     if (!FlushStateToDisk(state, FlushStateMode::IF_NEEDED)) {
         return false;
     }
-    int64_t nTime5 = GetTimeMicros(); nTimeChainState += nTime5 - nTime4;
-    LogPrint(BCLog::BENCH, "  - Writing chainstate: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime5 - nTime4) * MILLI, nTimeChainState * MICRO, nTimeChainState * MILLI / nBlocksTotal);
+    int64_t nTime5 = GetTimeMicros();
+    nTimeChainState += nTime5 - nTime4;
+    nCurrentTime = nTime5 - nTime4;
+    nAvgTime = (double)nTimeChainState / (double)nBlocksTotal;
+    blockMetrics.ConnectFlushDisk(nCurrentTime, nAvgTime);
+    LogPrint(BCLog::BENCH, "  - Writing chainstate: %.2fms [%.2fs (%.2fms/blk)]\n", nCurrentTime * MILLI, nTimeChainState * MICRO, nAvgTime * MILLI);
     // Remove conflicting transactions from the mempool.;
     if (m_mempool) {
         m_mempool->removeForBlock(blockConnecting.vtx, pindexNew->nHeight);
@@ -2747,11 +2792,18 @@ bool Chainstate::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew,
     m_chain.SetTip(*pindexNew);
     UpdateTip(pindexNew);
 
-    int64_t nTime6 = GetTimeMicros(); nTimePostConnect += nTime6 - nTime5; nTimeTotal += nTime6 - nTime1;
-    LogPrint(BCLog::BENCH, "  - Connect postprocess: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime6 - nTime5) * MILLI, nTimePostConnect * MICRO, nTimePostConnect * MILLI / nBlocksTotal);
+    int64_t nTime6 = GetTimeMicros();
+    nTimePostConnect += nTime6 - nTime5;
+    nTimeTotal += nTime6 - nTime1;
+    nCurrentTime = nTime6 - nTime5;
+    nAvgTime = (double)nTimePostConnect / (double)nBlocksTotal;
+    blockMetrics.ConnectUpdateTip(nCurrentTime, nAvgTime);
+    LogPrint(BCLog::BENCH, "  - Connect postprocess: %.2fms [%.2fs (%.2fms/blk)]\n", nCurrentTime * MILLI, nTimePostConnect * MICRO, nAvgTime * MILLI);
     LogPrint(BCLog::BENCH, "- Connect block: %.2fms [%.2fs (%.2fms/blk)]\n", (nTime6 - nTime1) * MILLI, nTimeTotal * MICRO, nTimeTotal * MILLI / nBlocksTotal);
-
     connectTrace.BlockConnected(pindexNew, std::move(pthisBlock));
+    nAvgTime = double(nTimeTotal) / double(nBlocksTotal);
+    nCurrentTime = GetTimeMicros() - nTime1;
+    blockMetrics.ConnectTotal(nCurrentTime, nAvgTime);
     return true;
 }
 

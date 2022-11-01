@@ -16,6 +16,7 @@
 #include <init.h>
 #include <init/common.h>
 #include <interfaces/chain.h>
+#include <metrics/container.h>
 #include <net.h>
 #include <net_processing.h>
 #include <node/blockstorage.h>
@@ -100,6 +101,7 @@ BasicTestingSetup::BasicTestingSetup(const std::string& chainName, const std::ve
     : m_path_root{fs::temp_directory_path() / "test_common_" PACKAGE_NAME / g_insecure_rand_ctx_temp_path.rand256().ToString()},
       m_args{}
 {
+    metrics::Init("", "test", false); // don't bind metrics exporter
     m_node.args = &gArgs;
     std::vector<const char*> arguments = Cat(
         {

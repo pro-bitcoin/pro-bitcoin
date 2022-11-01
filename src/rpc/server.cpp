@@ -5,6 +5,7 @@
 
 #include <rpc/server.h>
 
+#include <metrics/container.h>
 #include <rpc/util.h>
 #include <shutdown.h>
 #include <sync.h>
@@ -466,18 +467,22 @@ UniValue CRPCTable::execute(const JSONRPCRequest &request) const
 
 static bool ExecuteCommand(const CRPCCommand& command, const JSONRPCRequest& request, UniValue& result, bool last_handler)
 {
-    try
-    {
+    try {
+        auto start = std::chrono::high_resolution_clock::now();
+        static auto& rpcMetrics = metrics::Instance()->Rpc();
         RPCCommandExecution execution(request.strMethod);
         // Execute, convert arguments to array if necessary
+        bool actorResult = false;
         if (request.params.isObject()) {
-            return command.actor(transformNamedArguments(request, command.argNames), result, last_handler);
+            actorResult = command.actor(transformNamedArguments(request, command.argNames), result, last_handler);
         } else {
-            return command.actor(request, result, last_handler);
+            actorResult = command.actor(request, result, last_handler);
         }
-    }
-    catch (const std::exception& e)
-    {
+        auto end = std::chrono::high_resolution_clock::now();
+        auto diff = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        rpcMetrics.ObserveMethod(request.strMethod, diff.count());
+        return actorResult;
+    } catch (const std::exception& e) {
         throw JSONRPCError(RPC_MISC_ERROR, e.what());
     }
 }

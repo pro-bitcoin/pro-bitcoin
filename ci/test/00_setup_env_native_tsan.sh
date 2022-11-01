@@ -10,5 +10,6 @@ export CONTAINER_NAME=ci_native_tsan
 export DOCKER_NAME_TAG=ubuntu:22.04
 export PACKAGES="clang-13 llvm-13 libc++abi-13-dev libc++-13-dev python3-zmq"
 export DEP_OPTS="CC=clang-13 CXX='clang++-13 -stdlib=libc++'"
+DEP_OPTS="$DEP_OPTS prometheus_cpp_cxx=clang++-13  prometheus_cpp_cc=clang-13 prometheus_cpp_cxxflags='-fPIC -std=c++17 -stdlib=libc++'"
 export GOAL="install"
 export BITCOIN_CONFIG="--enable-zmq CPPFLAGS='-DARENA_DEBUG -DDEBUG_LOCKORDER -DDEBUG_LOCKCONTENTION' CXXFLAGS='-g' --with-sanitizers=thread CC=clang-13 CXX='clang++-13 -stdlib=libc++'"

@@ -52,6 +52,30 @@ global_task_template: &GLOBAL_TASK_TEMPLATE
     folder: "depends/built"
     fingerprint_script: echo $CIRRUS_TASK_NAME $(git rev-list -1 HEAD ./depends)
   << : *MAIN_TEMPLATE
+  always:
+    boost_test_log_artifacts:
+      path: "**ci/scratch/build/**/*testlog.xml"
+      type: text/xml
+      format: "boost"
+    functional_log_artifacts:
+      path: "**ci/scratch/test_runner/**/*.log"
+      type: text/plain
+    functional_node_artifacts:
+      path: "**ci/scratch/test_runner/**/node*/std*/tmp*"
+      type: text/plain
+    functional_cirrus_artifacts:
+      path: "**ci/scratch/test_runner/**/cirrus.json"
+      type: application/json
+      format: cirrus
+    functional_report_artifacts:
+      path: "**ci/scratch/test_runner/**/report.json"
+      type: application/json
+    bench_json_artifacts:
+      path: "**ci/scratch/bench.json"
+      type: application/json
+    bench_csv_artifacts:
+      path: "**ci/scratch/bench.csv"
+      type: test/plain
 
 macos_native_task_template: &MACOS_NATIVE_TASK_TEMPLATE
   << : *BASE_TEMPLATE
@@ -82,6 +106,7 @@ task:
 
 task:
   name: 'tidy [jammy]'
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:jammy
@@ -95,6 +120,7 @@ task:
 
 task:
   name: "Win64 native [vs2022]"
+  only_if: false
   << : *FILTER_TEMPLATE
   windows_container:
     cpu: 6
@@ -198,6 +224,7 @@ task:
 
 task:
   name: 'ARM [unit tests, no functional tests] [bullseye]'
+  only_if: true
   << : *GLOBAL_TASK_TEMPLATE
   arm_container:
     image: debian:bullseye
@@ -210,6 +237,7 @@ task:
 
 task:
   name: 'Win64 [unit tests, no gui tests, no boost::process, no functional tests] [jammy]'
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:jammy
@@ -219,6 +247,7 @@ task:
 
 task:
   name: '32-bit + dash [gui] [CentOS 8]'
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: quay.io/centos/centos:stream8
@@ -229,6 +258,7 @@ task:
 
 task:
   name: '[previous releases, uses qt5 dev package and some depends packages, DEBUG] [unsigned char] [buster]'
+  only_if: false
   previous_releases_cache:
     folder: "releases"
   << : *GLOBAL_TASK_TEMPLATE
@@ -239,6 +269,7 @@ task:
 
 task:
   name: '[TSan, depends, gui] [jammy]'
+  only_if: true
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:jammy
@@ -250,6 +281,7 @@ task:
 
 task:
   name: '[MSan, depends] [focal]'
+  only_if: true
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:focal
@@ -278,6 +310,7 @@ task:
 
 task:
   name: '[fuzzer,address,undefined,integer, no depends] [jammy]'
+  only_if: true
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:jammy
@@ -289,6 +322,7 @@ task:
 
 task:
   name: '[multiprocess, i686, DEBUG] [focal]'
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:focal
@@ -300,6 +334,7 @@ task:
 
 task:
   name: '[no wallet, libbitcoinkernel] [bionic]'
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   container:
     image: ubuntu:bionic
@@ -309,6 +344,7 @@ task:
 
 task:
   name: 'macOS 10.15 [gui, no tests] [focal]'
+  only_if: false
   << : *BASE_TEMPLATE
   macos_sdk_cache:
     folder: "depends/SDKs/$MACOS_SDK"
@@ -323,6 +359,7 @@ task:
 
 task:
   name: 'macOS 12 native x86_64 [gui, system sqlite] [no depends]'
+  only_if: false
   macos_instance:
     # Use latest image, but hardcode version to avoid silent upgrades (and breaks)
     image: monterey-xcode-13.3  # https://cirrus-ci.org/guide/macOS
@@ -335,6 +372,7 @@ task:
 
 task:
   name: 'ARM64 Android APK [focal]'
+  only_if: false
   << : *BASE_TEMPLATE
   android_sdk_cache:
     folder: "depends/SDKs/android"

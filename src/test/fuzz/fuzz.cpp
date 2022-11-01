@@ -5,6 +5,7 @@
 #include <test/fuzz/fuzz.h>
 
 #include <fs.h>
+#include <metrics/container.h>
 #include <netaddress.h>
 #include <netbase.h>
 #include <test/util/setup_common.h>
@@ -66,6 +67,7 @@ static TypeTestOneInput* g_test_one_input{nullptr};
 
 void initialize()
 {
+    metrics::Init("", "test", false); // don't bind metrics exporter
     // Terminate immediately if a fuzzing harness ever tries to create a TCP socket.
     CreateSock = [](const CService&) -> std::unique_ptr<Sock> { std::terminate(); };
 

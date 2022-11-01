@@ -16,8 +16,10 @@ import argparse
 from collections import deque
 import configparser
 import datetime
+import json
 import os
 import time
+from typing import List
 import shutil
 import signal
 import subprocess
@@ -166,6 +168,7 @@ BASE_SCRIPTS = [
     'wallet_createwallet.py --legacy-wallet',
     'wallet_createwallet.py --usecli',
     'wallet_createwallet.py --descriptors',
+    'feature_metrics.py',
     'wallet_listtransactions.py --legacy-wallet',
     'wallet_listtransactions.py --descriptors',
     'wallet_watchonly.py --legacy-wallet',
@@ -585,7 +588,7 @@ def run_tests(*, test_list, src_dir, build_dir, tmpdir, jobs=1, enable_coverage=
                     break
 
     print_results(test_results, max_len_name, (int(time.time() - start_time)))
-
+    report(test_results, tmpdir)
     if coverage:
         coverage_passed = coverage.report_rpc_coverage()
 
@@ -739,6 +742,25 @@ class TestResult():
     @property
     def was_successful(self):
         return self.status != "Failed"
+
+
+def report(test_results: List[TestResult], tmpdir: str):
+    report = []
+    for r in test_results:
+        report.append(
+            {
+            'name': r.name,
+            'status': r.status,
+            'duration': r.time
+        })
+
+    j = json.dumps(report, ensure_ascii=False)
+    try:
+        with open(os.path.join(tmpdir, 'report.json'), 'w', encoding='utf8') as f:
+            print(j, file=f)
+    except IOError as e:
+        print('WARNING failed to write test report {}\n'.format(e), file=sys.stderr)
+
 
 
 def check_script_prefixes():

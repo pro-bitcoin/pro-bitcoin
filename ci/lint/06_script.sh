@@ -18,6 +18,9 @@ else
 fi
 export COMMIT_RANGE
 
+export REPORTS_DIR="ci/scratch/lint"
+[ -d $REPORTS_DIR ] || mkdir -p $REPORTS_DIR
+
 # This only checks that the trees are pure subtrees, it is not doing a full
 # check with -r to not have to fetch all the remotes.
 test/lint/git-subtree-check.sh src/crypto/ctaes

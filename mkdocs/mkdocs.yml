@@ -1,0 +1,132 @@
+site_name: Pro Bitcoin
+site_description: Documentation
+site_url: https://pro-bitcoin.github.io/
+repo_name: 'pro-bitcoin/pro-bitcoin'
+repo_url: 'https://github.com/pro-bitcoin/pro-bitcoin'
+edit_uri: 'https://github.com/pro-bitcoin/pro-bitcoin/blob/master/mkdocs/docs/'
+docs_dir: docs
+
+plugins:
+  - search:
+      lang:
+        - en
+#  - alternate-link
+  - minify:
+      minify_html: false
+  - include-markdown
+# strict: true
+
+theme:
+  name: material
+  language: 'en'
+  # custom_dir: 'overrides'
+  logo: 'assets/images/pro-bitcoin.png'
+  favicon: assets/images/favicon.ico
+  palette:
+    scheme: slate
+    primary: orange
+    accent: deep purple
+    # Light mode
+#    - media: "(prefers-color-scheme: light)"
+#      scheme: default
+#      primary: orange
+#      accent: indigo
+#      toggle:
+#        icon: material/toggle-switch-off-outline
+#        name: Switch to dark mode
+
+    # Dark mode
+#    - media: "(prefers-color-scheme: dark)"
+#      scheme: slate
+#      primary: orange
+#      accent: deep purple
+#      toggle:
+#        icon: material/toggle-switch
+#        name: Switch to light mode
+
+  features:
+    - navigation.instant
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.top
+    - navigation.tracking
+
+  font:
+    text: Barlow
+    code: Roboto Mono
+
+extra:
+  social:
+#    - icon: fontawesome/brands/discord
+#      link: 'https://discord.gg/Ks2Kzd4'
+#    - icon: fontawesome/brands/telegram
+#      link: 'https://t.me/tasmota'
+    - icon: fontawesome/brands/twitter
+      link: 'https://twitter.com/probitcoinnode'
+    - icon: fontawesome/brands/github-alt
+      link: 'https://github.com/pro-bitcoin/pro-bitcoin'
+    - icon: fontawesome/solid/envelope
+      link: 'mailto:root@pro-bitcoin.io'
+#  analytics:
+#    provider: google
+#    property:
+
+markdown_extensions:
+  - admonition
+  - toc:
+     permalink: "~"
+     toc_depth: 3
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.betterem
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.highlight
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.superfences
+  - pymdownx.snippets
+  - pymdownx.tilde
+  - meta
+  - def_list
+  - attr_list
+  - md_in_html
+
+extra_css:
+  - assets/stylesheets/extra.css
+
+extra_javascript:
+  - https://code.jquery.com/jquery-3.6.1.min.js
+  - assets/js/code-anchor.js
+  - assets/js/grafana.js
+  - assets/js/jquery.js
+
+nav:
+  - Home: index.md
+  - Bitcoin Contrib: contrib.md
+  - Installing: install.md
+  - Walk Through:
+      - Intro: walk-intro.md
+      - Blocks:
+        - Intro: walk-through/blocks/intro.md
+        - Header: walk-through/blocks/header.md
+        - Weight: walk-through/blocks/weight.md
+        - Connect: walk-through/blocks/connect.md
+      - TX:
+          - Into: walk-through/tx/intro.md
+          - SigOps: walk-through/tx/sigops.md
+      - MemPool:
+          - Into: walk-through/mempool/intro.md
+      - Config: walk-through/config.md
+      - Net:
+          - Intro: walk-through/net/intro.md
+      - RPC:
+          - Intro: walk-through/rpc/intro.md
+      - Tests:
+          - Intro: walk-through/tests/intro.md
+          - Unit: walk-through/tests/unit.md
+          - Functional: walk-through/tests/functional.md
+  - About: about.md

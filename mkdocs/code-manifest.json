@@ -1,0 +1,56 @@
+{
+  "blob": "1cebb77cf68ba53092fbd26d21522a8adbfa2c2a",
+  "url": "https://raw.githubusercontent.com/pro-bitcoin/pro-bitcoin",
+  "blocks": [
+    {
+      "Location": "src/primitives/block.h#L20-L30",
+      "file": "CBlockHeader"
+    },
+    {
+      "Location": "src/validation.cpp#L3534-L3543",
+      "file": "ContextualCheckBlockHeader"
+    },
+    {
+      "Location": "src/chain.h#L293-L309",
+      "file": "GetMedianTimePast"
+    },
+    {
+      "Location": "src/consensus/validation.h#L143-L161",
+      "file": "GetBlockWeight"
+    },
+    {
+      "Location": "src/validation.cpp#L3530-L3532",
+      "file": "ValidateBlockWeight"
+    },
+    {
+      "Location": "src/consensus/consensus.h#L16-L17",
+      "file": "MaxSigOps"
+    },
+    {
+      "Location": "src/consensus/tx_verify.cpp#L146-L166",
+      "file": "GetTransactionSigOpCost"
+    },
+    {
+      "Location": "src/script/interpreter.cpp#L2072-L2087",
+      "file": "WitnessSigOps"
+    },
+    {
+      "Location": "src/util/system.h#L137-L155",
+      "file": "OptionsCategory"
+    },
+    {
+      "Location": "src/init.cpp#L492-L493",
+      "file": "MetricsInit"
+    },
+    {
+      "Location": "src/init.cpp#L1426-L1435",
+      "file": "MetricsConfig"
+    },
+    {
+      "Location": "src/script/script.cpp#L152-L175",
+      "file": "GetSigOpCount"
+    }
+  ]
+}
+
+

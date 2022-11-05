@@ -1,0 +1,21 @@
+
+iframe {
+    border: none;
+}
+
+codeanchor {
+    display: inline;
+}
+
+grafana {
+ display: block;
+}
+
+span.red {
+    color: red;
+    font-weight: bold;
+}
+span.orange {
+    color: orange;
+    font-weight: bold;
+}

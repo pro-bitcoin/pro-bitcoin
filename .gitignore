@@ -153,3 +153,4 @@ dist/
 
 .idea/
 venv/
+mkdocs/site/

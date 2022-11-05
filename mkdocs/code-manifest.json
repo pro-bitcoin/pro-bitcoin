@@ -49,6 +49,26 @@
     {
       "Location": "src/script/script.cpp#L152-L175",
       "file": "GetSigOpCount"
+    },
+    {
+      "Location": "src/net.h#L664-L680",
+      "file": "CConnman"
+    },
+    {
+      "Location": "src/init.cpp#L1265-L1269",
+      "file": "CConnmanInit"
+    },
+    {
+      "Location": "src/init.cpp#L1732-L1748",
+      "file": "CConnmanOptions"
+    },
+    {
+      "Location": "src/net.cpp#L949-L966",
+      "file": "CreateNodeFromAcceptedSocket"
+    },
+    {
+      "Location": "src/net.h#L344-L350",
+      "file": "CNode"
     }
   ]
 }

@@ -121,8 +121,7 @@ nav:
       - MemPool:
           - Into: walk-through/mempool/intro.md
       - Config: walk-through/config.md
-      - Net:
-          - Intro: walk-through/net/intro.md
+      - Net: walk-through/net/intro.md
       - RPC:
           - Intro: walk-through/rpc/intro.md
       - Tests:

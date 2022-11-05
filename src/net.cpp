@@ -2761,9 +2761,11 @@ void CConnman::RecordBytesSent(uint64_t bytes)
         // timeframe expired, reset cycle
         nMaxOutboundCycleStartTime = now;
         nMaxOutboundTotalBytesSentInCycle = 0;
+        netMetrics.MaxOutboundStartTime(now.count());
     }
 
     nMaxOutboundTotalBytesSentInCycle += bytes;
+    netMetrics.MaxOutbound(nMaxOutboundTotalBytesSentInCycle);
     netMetrics.BandwidthGauge(metrics::NetDirection::TX, "total", bytes);
 }
 

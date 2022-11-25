@@ -14,11 +14,16 @@ description: TBD
 
   Bitcoin supports transports, Ipv4, Ipv6, [Tor](https://github.com/pro-bitcoin/pro-bitcoin/blob/prometheus/doc/tor.md), [I2P](https://github.com/pro-bitcoin/pro-bitcoin/blob/prometheus/doc/i2p.md)
 
-Here are the current protocol connections: 
+  Here are the current protocol connections: 
 
 <iframe src="https://grafana.pro-bitcoin.io/d-solo/VkX8f0N7k/blocks?orgId=1&theme=dark&panelId=10" width="100%" height="250"></iframe>
 
-At the time of this writing most connections where Ipv4.  
+  At the time of this writing most connections where Ipv4.
+
+
+## Inbound/Outbound 
+
+
 
 ## CNode
 

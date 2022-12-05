@@ -217,7 +217,7 @@ AC_ARG_ENABLE([fuzz-binary],
     AS_HELP_STRING([--enable-fuzz-binary],
     [enable building of fuzz binary (default yes).]),
     [enable_fuzz_binary=$enableval],
-    [enable_fuzz_binary=yes])
+    [enable_fuzz_binary=no])
 
 AC_ARG_WITH([qrencode],
   [AS_HELP_STRING([--with-qrencode],
@@ -642,7 +642,7 @@ AC_ARG_WITH([utils],
   [AS_HELP_STRING([--with-utils],
   [build bitcoin-cli bitcoin-tx bitcoin-util bitcoin-wallet (default=yes)])],
   [build_bitcoin_utils=$withval],
-  [build_bitcoin_utils=yes])
+  [build_bitcoin_utils=no])
 
 AC_ARG_ENABLE([util-cli],
   [AS_HELP_STRING([--enable-util-cli],
@@ -1674,6 +1674,9 @@ fi
 dnl Prometheus Check
 
 PKG_CHECK_MODULES([PROMETHEUS], [prometheus-cpp-core >= 0.12.0, prometheus-cpp-pull >= 0.12.0], [use_prometheus=yes], [AC_MSG_ERROR([libprometheus-cpp-core version 0.12.0 or greater not found.])])
+AC_CHECK_HEADERS([zlib.h], [HAVE_ZLIB_H=1], [AC_MSG_ERROR([zlib.h not found])])
+AC_CHECK_LIB([z], [gzopen], [ZLIB], [AC_MSG_ERROR([libz not found])])
+ZLIB="-lz"
 
 AM_CONDITIONAL([BUILD_MULTIPROCESS], [test "$build_multiprocess" = "yes"])
 AM_CONDITIONAL([BUILD_BITCOIN_NODE], [test "$build_multiprocess" = "yes"])
@@ -1992,6 +1995,7 @@ AC_SUBST(HAVE_STRONG_GETAUXVAL)
 AC_SUBST(ANDROID_ARCH)
 AC_SUBST(HAVE_EVHTTP_CONNECTION_GET_PEER_CONST_CHAR)
 AC_SUBST(PROMETHEUS_LIBS)
+AC_SUBST(ZLIB)
 AC_CONFIG_FILES([Makefile src/Makefile doc/man/Makefile share/setup.nsi share/qt/Info.plist test/config.ini])
 AC_CONFIG_FILES([contrib/devtools/split-debug.sh],[chmod +x contrib/devtools/split-debug.sh])
 AM_COND_IF([HAVE_DOXYGEN], [AC_CONFIG_FILES([doc/Doxyfile])])

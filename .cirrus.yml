@@ -214,7 +214,8 @@ task:
 
 task:
   name: 'ARM [unit tests, no functional tests] [bullseye]'
-  only_if: true
+  # TODO: change use to true after zlib issue is solved
+  only_if: false
   << : *GLOBAL_TASK_TEMPLATE
   arm_container:
     image: debian:bullseye

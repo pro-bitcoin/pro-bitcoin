@@ -16,4 +16,4 @@ export PACKAGES="systemtap-sdt-dev bpfcc-tools clang llvm python3-zmq qtbase5-de
 export DOCKER_NAME_TAG=ubuntu:22.04  # May not run in docker unless --enable-usdt is dropped
 export NO_DEPENDS=1
 export GOAL="install"
-export BITCOIN_CONFIG="--enable-usdt --enable-zmq --with-incompatible-bdb --with-gui=no CPPFLAGS='-DARENA_DEBUG -DDEBUG_LOCKORDER' --with-sanitizers=address,integer,undefined CC=clang CXX=clang++"
+export BITCOIN_CONFIG="--enable-usdt --enable-zmq --with-incompatible-bdb --with-gui=no CPPFLAGS='-DARENA_DEBUG -DDEBUG_LOCKORDER' --with-sanitizers=address,integer,undefined CC=clang CXX=clang++ --enable-fuzz-binary --enable-util-cli"

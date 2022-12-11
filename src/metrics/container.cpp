@@ -4,40 +4,39 @@
 
 
 namespace metrics {
-Container::Container() = default;
 
-PeerMetrics& Container::Peer()
+PeerMetrics& Container::Peer() const
 {
     assert(this->_peerMetrics);
     return *this->_peerMetrics;
 }
-NetMetrics& Container::Net()
+NetMetrics& Container::Net() const
 {
     assert(this->_netMetrics);
     return *this->_netMetrics;
 }
-TxMetrics& Container::Tx()
+TxMetrics& Container::Tx() const
 {
     assert(this->_txMetrics);
     return *this->_txMetrics;
 }
-BlockMetrics& Container::Block()
+BlockMetrics& Container::Block() const
 {
     assert(this->_blocks_metrics);
     return *this->_blocks_metrics;
 }
-MemPoolMetrics& Container::MemPool()
+MemPoolMetrics& Container::MemPool() const
 {
     assert(this->_mempool_metrics);
     return *this->_mempool_metrics;
 }
-ConfigMetrics& Container::Config()
+ConfigMetrics& Container::Config() const
 {
     assert(this->_cfg_metrics);
     return *this->_cfg_metrics;
 }
 
-RpcMetrics& Container::Rpc()
+RpcMetrics& Container::Rpc() const
 {
     assert(this->_rpc_metrics);
     return *this->_rpc_metrics;
@@ -61,19 +60,19 @@ void Container::Init(const std::string& chain, bool noop)
     _rpc_metrics = RpcMetrics::make(chain, *prom_registry, noop);
 }
 
+Container& Container::Instance()
+{
+    static Container c;
+    return c;
+}
+
 void Init(const std::string& bind, const std::string& chain, bool noop)
 {
     if (!bind.empty() && !noop) {
         exposer = std::make_shared<prometheus::Exposer>(bind);
         exposer->RegisterCollectable(prom_registry);
     }
-    Instance()->Init(chain, noop);
-}
-
-Container* Instance()
-{
-    static Container c;
-    return &c;
+    Container::Instance().Init(chain, noop);
 }
 
 prometheus::Registry& Registry()

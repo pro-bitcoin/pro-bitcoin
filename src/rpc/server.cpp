@@ -469,7 +469,7 @@ static bool ExecuteCommand(const CRPCCommand& command, const JSONRPCRequest& req
 {
     try {
         auto start = std::chrono::high_resolution_clock::now();
-        static auto& rpcMetrics = metrics::Instance()->Rpc();
+        static auto& rpcMetrics = metrics::Container::Instance().Rpc();
         RPCCommandExecution execution(request.strMethod);
         // Execute, convert arguments to array if necessary
         bool actorResult = false;

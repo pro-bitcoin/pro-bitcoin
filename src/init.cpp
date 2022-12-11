@@ -1423,7 +1423,7 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
     assert(!node.mempool);
     assert(!node.chainman);
 
-    auto& configMetrics = metrics::Instance()->Config();
+    auto& configMetrics = metrics::Container::Instance().Config();
     configMetrics.SetFlag("alertnotify", static_cast<size_t>(OptionsCategory::OPTIONS), args.GetArg("-alertnotify", "") != "");
     configMetrics.SetFlag("acceptnonstdtxn", static_cast<size_t>(OptionsCategory::NODE_RELAY), args.GetBoolArg("-acceptnonstdtxn", !chainparams.RequireStandard()));
     std::string blockfilterindex_value = args.GetArg("-blockfilterindex", DEFAULT_BLOCKFILTERINDEX);
@@ -1559,7 +1559,7 @@ bool AppInitMain(NodeContext& node, interfaces::BlockAndHeaderTipInfo* tip_info)
             return InitError(error);
         }
 
-        auto metricsInterface = std::make_shared<metrics::MetricsNotificationsInterface>(metrics::Instance()->Block(), metrics::Instance()->MemPool(), *node.chainman);
+        auto metricsInterface = std::make_shared<metrics::MetricsNotificationsInterface>(metrics::Container::Instance().Block(), metrics::Container::Instance().MemPool(), *node.chainman);
         RegisterSharedValidationInterface(metricsInterface);
 
         if (!fLoaded && !ShutdownRequested()) {

@@ -58,6 +58,8 @@
 
 #include <math.h>
 
+static const auto& metricsContainer = metrics::Container::Instance();
+
 /** Maximum number of block-relay-only anchor connections */
 static constexpr size_t MAX_BLOCK_RELAY_ONLY_ANCHORS = 2;
 static_assert (MAX_BLOCK_RELAY_ONLY_ANCHORS <= static_cast<size_t>(MAX_BLOCK_RELAY_ONLY_CONNECTIONS), "MAX_BLOCK_RELAY_ONLY_ANCHORS must not exceed MAX_BLOCK_RELAY_ONLY_CONNECTIONS.");
@@ -88,8 +90,6 @@ static constexpr std::chrono::seconds MAX_UPLOAD_TIMEFRAME{60 * 60 * 24};
 
 // A random time period (0 to 1 seconds) is added to feeler connections to prevent synchronization.
 static constexpr auto FEELER_SLEEP_WINDOW{1s};
-
-static const auto& metricsContainer = metrics::Instance();
 
 /** Used to pass flags to the Bind() function */
 enum BindFlags {
@@ -571,7 +571,7 @@ CNode* CConnman::ConnectNode(CAddress addrConnect, const char *pszDest, bool fCo
 void CNode::CloseSocketDisconnect()
 {
     fDisconnect = true;
-    metricsContainer->Net().IncConnection("close");
+    metricsContainer.Net().IncConnection("close");
     LOCK(m_sock_mutex);
     if (m_sock) {
         LogPrint(BCLog::NET, "disconnecting peer=%d\n", id);
@@ -656,7 +656,7 @@ void CNode::CopyStats(CNodeStats& stats)
 
 bool CNode::ReceiveMsgBytes(Span<const uint8_t> msg_bytes, bool& complete)
 {
-    static auto& netMetrics = metricsContainer->Net();
+    static auto& netMetrics = metricsContainer.Net();
     complete = false;
     const auto time = GetTime<std::chrono::microseconds>();
     LOCK(cs_vRecv);
@@ -954,7 +954,7 @@ void CConnman::CreateNodeFromAcceptedSocket(std::unique_ptr<Sock>&& sock,
 {
     int nInbound = 0;
     int nMaxInbound = nMaxConnections - m_max_outbound;
-    metricsContainer->Net().IncConnection("accept");
+    metricsContainer.Net().IncConnection("accept");
     AddWhitelistPermissionFlags(permission_flags, addr);
     if (NetPermissions::HasFlag(permission_flags, NetPermissionFlags::Implicit)) {
         NetPermissions::ClearFlag(permission_flags, NetPermissionFlags::Implicit);
@@ -1139,8 +1139,8 @@ void CConnman::DisconnectNodes()
 
 void CConnman::NotifyNumConnectionsChanged()
 {
-    static auto& netMetrics = metricsContainer->Net();
-    static auto& peerMetrics = metricsContainer->Peer();
+    static auto& netMetrics = metricsContainer.Net();
+    static auto& peerMetrics = metricsContainer.Peer();
     size_t nodes_size;
     {
         LOCK(m_nodes_mutex);
@@ -2107,7 +2107,7 @@ void CConnman::OpenNetworkConnection(const CAddress& addrConnect, bool fCountFai
         LOCK(m_nodes_mutex);
         m_nodes.push_back(pnode);
     }
-    metricsContainer->Net().IncConnection("open");
+    metricsContainer.Net().IncConnection("open");
 }
 
 void CConnman::ThreadMessageHandler()
@@ -2742,14 +2742,14 @@ bool CConnman::DisconnectNode(NodeId id)
 
 void CConnman::RecordBytesRecv(uint64_t bytes)
 {
-    static auto& netMetrics = metricsContainer->Net();
+    static auto& netMetrics = metricsContainer.Net();
     netMetrics.BandwidthGauge(metrics::NetDirection::RX, "total", bytes);
     nTotalBytesRecv += bytes;
 }
 
 void CConnman::RecordBytesSent(uint64_t bytes)
 {
-    static auto& netMetrics = metricsContainer->Net();
+    static auto& netMetrics = metricsContainer.Net();
     AssertLockNotHeld(m_total_bytes_sent_mutex);
     LOCK(m_total_bytes_sent_mutex);
 
@@ -2899,8 +2899,8 @@ bool CConnman::NodeFullyConnected(const CNode* pnode)
 
 void CConnman::PushMessage(CNode* pnode, CSerializedNetMsg&& msg)
 {
-    static auto& peerMetrics = metricsContainer->Peer();
-    static auto& netMetrics = metricsContainer->Net();
+    static auto& peerMetrics = metricsContainer.Peer();
+    static auto& netMetrics = metricsContainer.Net();
     AssertLockNotHeld(m_total_bytes_sent_mutex);
     size_t nMessageSize = msg.data.size();
     auto msg_sanitized = SanitizeString(msg.m_type);

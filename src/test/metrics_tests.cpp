@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(metrics_config)
 
 void check_mempool_reason(size_t reason)
 {
-    auto& mempoolMetrics = metrics::Instance()->MemPool();
+    auto& mempoolMetrics = metrics::Container::Instance().MemPool();
     mempoolMetrics.Removed(reason);
     auto v = mempoolMetrics.GetRemoved(reason);
     BOOST_CHECK(v);
@@ -71,7 +71,7 @@ BOOST_AUTO_TEST_CASE(metrics_mempool_remove)
 
 BOOST_AUTO_TEST_CASE(metrics_rpc_counters)
 {
-    auto& rpcMetrics = metrics::Instance()->Rpc();
+    auto& rpcMetrics = metrics::Container::Instance().Rpc();
     rpcMetrics.ObserveMethod("amethod", 1000);
     rpcMetrics.ObserveMethod("amethod", 2000);
     BOOST_CHECK(rpcMetrics.HasMethod("amethod"));

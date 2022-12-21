@@ -27,21 +27,25 @@ protected:
     std::atomic<bool> _init{false};
 
 public:
-    Container();
-    ~Container() {}
+    static Container& Instance();
     void Init(const std::string& chain, bool noop);
-    PeerMetrics& Peer();
-    NetMetrics& Net();
-    TxMetrics& Tx();
-    BlockMetrics& Block();
+    PeerMetrics& Peer() const;
+    NetMetrics& Net() const;
+    TxMetrics& Tx() const;
+    BlockMetrics& Block() const;
     //UtxoMetrics& Utxo();
-    MemPoolMetrics& MemPool();
-    ConfigMetrics& Config();
-    RpcMetrics& Rpc();
+    MemPoolMetrics& MemPool() const;
+    ConfigMetrics& Config() const;
+    RpcMetrics& Rpc() const;
+private:
+    Container() = default;
+    Container(const Container&) = delete;
+    Container& operator=(const Container&) = delete;
+    ~Container() {}
 };
 
 void Init(const std::string& bind, const std::string& chain, bool noop = false);
-Container* Instance();
+
 prometheus::Registry& Registry();
 } // namespace metrics
 

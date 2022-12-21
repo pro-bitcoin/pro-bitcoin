@@ -56,6 +56,8 @@ using node::fImporting;
 using node::fPruneMode;
 using node::fReindex;
 
+static const auto& metricsContainer = metrics::Container::Instance();
+
 /** How long to cache transactions in mapRelay for normal relay */
 static constexpr auto RELAY_TX_CACHE_TIME = 15min;
 /** How long a transaction has to be in the mempool before it can unconditionally be relayed (even when not in mapRelay). */
@@ -183,8 +185,6 @@ static constexpr double MAX_ADDR_RATE_PER_SECOND{0.1};
 static constexpr size_t MAX_ADDR_PROCESSING_TOKEN_BUCKET{MAX_ADDR_TO_SEND};
 /** The compactblocks version we support. See BIP 152. */
 static constexpr uint64_t CMPCTBLOCKS_VERSION{2};
-
-static const auto& metricsContainer = metrics::Instance();
 
 // Internal stuff
 namespace {
@@ -1626,11 +1626,11 @@ void PeerManagerImpl::Misbehaving(Peer& peer, int howmuch, const std::string& me
 
     if (score_now >= DISCOURAGEMENT_THRESHOLD && score_before < DISCOURAGEMENT_THRESHOLD) {
         warning = " DISCOURAGE THRESHOLD EXCEEDED";
-        metricsContainer->Peer().IncDiscourage();
+        metricsContainer.Peer().IncDiscourage();
         peer.m_should_discourage = true;
     }
 
-    metricsContainer->Peer().IncMisbehaveAmount(howmuch);
+    metricsContainer.Peer().IncMisbehaveAmount(howmuch);
     LogPrint(BCLog::NET, "Misbehaving: peer=%d (%d -> %d)%s%s\n",
              peer.m_id, score_before, score_now, warning, message_prefixed);
 }
@@ -1639,7 +1639,7 @@ bool PeerManagerImpl::MaybePunishNodeForBlock(NodeId nodeid, const BlockValidati
                                               bool via_compact_block, const std::string& message)
 {
     if (!state.IsValid()) {
-        metricsContainer->Peer().IncTxValidationResult(static_cast<int>(state.GetResult()));
+        metricsContainer.Peer().IncTxValidationResult(static_cast<int>(state.GetResult()));
     }
     PeerRef peer{GetPeerRef(nodeid)};
     switch (state.GetResult()) {
@@ -3587,7 +3587,7 @@ void PeerManagerImpl::ProcessMessage(CNode& pfrom, const std::string& msg_type, 
             LogPrint(BCLog::NET, "addrfetch connection completed peer=%d; disconnecting\n", pfrom.GetId());
             pfrom.fDisconnect = true;
         }
-        metricsContainer->Peer().Known(m_addrman.size());
+         metricsContainer.Peer().Known(m_addrman.size());
         return;
     }
 
@@ -4587,7 +4587,7 @@ void PeerManagerImpl::ProcessMessage(CNode& pfrom, const std::string& msg_type, 
                     // Matching pong received, this ping is no longer outstanding
                     bPingFinished = true;
                     const auto ping_time = ping_end - peer->m_ping_start.load();
-                    metricsContainer->Net().PingTime(ping_time.count());
+                    metricsContainer.Net().PingTime(ping_time.count());
                     if (ping_time.count() >= 0) {
                         // Let connman know about this successful ping-pong
                         pfrom.PongReceived(ping_time);
@@ -4614,7 +4614,7 @@ void PeerManagerImpl::ProcessMessage(CNode& pfrom, const std::string& msg_type, 
         }
 
         if (!(sProblem.empty())) {
-            metricsContainer->Net().IncPingProblem();
+            metricsContainer.Net().IncPingProblem();
             LogPrint(BCLog::NET, "pong peer=%d: %s, %x expected, %x received, %u bytes\n",
                 pfrom.GetId(),
                 sProblem,
@@ -4790,7 +4790,7 @@ bool PeerManagerImpl::MaybeDiscourageAndDisconnect(CNode& pnode, Peer& peer)
 bool PeerManagerImpl::ProcessMessages(CNode* pfrom, std::atomic<bool>& interruptMsgProc)
 {
     bool fMoreWork = false;
-    static auto& peerMetrics = metricsContainer->Peer();
+    static auto& peerMetrics = metricsContainer.Peer();
     PeerRef peer = GetPeerRef(pfrom->GetId());
     if (peer == nullptr) return false;
 
@@ -5778,6 +5778,6 @@ bool PeerManagerImpl::SendMessages(CNode* pto)
     MaybeSendFeefilter(*pto, *peer, current_time);
     auto end = std::chrono::high_resolution_clock::now();
     auto diff = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
-    metricsContainer->Peer().SendMessageTime(diff.count());
+    metricsContainer.Peer().SendMessageTime(diff.count());
     return true;
 }

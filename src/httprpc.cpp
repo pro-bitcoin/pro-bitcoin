@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+static const auto& metricsContainer = metrics::Container::Instance();
+
 /** WWW-Authenticate to present with 401 Unauthorized response */
 static const char* WWW_AUTH_HEADER_DATA = "Basic realm=\"jsonrpc\"";
 
@@ -146,7 +148,7 @@ static bool RPCAuthorized(const std::string& strAuth, std::string& strAuthUserna
 
 static bool HTTPReq_JSONRPC(const std::any& context, HTTPRequest* req)
 {
-    static auto& rpcMetrics = metrics::Instance()->Rpc();
+    static auto& rpcMetrics = metricsContainer.Rpc();
     // JSONRPC handles only POST
     if (req->GetRequestMethod() != HTTPRequest::POST) {
         req->WriteReply(HTTP_BAD_METHOD, "JSONRPC server handles only POST requests");

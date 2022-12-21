@@ -109,7 +109,7 @@ const std::vector<std::string> CHECKLEVEL_DOC {
  * */
 static constexpr int PRUNE_LOCK_BUFFER{10};
 
-static const auto& metricsContainer = metrics::Instance();
+static const auto& metricsContainer = metrics::Container::Instance();
 
 /**
  * Mutex to guard access to validation specific variables, such as reading
@@ -1172,7 +1172,7 @@ bool MemPoolAccept::SubmitPackage(const ATMPArgs& args, std::vector<Workspace>& 
 
 MempoolAcceptResult MemPoolAccept::AcceptSingleTransaction(const CTransactionRef& ptx, ATMPArgs& args)
 {
-    static auto& mempoolMetrics = metricsContainer->MemPool();
+    static auto& mempoolMetrics = metricsContainer.MemPool();
     AssertLockHeld(cs_main);
     LOCK(m_pool.cs); // mempool "read lock" (held through GetMainSignals().TransactionAddedToMempool())
 
@@ -1447,7 +1447,7 @@ MempoolAcceptResult AcceptToMemoryPool(Chainstate& active_chainstate, const CTra
     auto end = std::chrono::high_resolution_clock::now();
     auto diff = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
     if (result.m_result_type == MempoolAcceptResult::ResultType::VALID) {
-        metricsContainer->MemPool().AcceptTime(diff.count());
+        metricsContainer.MemPool().AcceptTime(diff.count());
     }
     return result;
 }
@@ -1567,7 +1567,7 @@ bool Chainstate::IsInitialBlockDownload() const
     if (m_chain.Tip()->GetBlockTime() < (GetTime() - nMaxTipAge))
         return true;
     LogPrintf("Leaving InitialBlockDownload (latching to false)\n");
-    metricsContainer->Config().SetIBD(false);
+    metricsContainer.Config().SetIBD(false);
     m_cached_finished_ibd.store(true, std::memory_order_relaxed);
     return false;
 }
@@ -2001,7 +2001,7 @@ bool Chainstate::ConnectBlock(const CBlock& block, BlockValidationState& state, 
     assert(*pindex->phashBlock == block_hash);
 
     int64_t nTimeStart = GetTimeMicros();
-    static auto& blockMetrics = metricsContainer->Block();
+    static auto& blockMetrics = metricsContainer.Block();
     // Check it again in case a previous version let a bad block in
     // NOTE: We don't currently (re-)invoke ContextualCheckBlock() or
     // ContextualCheckBlockHeader() here. This means that if we add a new
@@ -2724,7 +2724,7 @@ bool Chainstate::ConnectTip(BlockValidationState& state, CBlockIndex* pindexNew,
 {
     AssertLockHeld(cs_main);
     if (m_mempool) AssertLockHeld(m_mempool->cs);
-    static auto& blockMetrics = metricsContainer->Block();
+    static auto& blockMetrics = metricsContainer.Block();
     assert(pindexNew->pprev == m_chain.Tip());
     // Read block from disk.
     int64_t nTime1 = GetTimeMicros();

@@ -1,0 +1,6 @@
+Dockerfile
+ci/
+releases/
+mkdocs/
+depends/
+venv/

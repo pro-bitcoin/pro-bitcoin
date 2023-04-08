@@ -1,4 +1,6 @@
 ---
+hide:
+  - toc
 title: Configuration
 description: TBD
 ---
@@ -8,10 +10,6 @@ description: TBD
 Bitcoin configuration is rather complex and long. Below you will find almost all configuration as defined in [bitcoind -help](https://man.archlinux.org/man/community/bitcoin-daemon/bitcoind.1.en)
 
 ---
-
-## Dynamic Configuration
-
- `// TODO`
 
 ## Categories
 
@@ -55,3 +53,6 @@ include-markdown "../../snippets/MetricsConfig.md"
 
 See [config](https://grafana.pro-bitcoin.io/d/V9BHdTN7z/configuration?orgId=1) dashboard for complete visual
 
+## Dynamic Configuration
+
+ `// TODO`
